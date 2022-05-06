@@ -28,4 +28,16 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<?> userAlreadyExistsExceptionHandler(UserAlreadyExistsException ex, WebRequest r) {
+        String uri = ((ServletWebRequest)r).getRequest().getRequestURI().toString();
+        ErrorResponse errorResponse = new ErrorResponse(new Date(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                HttpStatus.INTERNAL_SERVER_ERROR.name(),
+                ex.getMessage(),
+                uri );
+
+        return new ResponseEntity(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 }
