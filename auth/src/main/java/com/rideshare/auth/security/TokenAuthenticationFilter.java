@@ -32,7 +32,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         try {
             String jwt = getJwtFromRequest(request);
 
-            if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
+            if (StringUtils.hasText(jwt)) {
+                tokenProvider.validateToken(jwt);
                 String userId = tokenProvider.getUserIdFromToken(jwt);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
                 logger.debug("User Details: " + userDetails);
@@ -44,6 +45,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             }
         } catch (Exception ex) {
             logger.error("Could not set user authentication in security context", ex);
+            throw new IOException("Could not set user authentication in security context");
         }
 
         filterChain.doFilter(request, response);

@@ -15,12 +15,12 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(
-        prePostEnabled = true
+        prePostEnabled = true,
+        securedEnabled = true
 )
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
@@ -56,11 +56,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/users/**")
+                .antMatchers("/users/**", "/swagger-ui.html", "/swagger-resources/**", "/webjars/**", "/v2/api-docs")
                 .permitAll()
                 .anyRequest()
                 .authenticated();
 
-        http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+//        http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 }

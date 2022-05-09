@@ -29,7 +29,7 @@ public class TokenProvider {
                 .collect(Collectors.joining(","));
 
         return Jwts.builder()
-                .setSubject(userPrincipal.getUsername())
+                .setSubject(userPrincipal.getId())
                 .setIssuedAt(new Date())
                 .claim("roles", authorities)
                 .setExpiration(expiryDate)
@@ -46,21 +46,7 @@ public class TokenProvider {
         return claims.getSubject();
     }
 
-    public boolean validateToken(String authToken) {
-        try {
-            Jwts.parser().setSigningKey(tokenSecret).parseClaimsJws(authToken);
-            return true;
-        } catch (SignatureException ex) {
-            logger.error("Invalid JWT signature");
-        } catch (MalformedJwtException ex) {
-            logger.error("Invalid JWT token");
-        } catch (ExpiredJwtException ex) {
-            logger.error("Expired JWT token");
-        } catch (UnsupportedJwtException ex) {
-            logger.error("Unsupported JWT token");
-        } catch (IllegalArgumentException ex) {
-            logger.error("JWT claims string is empty.");
-        }
-        return false;
+    public void validateToken(String authToken) throws Exception {
+        Jwts.parser().setSigningKey(tokenSecret).parseClaimsJws(authToken);
     }
 }
