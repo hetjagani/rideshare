@@ -64,12 +64,10 @@ public class UserController {
                 final String token = tokenProvider.createToken(auth);
 
                 return ResponseEntity.ok(new AuthResponse(token));
-            } catch(AuthenticationException ae) {
-                ae.printStackTrace();
             } catch (Exception e) {
                 e.printStackTrace();
+                throw e;
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -6,18 +6,9 @@ import com.rideshare.auth.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.SqlParameterValue;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.Type;
-import java.sql.PreparedStatement;
-import java.sql.Types;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class UserService implements IUserService{
@@ -57,7 +48,7 @@ public class UserService implements IUserService{
         for (String role:
              user.getRoles()) {
            String createRoleSQL = "INSERT INTO \"auth\".\"role\"(user_id, role) VALUES(?,?);";
-           jdbcTemplate.update(createRoleSQL, id, role);
+           jdbcTemplate.update(createRoleSQL, id, role.toUpperCase());
         }
 
         return getUserById(id);
