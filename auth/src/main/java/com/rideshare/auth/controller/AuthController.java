@@ -9,18 +9,14 @@ import com.rideshare.auth.webentity.AuthResponse;
 import com.rideshare.auth.webentity.LoginInfo;
 import com.rideshare.auth.webentity.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -32,8 +28,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping(path = "/users")
-public class UserController {
+@RequestMapping(path = "/users/auth")
+public class AuthController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
