@@ -28,7 +28,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping(path = "/users/auth")
+@RequestMapping(path = "/auth")
 public class AuthController {
 
     @Autowired
@@ -45,7 +45,7 @@ public class AuthController {
 
     private Set<String> validRoles = new HashSet<String>(Arrays.asList("DRIVER", "RIDER", "ADMIN"));
 
-    @GetMapping(path = "/list")
+    @GetMapping(path = "/users")
     public ResponseEntity<List<com.rideshare.auth.model.User>> getAllUsers(@RequestParam(required = false) Integer page, @RequestParam(required = false) Integer limit) {
         try {
             return ResponseEntity.ok(userService.getAllUsers(page, limit));

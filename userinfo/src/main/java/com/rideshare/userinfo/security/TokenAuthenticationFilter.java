@@ -49,7 +49,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             if (StringUtils.hasText(jwt)) {
                 // validate token by calling validate endpoint on auth service
                 // create UserPrincipal object from the details and set user details auth
-                String requestURL = authURL + "/users/auth/validate" + "?token={token}";
+                String requestURL = authURL + "/auth/validate" + "?token={token}";
                 Map<String, String> queryParams = new HashMap<>();
                 queryParams.put("token", jwt);
 

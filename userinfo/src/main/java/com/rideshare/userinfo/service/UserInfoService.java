@@ -44,7 +44,7 @@ public class UserInfoService implements DAOInterface<UserInfo> {
 
     public List<UserInfo> getAllPaginated(String token, Integer page, Integer limit) throws Exception {
         // get list of users from auth service with pagination params
-        String requestURL = authURL + "/users/auth/list" + "?page={page}&limit={limit}";
+        String requestURL = authURL + "/auth/users" + "?page={page}&limit={limit}";
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put("page", page);
         queryParams.put("limit", limit);
