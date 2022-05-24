@@ -3,6 +3,7 @@ package com.rideshare.auth.service;
 import com.rideshare.auth.mapper.RoleMapper;
 import com.rideshare.auth.mapper.UserMapper;
 import com.rideshare.auth.model.User;
+import com.rideshare.auth.util.Pagination;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,6 +16,15 @@ public class UserService implements IUserService{
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Override
+    public List<User> getAllUsers(Integer page, Integer limit) throws DataAccessException {
+        int offset = Pagination.getOffset(page, limit);
+        String sql = "SELECT * FROM \"auth\".\"user\" LIMIT ? OFFSET ?;";
+        List<User> userList = jdbcTemplate.query(sql, new UserMapper(), new Object[]{limit, offset});
+
+        return userList;
+    }
 
     @Override
     public User getUserById(Integer id) throws DataAccessException {
@@ -32,12 +42,6 @@ public class UserService implements IUserService{
         List<String> roles = getRoles(user.getId());
         user.setRoles(roles);
         return user;
-    }
-
-    @Override
-    public List<User> getAllUsers(Integer id) throws DataAccessException {
-        String sql = "SELECT * FROM \"user\";";
-        return jdbcTemplate.query(sql, new UserMapper());
     }
 
     @Override

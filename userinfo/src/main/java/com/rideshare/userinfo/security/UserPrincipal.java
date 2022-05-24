@@ -14,8 +14,8 @@ public class UserPrincipal implements UserDetails {
     private String id;
     private String email;
     private String password;
-
     private Boolean isVerified;
+    private String phoneNo;
 
     private Collection<? extends GrantedAuthority> authorities;
     private Map<String, Object> attributes;
@@ -98,6 +98,14 @@ public class UserPrincipal implements UserDetails {
 
     public String getName() {
         return String.valueOf(id);
+    }
+
+    public String getPhoneNo() {
+        return phoneNo;
+    }
+
+    public void setPhoneNo(String phoneNo) {
+        this.phoneNo = phoneNo;
     }
 
     @Override

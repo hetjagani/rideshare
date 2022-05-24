@@ -49,7 +49,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             if (StringUtils.hasText(jwt)) {
                 // validate token by calling validate endpoint on auth service
                 // create UserPrincipal object from the details and set user details auth
-                String requestURL = authURL + "/users/validate" + "?token={token}";
+                String requestURL = authURL + "/users/auth/validate" + "?token={token}";
                 Map<String, String> queryParams = new HashMap<>();
                 queryParams.put("token", jwt);
 
@@ -60,6 +60,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                 List<GrantedAuthority> authorities = respUser.getRoles().stream().map((r)->new SimpleGrantedAuthority(r)).collect(Collectors.toList());
 
                 UserPrincipal userDetails = new UserPrincipal(String.valueOf(respUser.getId()), respUser.getEmail(), null, respUser.getVerified(), authorities);
+                userDetails.setPhoneNo(respUser.getPhoneNo());
 
                 logger.debug("Setting Authentication for: " + userDetails);
 

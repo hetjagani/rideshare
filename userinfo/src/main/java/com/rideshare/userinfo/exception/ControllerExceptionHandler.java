@@ -27,4 +27,16 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
         return new ResponseEntity(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<?> forbiddenExceptionHandler(ForbiddenException ex, WebRequest r) {
+        String uri = ((ServletWebRequest)r).getRequest().getRequestURI().toString();
+        ErrorResponse errorResponse = new ErrorResponse(new Date(),
+                HttpStatus.FORBIDDEN.value(),
+                HttpStatus.FORBIDDEN.name(),
+                ex.getMessage(),
+                uri );
+
+        return new ResponseEntity(errorResponse, HttpStatus.FORBIDDEN);
+    }
 }

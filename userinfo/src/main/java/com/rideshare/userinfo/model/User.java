@@ -88,4 +88,16 @@ public class User {
     public void setRoles(List<String> roles) {
         this.roles = roles;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", phoneNo='" + phoneNo + '\'' +
+                ", isVerified=" + isVerified +
+                ", roles=" + roles +
+                '}';
+    }
 }

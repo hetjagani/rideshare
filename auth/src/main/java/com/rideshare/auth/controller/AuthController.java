@@ -45,6 +45,16 @@ public class AuthController {
 
     private Set<String> validRoles = new HashSet<String>(Arrays.asList("DRIVER", "RIDER", "ADMIN"));
 
+    @GetMapping(path = "/list")
+    public ResponseEntity<List<com.rideshare.auth.model.User>> getAllUsers(@RequestParam(required = false) Integer page, @RequestParam(required = false) Integer limit) {
+        try {
+            return ResponseEntity.ok(userService.getAllUsers(page, limit));
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
     @PostMapping(path = "/signup")
     public ResponseEntity<AuthResponse> signUpUser(@RequestBody User user) throws BadRequestException {
         try {
