@@ -9,8 +9,7 @@
 ### APIs
 * `GET /users` - Get list of users
 * `GET /users/{id}` - Get userinfo by id
-* `POST /users` - Add userinfo
-* `PUT /users/{id}` - Update userinfo
+* `PUT /users` - Save userinfo
 * `DELETE /users/{id}` - Delete userinfo
 
 * `GET /users/{userId}/places` - Get all saved places for user

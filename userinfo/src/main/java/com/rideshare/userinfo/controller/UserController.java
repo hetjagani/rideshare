@@ -4,17 +4,23 @@ import com.rideshare.userinfo.exception.ForbiddenException;
 import com.rideshare.userinfo.model.UserInfo;
 import com.rideshare.userinfo.security.UserPrincipal;
 import com.rideshare.userinfo.service.UserInfoService;
+import io.swagger.annotations.ApiParam;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,12 +34,11 @@ public class UserController {
     @Autowired
     private RestTemplate restTemplate;
 
-    private Logger logger = LogManager.getLogger(UserController.class);
+    private final Logger logger = LogManager.getLogger(UserController.class);
 
     @GetMapping
     public ResponseEntity<List<UserInfo>> getAllUsers(@RequestHeader HttpHeaders headers, @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer limit) throws Exception {
         try {
-            logger.debug(headers.get("Authorization"));
             String token = headers.get("Authorization").get(0);
 
             List<UserInfo> userInfoList = userInfoService.getAllPaginated(token, page, limit);
@@ -46,9 +51,8 @@ public class UserController {
     }
 
     @GetMapping(path = "/me")
-    public ResponseEntity<UserInfo> getSelfUserInfo(Authentication auth) throws Exception {
+    public ResponseEntity<UserInfo> getSelfUserInfo(@AuthenticationPrincipal UserPrincipal userDetails) throws Exception {
         try {
-            UserPrincipal userDetails = (UserPrincipal) auth.getPrincipal();
             Integer userID = Integer.parseInt(userDetails.getId());
 
             UserInfo userInfo = userInfoService.getById(userID);
@@ -64,26 +68,33 @@ public class UserController {
         }
     }
 
-    @PostMapping
-    public ResponseEntity<UserInfo> createUserInfo(@RequestBody @Valid com.rideshare.userinfo.webentity.UserInfo userInfo, Authentication auth) throws Exception {
+    @PutMapping
+    public ResponseEntity<UserInfo> saveUserInfo(@RequestBody @Valid com.rideshare.userinfo.webentity.UserInfo userInfo, @AuthenticationPrincipal UserPrincipal userDetails) throws Exception {
+        // prepare object to store in db
+        UserInfo toSaveUserInfo = new UserInfo();
+        toSaveUserInfo.setId(userInfo.getId());
+        toSaveUserInfo.setEmail(userDetails.getEmail());
+        toSaveUserInfo.setPhoneNo(userDetails.getPhoneNo());
+        toSaveUserInfo.setVerified(userDetails.isEnabled());
+        toSaveUserInfo.setRoles(userDetails.getAuthorities().stream().map((e)->e.toString()).collect(Collectors.toList()));
+        toSaveUserInfo.setFirstName(userInfo.getFirstName());
+        toSaveUserInfo.setLastName(userInfo.getLastName());
+        toSaveUserInfo.setProfileImage(userInfo.getProfileImage());
         try {
-            UserPrincipal userDetails = (UserPrincipal) auth.getPrincipal();
             // check if logged in user is same as provided user
             if(Integer.parseInt(userDetails.getId()) != userInfo.getId()) {
                 throw new ForbiddenException("cannot add userinfo of other user then self");
             }
-            // if user exist then save user info in the db
-            UserInfo toCreateUserInfo = new UserInfo();
-            toCreateUserInfo.setId(userInfo.getId());
-            toCreateUserInfo.setEmail(userDetails.getEmail());
-            toCreateUserInfo.setPhoneNo(userDetails.getPhoneNo());
-            toCreateUserInfo.setVerified(userDetails.isEnabled());
-            toCreateUserInfo.setRoles(userDetails.getAuthorities().stream().map((e)->e.toString()).collect(Collectors.toList()));
-            toCreateUserInfo.setFirstName(userInfo.getFirstName());
-            toCreateUserInfo.setLastName(userInfo.getLastName());
-            toCreateUserInfo.setProfileImage(userInfo.getProfileImage());
 
-            UserInfo result = userInfoService.create(toCreateUserInfo);
+            UserInfo presentUser = userInfoService.getById(Integer.parseInt(userDetails.getId()));
+            UserInfo result = null;
+            if(presentUser != null) {
+                result = userInfoService.update(toSaveUserInfo);
+            }
+
+            return ResponseEntity.ok(result);
+        } catch (EmptyResultDataAccessException emptyEx) {
+            UserInfo result = userInfoService.create(toSaveUserInfo);
 
             return ResponseEntity.ok(result);
         } catch (Exception e) {

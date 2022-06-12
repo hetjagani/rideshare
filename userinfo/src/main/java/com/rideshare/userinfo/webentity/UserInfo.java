@@ -6,7 +6,9 @@ import javax.validation.constraints.NotNull;
 public class UserInfo {
     @NotNull
     private Integer id;
+    @NotBlank
     private String firstName;
+    @NotBlank
     private String lastName;
     private String profileImage;
 

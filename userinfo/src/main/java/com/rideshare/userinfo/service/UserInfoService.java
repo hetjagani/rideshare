@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @Service
 public class UserInfoService implements DAOInterface<UserInfo> {
 
-    private Logger logger = LogManager.getLogger(UserInfoService.class);
+    private final Logger logger = LogManager.getLogger(UserInfoService.class);
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -38,6 +38,7 @@ public class UserInfoService implements DAOInterface<UserInfo> {
     private String authURL;
 
     @Override
+    @Deprecated
     public List<UserInfo> getAll() throws Exception {
         return null;
     }
@@ -103,7 +104,10 @@ public class UserInfoService implements DAOInterface<UserInfo> {
 
     @Override
     public UserInfo update(UserInfo object) throws Exception {
-        return null;
+        // update user info object in the database and return the original object with all info
+        String updateSQL = "UPDATE \"userinfo\".\"userinfo\" SET first_name=?, last_name=?, profile_image=? WHERE id=?";
+        jdbcTemplate.update(updateSQL, object.getFirstName(), object.getLastName(), object.getProfileImage(), object.getId());
+        return object;
     }
 
     @Override
