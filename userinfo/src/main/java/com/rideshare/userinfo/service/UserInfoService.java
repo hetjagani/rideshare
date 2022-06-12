@@ -3,6 +3,7 @@ package com.rideshare.userinfo.service;
 import com.rideshare.userinfo.mapper.UserInfoMapper;
 import com.rideshare.userinfo.model.User;
 import com.rideshare.userinfo.model.UserInfo;
+import com.rideshare.userinfo.webentity.PaginatedEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +13,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -24,7 +23,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class UserInfoService implements DAOInterface<UserInfo> {
+public class UserInfoService implements IUserInfoService {
 
     private final Logger logger = LogManager.getLogger(UserInfoService.class);
 
@@ -38,12 +37,7 @@ public class UserInfoService implements DAOInterface<UserInfo> {
     private String authURL;
 
     @Override
-    @Deprecated
-    public List<UserInfo> getAll() throws Exception {
-        return null;
-    }
-
-    public List<UserInfo> getAllPaginated(String token, Integer page, Integer limit) throws Exception {
+    public PaginatedEntity<UserInfo> getAllPaginated(String token, Integer page, Integer limit) throws Exception {
         // get list of users from auth service with pagination params
         String requestURL = authURL + "/auth/users" + "?page={page}&limit={limit}";
         Map<String, Object> queryParams = new HashMap<>();
@@ -79,7 +73,7 @@ public class UserInfoService implements DAOInterface<UserInfo> {
             return u;
         }).collect(Collectors.toList());
 
-        return result;
+        return new PaginatedEntity<UserInfo>(result, page != null ? page : 0, limit);
     }
 
     @Override
@@ -87,11 +81,6 @@ public class UserInfoService implements DAOInterface<UserInfo> {
         String sql = "SELECT * FROM \"userinfo\".\"userinfo\" WHERE id = ?;";
 
         return jdbcTemplate.queryForObject(sql, new UserInfoMapper(), id);
-    }
-
-    @Override
-    public List<UserInfo> getAllPaginated(Integer page, Integer limit) throws Exception {
-        return null;
     }
 
     @Override

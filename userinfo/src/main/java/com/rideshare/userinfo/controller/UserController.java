@@ -3,33 +3,27 @@ package com.rideshare.userinfo.controller;
 import com.rideshare.userinfo.exception.ForbiddenException;
 import com.rideshare.userinfo.model.UserInfo;
 import com.rideshare.userinfo.security.UserPrincipal;
-import com.rideshare.userinfo.service.UserInfoService;
-import io.swagger.annotations.ApiParam;
+import com.rideshare.userinfo.service.IUserInfoService;
+import com.rideshare.userinfo.webentity.PaginatedEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PostAuthorize;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import java.util.List;
 import java.util.stream.Collectors;
 
-@Controller
+@RestController
 @RequestMapping(path = "/users")
 public class UserController {
 
     @Autowired
-    private UserInfoService userInfoService;
+    private IUserInfoService userInfoService;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -37,11 +31,11 @@ public class UserController {
     private final Logger logger = LogManager.getLogger(UserController.class);
 
     @GetMapping
-    public ResponseEntity<List<UserInfo>> getAllUsers(@RequestHeader HttpHeaders headers, @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer limit) throws Exception {
+    public ResponseEntity<PaginatedEntity<UserInfo>> getAllUsers(@RequestHeader HttpHeaders headers, @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer limit) throws Exception {
         try {
             String token = headers.get("Authorization").get(0);
 
-            List<UserInfo> userInfoList = userInfoService.getAllPaginated(token, page, limit);
+            PaginatedEntity<UserInfo> userInfoList = userInfoService.getAllPaginated(token, page, limit);
 
             return ResponseEntity.ok(userInfoList);
         } catch (Exception e) {

@@ -43,7 +43,7 @@ public class SpringFoxConfig {
                 .securityContexts(Arrays.asList(securityContext()))
                 .securitySchemes(Arrays.asList(apiKey()))
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.rideshare.userinfo"))
+                .apis(RequestHandlerSelectors.basePackage("com.rideshare.userinfo.controller"))
                 .paths(PathSelectors.any())
                 .build();
     }
