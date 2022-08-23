@@ -22,15 +22,20 @@ public class PlacesService implements IPlacesService {
     @Override
     public PaginatedEntity<Place> getAllPaginated(Integer userId, Integer page, Integer limit) throws Exception {
         Integer offset = Pagination.getOffset(page,limit);
-        String query = "SELECT * FROM \"userinfo\".\"places\" LIMIT ? OFFSET ?";
-        List<Place> placeList = jdbcTemplate.query(query, new PlacesMapper(), limit, offset);
+        String query = "SELECT * FROM \"userinfo\".\"places\" WHERE user_id = ? LIMIT ? OFFSET ?";
+        List<Place> placeList = jdbcTemplate.query(query, new PlacesMapper(), userId, limit, offset);
         return new PaginatedEntity<Place>(placeList, page, limit);
     }
 
     @Override
     public Place getById(Integer userId, Integer id) throws Exception {
         String query = "SELECT * FROM \"userinfo\".\"places\" WHERE id = ? AND user_id = ?";
-        return jdbcTemplate.queryForObject(query, new PlacesMapper(), id, userId);
+        Place place = jdbcTemplate.queryForObject(query, new PlacesMapper(), id, userId);
+
+        UserInfo user = userInfoService.getById(userId);
+        place.setUser(user);
+
+        return place;
     }
 
     @Override
@@ -48,11 +53,25 @@ public class PlacesService implements IPlacesService {
 
     @Override
     public Place update(Integer userId, Integer placeId, Place object) throws Exception {
-        return null;
+        String query = "UPDATE \"userinfo\".\"places\"\n" +
+                "SET name=?, first_line=?, second_line=?, city=?, state=?, country=?, zipcode=?\n" +
+                "WHERE id=? AND user_id=?;";
+        jdbcTemplate.update(query, object.getName(), object.getFirstLine(), object.getSecondLine(), object.getCity(), object.getState(), object.getCountry(), object.getZipcode(), placeId, userId);
+
+        Place updatedPlace = getById(userId, placeId);
+
+        UserInfo user = userInfoService.getById(userId);
+        updatedPlace.setUser(user);
+
+        return updatedPlace;
     }
 
     @Override
-    public boolean delete(Integer id) throws Exception {
-        return false;
+    public boolean delete(Integer userId, Integer placeId) throws Exception {
+        String query = "DELETE FROM userinfo.places\n" +
+                "\tWHERE id=? AND user_id=?;";
+
+        jdbcTemplate.update(query, placeId, userId);
+        return true;
     }
 }

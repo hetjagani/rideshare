@@ -4,6 +4,7 @@ import com.rideshare.userinfo.model.Place;
 import com.rideshare.userinfo.model.User;
 import com.rideshare.userinfo.security.UserPrincipal;
 import com.rideshare.userinfo.service.IPlacesService;
+import com.rideshare.userinfo.webentity.DeleteSuccess;
 import com.rideshare.userinfo.webentity.PaginatedEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,18 @@ public class PlaceController {
        }
     }
 
+    @GetMapping(path = "/{placeId}")
+    public ResponseEntity<Place> getPlaceById(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Integer placeId) throws Exception {
+        try {
+            Integer userId = Integer.parseInt(userPrincipal.getId());
+
+            return ResponseEntity.ok(placesService.getById(userId, placeId));
+        } catch (Exception e) {
+           e.printStackTrace();
+           throw e;
+        }
+    }
+
     @PostMapping
     public ResponseEntity<Place> createPlace(@AuthenticationPrincipal UserPrincipal userDetails, @RequestBody com.rideshare.userinfo.webentity.Place place) throws Exception {
         try {
@@ -49,6 +62,44 @@ public class PlaceController {
             Place createdPlace = placesService.create(toCreatePlace);
 
             return ResponseEntity.ok(createdPlace);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    @PutMapping(path = "/{placeId}")
+    public ResponseEntity<Place> updatePlace(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody com.rideshare.userinfo.webentity.Place place, @PathVariable Integer placeId) throws Exception {
+        try {
+            Integer userId = Integer.parseInt(userPrincipal.getId());
+            Place dbPlace = placesService.getById(userId, placeId);
+
+            dbPlace.setName(place.getName());
+            dbPlace.setFirstLine(place.getFirstLine());
+            dbPlace.setSecondLine(place.getSecondLine());
+            dbPlace.setCity(place.getCity());
+            dbPlace.setState(place.getState());
+            dbPlace.setCountry(place.getCountry());
+            dbPlace.setZipcode(place.getZipcode());
+
+            Place updatedPlace = placesService.update(userId, dbPlace.getId(), dbPlace);
+
+            return ResponseEntity.ok(updatedPlace);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    @DeleteMapping(path = "/{placeId}")
+    public ResponseEntity<DeleteSuccess> deletePlace(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Integer placeId) throws Exception {
+        try {
+            Integer userId = Integer.parseInt(userPrincipal.getId());
+
+            if(placesService.delete(userId, placeId)) {
+                return ResponseEntity.ok(new DeleteSuccess(true));
+            }
+            return ResponseEntity.ok(new DeleteSuccess(false));
         } catch (Exception e) {
             e.printStackTrace();
             throw e;

@@ -8,5 +8,5 @@ public interface IPlacesService {
     Place getById(Integer userId, Integer id) throws Exception;
     Place create(Place object) throws Exception;
     Place update(Integer userId, Integer placeId, Place object) throws Exception;
-    boolean delete(Integer id) throws Exception;
+    boolean delete(Integer userId, Integer placeId) throws Exception;
 }
