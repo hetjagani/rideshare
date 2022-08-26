@@ -1,7 +1,7 @@
-package com.rideshare.userinfo.security;
+package com.rideshare.ride.security;
 
-import com.rideshare.userinfo.exception.AuthenticationFailException;
-import com.rideshare.userinfo.model.User;
+import com.rideshare.ride.exception.AuthenticationFailException;
+import com.rideshare.ride.model.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
