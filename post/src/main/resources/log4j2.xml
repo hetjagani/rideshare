@@ -11,7 +11,7 @@
         </Console>
     </Appenders>
     <Loggers>
-        <Logger name="com.rideshare.ride" level="debug" additivity="false">
+        <Logger name="com.rideshare.post" level="debug" additivity="false">
             <AppenderRef ref="ConsoleAppender" />
         </Logger>
 
