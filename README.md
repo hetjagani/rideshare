@@ -28,6 +28,10 @@
 * Order creating for rides
 * Sending money to driver and company's share
 * User's payment information
+### Chat Service (JAVA)
+* Chat backend code
+* Save messages for chat between users
+* Manages Web socket connections for chat
 ### Analytics Service (JAVA)
 * Gather analytics information from all services
 * APIs to access analytics for driver/rider/admin
