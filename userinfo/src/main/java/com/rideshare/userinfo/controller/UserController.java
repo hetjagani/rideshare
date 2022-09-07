@@ -99,7 +99,7 @@ public class UserController {
     }
 
     @GetMapping(path = "/{userID}")
-    public ResponseEntity<UserInfo> getUserInfoById(@AuthenticationPrincipal UserPrincipal userDetails, @PathVariable Integer userID) throws Exception {
+    public ResponseEntity<UserInfo> getUserInfoById(@PathVariable Integer userID) throws Exception {
         try {
             UserInfo userInfo = userInfoService.getById(userID);
             return ResponseEntity.ok(userInfo);

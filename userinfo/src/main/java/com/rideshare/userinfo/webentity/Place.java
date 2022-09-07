@@ -1,8 +1,7 @@
 package com.rideshare.userinfo.webentity;
 
 
-public class
-Place {
+public class Place {
     private String name;
     private String firstLine;
     private String secondLine;
