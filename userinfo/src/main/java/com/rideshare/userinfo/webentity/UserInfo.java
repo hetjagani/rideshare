@@ -21,6 +21,12 @@ public class UserInfo {
         this.profileImage = profileImage;
     }
 
+    public UserInfo(String firstName, String lastName, String profileImage) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.profileImage = profileImage;
+    }
+
     public Integer getId() {
         return id;
     }

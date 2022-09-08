@@ -1,6 +1,7 @@
 package com.rideshare.userinfo.controller;
 
 import com.rideshare.userinfo.exception.ForbiddenException;
+import com.rideshare.userinfo.model.Place;
 import com.rideshare.userinfo.model.UserInfo;
 import com.rideshare.userinfo.security.UserPrincipal;
 import com.rideshare.userinfo.service.IUserInfoService;
@@ -97,4 +98,14 @@ public class UserController {
         }
     }
 
+    @GetMapping(path = "/{userID}")
+    public ResponseEntity<UserInfo> getUserInfoById(@PathVariable Integer userID) throws Exception {
+        try {
+            UserInfo userInfo = userInfoService.getById(userID);
+            return ResponseEntity.ok(userInfo);
+        }catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
 }
