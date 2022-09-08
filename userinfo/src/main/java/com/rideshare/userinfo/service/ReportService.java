@@ -75,9 +75,10 @@ public class ReportService implements DAOInterface<DetailedReport>{
 
     @Override
     public DetailedReport create(DetailedReport object) throws Exception {
+
         // create report info object in the database and return the original object with all info
-        String createReportSQL = "INSERT INTO \"userinfo\".\"report\"(user_id, reported_id, title, category, description) VALUES(?, ?,?,?,?)";
-        Integer id = jdbcTemplate.update(createReportSQL, object.getUserInfo().getId(), object.getReportedUserInfo().getId(), object.getTitle(), object.getCategory(), object.getDescription());
+        String createReportSQL = "INSERT INTO \"userinfo\".\"report\"(user_id, reported_id, title, category, description) VALUES(?, ?,?,?,?) RETURNING id";
+        Integer id = jdbcTemplate.queryForObject(createReportSQL, Integer.class, object.getUserInfo().getId(), object.getReportedUserInfo().getId(), object.getTitle(), object.getCategory(), object.getDescription());
         return getById(id);
     }
 
@@ -90,8 +91,9 @@ public class ReportService implements DAOInterface<DetailedReport>{
                 "title = ?, " +
                 "category = ?, " +
                 "description = ? " +
-                "WHERE id = ?";
-        Integer id = jdbcTemplate.update(createReportSQL, object.getUserInfo().getId(), object.getReportedUserInfo().getId(), object.getTitle(), object.getCategory(), object.getDescription(), object.getReportId());
+                "WHERE id = ? " +
+                "RETURNING id";
+        Integer id = jdbcTemplate.queryForObject(createReportSQL, Integer.class, object.getUserInfo().getId(), object.getReportedUserInfo().getId(), object.getTitle(), object.getCategory(), object.getDescription(), object.getReportId());
         return getById(id);
     }
 
