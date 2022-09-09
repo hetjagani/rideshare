@@ -15,7 +15,7 @@ public class RideController {
     @GetMapping(path = "/{userId}")
     public ResponseEntity getRidesForUser(@PathVariable String userId) {
 
-        return ResponseEntity.ok("Getting Rides for userId: "+userId);
+        return ResponseEntity.ok("Getting fake Rides for userId: "+userId);
 
     }
 
