@@ -1,6 +1,8 @@
 package com.rideshare.userinfo.controller;
 
+import com.rideshare.userinfo.exception.ForbiddenException;
 import com.rideshare.userinfo.exception.UserDoesNotExistException;
+import com.rideshare.userinfo.security.UserPrincipal;
 import com.rideshare.userinfo.service.DAOInterface;
 import com.rideshare.userinfo.webentity.DetailedReport;
 import com.rideshare.userinfo.webentity.ReportInfo;
@@ -10,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import java.util.List;
@@ -77,8 +80,12 @@ public class ReportController {
     }
 
     @PutMapping(path = "/{reportID}")
-    public ResponseEntity<DetailedReport> updateReportInfoById(@PathVariable Integer reportID, @PathVariable Integer userID, @RequestBody ReportInfo reportInfo) throws Exception {
+    public ResponseEntity<DetailedReport> updateReportInfoById(@AuthenticationPrincipal UserPrincipal userDetails, @PathVariable Integer reportID, @PathVariable Integer userID, @RequestBody ReportInfo reportInfo) throws Exception {
         try {
+            // check if logged in user is same as user updating report
+            if(Integer.parseInt(userDetails.getId()) != userID) {
+                throw new ForbiddenException("cannot update report for other user");
+            }
             com.rideshare.userinfo.webentity.DetailedReport detailedReport =
                     new com.rideshare.userinfo.webentity.DetailedReport(
                             new com.rideshare.userinfo.webentity.UserInfo(userID, "", "", ""),
@@ -89,8 +96,8 @@ public class ReportController {
                     );
             detailedReport.setReportId(reportID);
             try {
-                com.rideshare.userinfo.webentity.DetailedReport createdReport = (DetailedReport) reportsService.update(detailedReport);
-                return ResponseEntity.ok(createdReport);
+                com.rideshare.userinfo.webentity.DetailedReport updatedReport = (DetailedReport) reportsService.update(detailedReport);
+                return ResponseEntity.ok(updatedReport);
             }catch (org.springframework.dao.DataIntegrityViolationException e){
                 e.printStackTrace();
                 throw new UserDoesNotExistException("Reported ID Does not exists!");
