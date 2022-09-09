@@ -33,6 +33,7 @@ public class AddressService implements IAddressService {
     @Override
     public PaginatedEntity<Address> searchAddress(String query, Integer page, Integer limit) throws Exception {
         Integer offset = Pagination.getOffset(page, limit);
+        if (query == null) query = "";
         query = "%" + query + "%";
         List<Address> searchedAddresses = jdbcTemplate.query(searchQuery, new AddressMapper(), query, query, query, query, query, query, limit, offset);
         return new PaginatedEntity<>(searchedAddresses, page, limit);
@@ -47,7 +48,7 @@ public class AddressService implements IAddressService {
 
     @Override
     public boolean delete(Integer id) throws Exception {
-        jdbcTemplate.update(deleteQuery, id);
-        return true;
+        int affectedRows = jdbcTemplate.update(deleteQuery, id);
+        return affectedRows != 0;
     }
 }

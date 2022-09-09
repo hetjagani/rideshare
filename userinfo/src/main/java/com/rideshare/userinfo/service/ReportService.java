@@ -99,6 +99,6 @@ public class ReportService implements DAOInterface<DetailedReport>{
     public boolean delete(Integer id) throws Exception {
         String deleteReportSQL = "DELETE FROM \"userinfo\".\"report\" WHERE id = ?";
         int deleted = jdbcTemplate.update(deleteReportSQL, id);
-        return deleted == 1 ? true: false;
+        return deleted != 0;
     }
 }

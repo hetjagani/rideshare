@@ -29,6 +29,7 @@ public class TagsService implements ITagsService {
     @Override
     public PaginatedEntity<Tag> searchTags(String query, Integer page, Integer limit) throws Exception {
         Integer offset = Pagination.getOffset(page, limit);
+        if (query == null) query = "";
         query = "%" + query + "%";
         List<Tag> tagList = jdbcTemplate.query(searchQuery, new TagsMapper(), query, limit, offset);
 
@@ -44,7 +45,7 @@ public class TagsService implements ITagsService {
 
     @Override
     public boolean delete(Integer id) throws Exception {
-        jdbcTemplate.update(deleteQuery, id);
-        return true;
+        int affectedRows = jdbcTemplate.update(deleteQuery, id);
+        return affectedRows != 0;
     }
 }

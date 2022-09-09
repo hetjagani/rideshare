@@ -71,7 +71,7 @@ public class PlacesService implements IPlacesService {
         String query = "DELETE FROM userinfo.places\n" +
                 "\tWHERE id=? AND user_id=?;";
 
-        jdbcTemplate.update(query, placeId, userId);
-        return true;
+        int affectedRows = jdbcTemplate.update(query, placeId, userId);
+        return affectedRows != 0;
     }
 }
