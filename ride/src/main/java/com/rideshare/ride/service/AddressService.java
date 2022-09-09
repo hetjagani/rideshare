@@ -26,6 +26,7 @@ public class AddressService implements IAddressService {
 
     private final String deleteQuery = "DELETE FROM ride.address WHERE id = ?";
 
+    @Override
     public Address getById(Integer id) throws Exception {
         return jdbcTemplate.queryForObject(getByIdQuery, new AddressMapper(), id);
     }

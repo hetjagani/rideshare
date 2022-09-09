@@ -25,6 +25,17 @@ public class AddressController {
         }
     }
 
+    @GetMapping(path = "/{id}")
+    public ResponseEntity<Address> getAddressById(@PathVariable Integer id) throws Exception {
+        try {
+            Address address = addressService.getById(id);
+            return ResponseEntity.ok(address);
+        } catch (Exception e){
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
     @PostMapping
     public ResponseEntity<Address> addAddress(@RequestBody Address address) throws Exception {
         try {
