@@ -1,5 +1,6 @@
 package com.rideshare.userinfo.service;
 
+import com.rideshare.userinfo.facade.RideServiceFacade;
 import com.rideshare.userinfo.mapper.PlacesMapper;
 import com.rideshare.userinfo.model.Place;
 import com.rideshare.userinfo.model.UserInfo;
@@ -19,6 +20,9 @@ public class PlacesService implements IPlacesService {
     @Autowired
     private IUserInfoService userInfoService;
 
+    @Autowired
+    private RideServiceFacade rideServiceFacade;
+
     @Override
     public PaginatedEntity<Place> getAllPaginated(Integer userId, Integer page, Integer limit) throws Exception {
         Integer offset = Pagination.getOffset(page,limit);
@@ -31,23 +35,15 @@ public class PlacesService implements IPlacesService {
     public Place getById(Integer userId, Integer id) throws Exception {
         String query = "SELECT * FROM \"userinfo\".\"places\" WHERE id = ? AND user_id = ?";
         Place place = jdbcTemplate.queryForObject(query, new PlacesMapper(), id, userId);
-
         UserInfo user = userInfoService.getById(userId);
-        place.setUser(user);
-
         return place;
     }
 
     @Override
     public Place create(Place object) throws Exception {
-        String query = "INSERT INTO \"userinfo\".\"places\"(name, first_line, second_line, city, state, country, zipcode, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id;";
-        Integer id = jdbcTemplate.queryForObject(query, Integer.class, object.getName(), object.getFirstLine(), object.getSecondLine(), object.getCity(), object.getState(), object.getCountry(), object.getZipcode(), object.getUserId());
-
+        String query = "INSERT INTO \"userinfo\".\"places\"(name, user_id, address_id) VALUES (?, ?, ?) RETURNING id;";
+        Integer id = jdbcTemplate.queryForObject(query, Integer.class, object.getName(), object.getUserId(), object.getAddressId());
         Place createdPlace = getById(object.getUserId(), id);
-
-        UserInfo user = userInfoService.getById(object.getUserId());
-        createdPlace.setUser(user);
-
         return createdPlace;
     }
 
@@ -56,13 +52,8 @@ public class PlacesService implements IPlacesService {
         String query = "UPDATE \"userinfo\".\"places\"\n" +
                 "SET name=?, first_line=?, second_line=?, city=?, state=?, country=?, zipcode=?\n" +
                 "WHERE id=? AND user_id=?;";
-        jdbcTemplate.update(query, object.getName(), object.getFirstLine(), object.getSecondLine(), object.getCity(), object.getState(), object.getCountry(), object.getZipcode(), placeId, userId);
-
+        jdbcTemplate.update(query, object.getName(), placeId, userId, object.getAddressId());
         Place updatedPlace = getById(userId, placeId);
-
-        UserInfo user = userInfoService.getById(userId);
-        updatedPlace.setUser(user);
-
         return updatedPlace;
     }
 
