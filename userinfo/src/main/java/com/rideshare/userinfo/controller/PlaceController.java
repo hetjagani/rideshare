@@ -76,10 +76,16 @@ public class PlaceController {
     }
 
     @PutMapping(path = "/{placeId}")
-    public ResponseEntity<Place> updatePlace(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody com.rideshare.userinfo.webentity.Place place, @PathVariable Integer placeId) throws Exception {
+    public ResponseEntity<Place> updatePlace(@RequestHeader HttpHeaders headers, @AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody com.rideshare.userinfo.webentity.Place place, @PathVariable Integer placeId) throws Exception {
         try {
+            String token = headers.get("Authorization").get(0);
             Integer userId = Integer.parseInt(userPrincipal.getId());
             Place dbPlace = placesService.getById(userId, placeId);
+
+            Integer addressId = place.getAddressId();
+
+            //Checks if address is present with Address Id provided. Throws Exception if not found.
+            rideService.checkIfAddressIsValid(token, addressId);
 
             dbPlace.setName(place.getName());
             dbPlace.setAddressId(place.getAddressId());

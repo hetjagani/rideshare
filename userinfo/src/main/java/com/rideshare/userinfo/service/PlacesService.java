@@ -50,9 +50,9 @@ public class PlacesService implements IPlacesService {
     @Override
     public Place update(Integer userId, Integer placeId, Place object) throws Exception {
         String query = "UPDATE \"userinfo\".\"places\"\n" +
-                "SET name=?, first_line=?, second_line=?, city=?, state=?, country=?, zipcode=?\n" +
-                "WHERE id=? AND user_id=?;";
-        jdbcTemplate.update(query, object.getName(), placeId, userId, object.getAddressId());
+                "SET name=?, user_id=?, address_id=?" +
+                " WHERE id=?;";
+        jdbcTemplate.update(query, object.getName(), userId, object.getAddressId(), placeId);
         Place updatedPlace = getById(userId, placeId);
         return updatedPlace;
     }
