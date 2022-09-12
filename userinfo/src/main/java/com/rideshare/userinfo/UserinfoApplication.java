@@ -1,5 +1,6 @@
 package com.rideshare.userinfo;
 
+import com.rideshare.userinfo.facade.RideServiceFacade;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
@@ -17,6 +18,11 @@ public class UserinfoApplication {
 	@Bean
 	public RestTemplate restTemplate() {
 		return new RestTemplate();
+	}
+
+	@Bean
+	public RideServiceFacade rideServiceFacade() {
+		return new RideServiceFacade();
 	}
 
 	public static void main(String[] args) {
