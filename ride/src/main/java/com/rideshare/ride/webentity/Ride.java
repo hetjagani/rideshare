@@ -10,6 +10,7 @@ import java.util.List;
 public class Ride {
     private Integer id;
     private Integer postId;
+    private Integer userId;
     private Float pricePerPerson;
     private Integer noPassengers;
     private String status;

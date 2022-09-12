@@ -32,6 +32,21 @@ public class AddressService implements IAddressService {
     }
 
     @Override
+    public Address getOrCreate(Address address) throws Exception {
+        if (address.getId() != null) {
+            Address dbAddress = jdbcTemplate.queryForObject(getByIdQuery, new AddressMapper(), address.getId());
+
+            if(dbAddress != null) {
+                return dbAddress;
+            } else {
+                return create(address);
+            }
+        } else {
+            return create(address);
+        }
+    }
+
+    @Override
     public PaginatedEntity<Address> searchAddress(String query, Integer page, Integer limit) throws Exception {
         Integer offset = Pagination.getOffset(page, limit);
         if (query == null) query = "";

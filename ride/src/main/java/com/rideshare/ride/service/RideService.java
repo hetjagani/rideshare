@@ -34,7 +34,12 @@ public class RideService implements IRideService {
 
     private final String paginatedRideAddressQuery = "SELECT *\n" +
             "FROM ride.ride, ride.address as start_add, ride.address as end_add\n" +
-            "WHERE (ride.start_address = start_add.id) AND (ride.end_address = end_add.id)\n" +
+            "WHERE (ride.start_address = start_add.id) AND (ride.end_address = end_add.id) AND status != 'DELETED'\n" +
+            "LIMIT ? OFFSET ?;";
+
+    private final String getRidesByUserIdQuery = "SELECT *\n" +
+            "FROM ride.ride, ride.address as start_add, ride.address as end_add\n" +
+            "WHERE (ride.start_address = start_add.id) AND (ride.end_address = end_add.id) AND user_id = ? AND status != 'DELETED'\n" +
             "LIMIT ? OFFSET ?;";
 
     private final String allRidesQuery = "SELECT *\n" +
@@ -45,10 +50,10 @@ public class RideService implements IRideService {
             "FROM ride.ride, ride.address as start_add, ride.address as end_add\n" +
             "WHERE (ride.start_address = start_add.id) AND (ride.end_address = end_add.id) AND ride.id = ?;";
 
-    private final String insertRideQuery = "INSERT INTO ride.ride(post_id, price_per_person, no_passengers, status, start_address, end_address)\n" +
-            "VALUES (?,?,?,?,?,?) RETURNING id;";
+    private final String insertRideQuery = "INSERT INTO ride.ride(post_id, user_id, price_per_person, no_passengers, status, start_address, end_address)\n" +
+            "VALUES (?,?,?,?,?,?,?) RETURNING id;";
 
-    private final String deleteQuery = "DELETE FROM ride.ride WHERE ride.id = ?";
+    private final String deleteQuery = "UPDATE ride.ride SET status = ? WHERE ride.id = ?";
 
     private final String insertRideTagQuery = "INSERT INTO ride.ride_tags(ride_id, tag_id) VALUES(?,?);";
 
@@ -56,6 +61,34 @@ public class RideService implements IRideService {
     public PaginatedEntity<Ride> getPaginated(Integer page, Integer limit) throws Exception {
         Integer offset = Pagination.getOffset(page, limit);
         List<Ride> ridesWithAddress = jdbcTemplate.query(paginatedRideAddressQuery, new RideWithAddressMapper(), limit, offset);
+
+        List<RideTag> rideTags = jdbcTemplate.query(allRideTags, new RideTagMapper());
+        Map<Integer, List<Tag>> rideTagsMap = new HashMap<>();
+
+        rideTags.forEach((RideTag rt) -> {
+            List<Tag> tags;
+            if(rideTagsMap.containsKey(rt.getRideId())) {
+                tags = rideTagsMap.get(rt.getRideId());
+            } else {
+                tags = new ArrayList<>();
+            }
+            tags.add(rt.getTag());
+            rideTagsMap.put(rt.getRideId(), tags);
+        });
+
+        List<Ride> rideList = ridesWithAddress.stream().map((Ride r) -> {
+            List<Tag> tagList = rideTagsMap.get(r.getId());
+            r.setTags(tagList);
+            return r;
+        }).collect(Collectors.toList());
+
+        return new PaginatedEntity<>(rideList, page, limit);
+    }
+
+    @Override
+    public PaginatedEntity<Ride> searchRides(Integer userId, Integer page, Integer limit) throws Exception {
+        Integer offset = Pagination.getOffset(page, limit);
+        List<Ride> ridesWithAddress = jdbcTemplate.query(getRidesByUserIdQuery, new RideWithAddressMapper(), userId, limit, offset);
 
         List<RideTag> rideTags = jdbcTemplate.query(allRideTags, new RideTagMapper());
         Map<Integer, List<Tag>> rideTagsMap = new HashMap<>();
@@ -109,7 +142,7 @@ public class RideService implements IRideService {
 
     @Override
     public Ride getById(Integer id) throws Exception {
-        Ride rideWithAddress = jdbcTemplate.queryForObject(allRidesQuery, new RideWithAddressMapper(), id);
+        Ride rideWithAddress = jdbcTemplate.queryForObject(getByIdQuery, new RideWithAddressMapper(), id);
 
         List<RideTag> rideTags = jdbcTemplate.query(rideTagsWithId, new RideTagMapper(), id);
 
@@ -121,7 +154,7 @@ public class RideService implements IRideService {
 
     @Override
     public Ride create(com.rideshare.ride.model.Ride ride) throws Exception {
-        Integer id = jdbcTemplate.queryForObject(insertRideQuery, Integer.class, ride.getPostId(), ride.getPricePerPerson(), ride.getNoPassengers(), RideStatus.CREATED, ride.getStartAddress(), ride.getEndAddress());
+        Integer id = jdbcTemplate.queryForObject(insertRideQuery, Integer.class, ride.getPostId(), ride.getUserId(), ride.getPricePerPerson(), ride.getNoPassengers(), RideStatus.CREATED, ride.getStartAddress(), ride.getEndAddress());
 
         ride.getTagIds().stream().forEach((Integer tagId) -> {
             jdbcTemplate.update(insertRideTagQuery, id, tagId);
@@ -132,13 +165,8 @@ public class RideService implements IRideService {
     }
 
     @Override
-    public com.rideshare.ride.model.Ride update(com.rideshare.ride.model.Ride ride) throws Exception {
-        return null;
-    }
-
-    @Override
     public boolean delete(Integer id) throws Exception {
-        jdbcTemplate.update(deleteQuery, id);
-        return true;
+        Integer rowsAffected = jdbcTemplate.update(deleteQuery, RideStatus.DELETED, id);
+        return rowsAffected != 0;
     }
 }
