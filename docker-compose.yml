@@ -1,0 +1,38 @@
+version: "3.7"
+
+services:
+  ###########################################################################
+  #######             DB SERVICES                                     #######
+  ###########################################################################
+  postgres:
+    image: postgres:11.7-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./pg-init-scripts:/docker-entrypoint-initdb.d
+      - ./data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_MULTIPLE_DATABASES=auth,userinfo,ride,post,rating,payment,chat,document
+    networks:
+      - rideshare
+
+  auth:
+    depends_on:
+      - postgres
+    build:
+      context: ./auth
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    volumes:
+      - type: bind
+        source: ./auth
+        target: /app
+    restart: unless-stopped
+    networks:
+      - rideshare
+
+networks:
+  rideshare:
