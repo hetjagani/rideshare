@@ -1,15 +1,11 @@
 package com.rideshare.userinfo.facade;
 
-import com.rideshare.userinfo.exception.ForbiddenException;
-import com.rideshare.userinfo.exception.UserDoesNotExistException;
-import com.rideshare.userinfo.model.User;
-import com.rideshare.userinfo.webentity.Address;
+import com.rideshare.userinfo.webentity.PaginatedEntity;
+import com.rideshare.userinfo.webentity.Ride;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,5 +33,26 @@ public class RideServiceFacade {
             throw new Exception("Address Does not exist");
         }
         return true;
+    }
+
+    public PaginatedEntity<Ride> getAllRides(String token, Integer page, Integer limit, Integer userId,
+                                                             Boolean all) {
+
+        // all = true only when user is Admin
+        String requestURL = rideUrl + "/rides" + "?all=" + all + (all != true ? "&userId=" +userId : "&page="+page
+                                +"&limit="+limit);
+
+        HttpHeaders header = new HttpHeaders();
+        header.add("Authorization", token);
+
+        HttpEntity request = new HttpEntity(header);
+
+        try {
+            ResponseEntity<PaginatedEntity<Ride>> response = restTemplate.exchange(requestURL, HttpMethod.GET, request, new ParameterizedTypeReference<PaginatedEntity<Ride>>() {});
+            return response.getBody();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 }
