@@ -35,7 +35,6 @@ public class PlacesService implements IPlacesService {
     public Place getById(Integer userId, Integer id) throws Exception {
         String query = "SELECT * FROM \"userinfo\".\"places\" WHERE id = ? AND user_id = ?";
         Place place = jdbcTemplate.queryForObject(query, new PlacesMapper(), id, userId);
-        UserInfo user = userInfoService.getById(userId);
         return place;
     }
 
