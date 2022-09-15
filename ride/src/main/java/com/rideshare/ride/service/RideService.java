@@ -50,8 +50,10 @@ public class RideService implements IRideService {
             "FROM ride.ride, ride.address as start_add, ride.address as end_add\n" +
             "WHERE (ride.start_address = start_add.id) AND (ride.end_address = end_add.id) AND ride.id = ?;";
 
-    private final String insertRideQuery = "INSERT INTO ride.ride(post_id, user_id, price_per_person, no_passengers, status, start_address, end_address)\n" +
-            "VALUES (?,?,?,?,?,?,?) RETURNING id;";
+    private final String insertRideQuery = "INSERT INTO ride.ride(post_id, user_id, price_per_person, no_passengers, capacity, status, start_address, end_address)\n" +
+            "VALUES (?,?,?,?,?,?,?,?) RETURNING id;";
+
+    private final String updateCapacityQuery = "UPDATE ride.ride SET capacity = ? WHERE id = ?";
 
     private final String deleteQuery = "UPDATE ride.ride SET status = ? WHERE ride.id = ?";
 
@@ -142,6 +144,7 @@ public class RideService implements IRideService {
 
     @Override
     public Ride getById(Integer id) throws Exception {
+        // TODO: get information of user who has created this ride
         Ride rideWithAddress = jdbcTemplate.queryForObject(getByIdQuery, new RideWithAddressMapper(), id);
 
         List<RideTag> rideTags = jdbcTemplate.query(rideTagsWithId, new RideTagMapper(), id);
@@ -154,7 +157,7 @@ public class RideService implements IRideService {
 
     @Override
     public Ride create(com.rideshare.ride.model.Ride ride) throws Exception {
-        Integer id = jdbcTemplate.queryForObject(insertRideQuery, Integer.class, ride.getPostId(), ride.getUserId(), ride.getPricePerPerson(), ride.getNoPassengers(), RideStatus.CREATED, ride.getStartAddress(), ride.getEndAddress());
+        Integer id = jdbcTemplate.queryForObject(insertRideQuery, Integer.class, ride.getPostId(), ride.getUserId(), ride.getPricePerPerson(), ride.getNoPassengers(), ride.getNoPassengers(), RideStatus.CREATED, ride.getStartAddress(), ride.getEndAddress());
 
         ride.getTagIds().stream().forEach((Integer tagId) -> {
             jdbcTemplate.update(insertRideTagQuery, id, tagId);
@@ -162,6 +165,13 @@ public class RideService implements IRideService {
 
         Ride createdRide = getById(id);
         return createdRide;
+    }
+
+    @Override
+    public Ride updateCapacity(Integer rideId, Integer capacity) throws Exception {
+        jdbcTemplate.update(updateCapacityQuery, capacity, rideId);
+        Ride updatedRide = getById(rideId);
+        return updatedRide;
     }
 
     @Override

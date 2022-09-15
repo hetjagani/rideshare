@@ -1,5 +1,6 @@
 package com.rideshare.payment.exception;
 
+import com.stripe.exception.StripeException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.core.Ordered;
@@ -69,5 +70,17 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
                 uri );
 
         return new ResponseEntity(errorResponse, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(StripeException.class)
+    public ResponseEntity<?> stripeException(StripeException ex, WebRequest r) {
+        String uri = ((ServletWebRequest)r).getRequest().getRequestURI();
+        ErrorResponse errorResponse = new ErrorResponse(new Date(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                HttpStatus.INTERNAL_SERVER_ERROR.name(),
+                ex.getMessage(),
+                uri );
+
+        return new ResponseEntity(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
