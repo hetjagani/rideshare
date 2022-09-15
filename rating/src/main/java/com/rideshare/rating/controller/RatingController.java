@@ -13,9 +13,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-
-import javax.websocket.server.PathParam;
-
 @RestController
 @RequestMapping(path = "/ratings")
 public class RatingController {
@@ -28,9 +25,16 @@ public class RatingController {
 
     @Autowired
     private RestTemplate restTemplate;
-    @GetMapping(path = "/{userId}")
-    public ResponseEntity getRatingsForUser(@PathVariable String userId) {
-        return ResponseEntity.ok("Getting Ratings for userId: "+userId);
+    @GetMapping(path = "/{ratingId}")
+    public ResponseEntity<Rating> getRatingById(@PathVariable Integer ratingId) throws Exception {
+        try{
+            System.out.println("Controller by id  "+ ratingId);
+            Rating rating = ratingService.getRatingById(ratingId);
+            return ResponseEntity.ok(rating);
+        }catch(Exception e){
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @PostMapping

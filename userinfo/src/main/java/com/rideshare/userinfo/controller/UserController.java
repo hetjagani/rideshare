@@ -101,7 +101,6 @@ public class UserController {
     @GetMapping(path = "/{userID}")
     public ResponseEntity<UserInfo> getUserInfoById(@PathVariable Integer userID) throws Exception {
         try {
-            System.out.println(userID);
             UserInfo userInfo = userInfoService.getById(userID);
             return ResponseEntity.ok(userInfo);
         }catch (Exception e) {

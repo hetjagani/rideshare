@@ -8,13 +8,13 @@ import java.util.List;
 public class Rating {
     private Integer id;
     private Integer userId;
-    private Integer rating;
+    private Float rating;
     private String description;
     private List<String> liked; // Items Liked about the ride/ driver
     private List<String> disliked; // Items Disliked about the ride/ driver
 
     public Rating(){}
-    public Rating(Integer id, Integer userId, Integer rating, String description, List<String> liked, List<String> disliked) {
+    public Rating(Integer id, Integer userId, Float rating, String description, List<String> liked, List<String> disliked) {
         this.id = id;
         this.userId = userId;
         this.rating = rating;
@@ -23,7 +23,7 @@ public class Rating {
         this.disliked = disliked;
     }
 
-    public Rating(Integer userId, Integer rating, String description, List<String> liked, List<String> disliked) {
+    public Rating(Integer userId, Float rating, String description, List<String> liked, List<String> disliked) {
         this.userId = userId;
         this.rating = rating;
         this.description = description;
