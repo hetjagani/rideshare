@@ -70,4 +70,16 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
         return new ResponseEntity(errorResponse, HttpStatus.FORBIDDEN);
     }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<?> entityNotFoundException(EntityNotFoundException ex, WebRequest r) {
+        String uri = ((ServletWebRequest)r).getRequest().getRequestURI();
+        ErrorResponse errorResponse = new ErrorResponse(new Date(),
+                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.NOT_FOUND.name(),
+                ex.getMessage(),
+                uri );
+
+        return new ResponseEntity(errorResponse, HttpStatus.NOT_FOUND);
+    }
 }

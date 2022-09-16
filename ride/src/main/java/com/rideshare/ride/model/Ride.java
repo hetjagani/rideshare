@@ -11,6 +11,7 @@ public class Ride {
     private Integer userId;
     private Float pricePerPerson;
     private Integer noPassengers;
+    private Integer capacity;
     private String status;
     private List<Integer> tagIds;
     private Integer startAddress;
