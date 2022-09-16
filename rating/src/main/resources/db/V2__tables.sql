@@ -2,6 +2,7 @@ CREATE TABLE
 IF NOT EXISTS "rating"."rating"
         (id SERIAL PRIMARY KEY,
         user_id Integer,
+        rating_user_id INTEGER,
         rating Integer,
         description VARCHAR(1024));
 

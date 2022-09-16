@@ -16,8 +16,6 @@ import org.springframework.web.client.RestTemplate;
 @RestController
 @RequestMapping(path = "/ratings")
 public class RatingController {
-
-
     @Value("${app.userinfo.url}")
     private String userinfoUrl;
     @Autowired
@@ -26,10 +24,10 @@ public class RatingController {
     @Autowired
     private RestTemplate restTemplate;
     @GetMapping(path = "/{ratingId}")
-    public ResponseEntity<Rating> getRatingById(@PathVariable Integer ratingId) throws Exception {
+    public ResponseEntity<com.rideshare.rating.webentity.Rating> getRatingById(@RequestHeader HttpHeaders headers, @PathVariable Integer ratingId) throws Exception {
         try{
-            System.out.println("Controller by id  "+ ratingId);
-            Rating rating = ratingService.getRatingById(ratingId);
+            String token = headers.get("Authorization").get(0);
+            com.rideshare.rating.webentity.Rating rating = ratingService.getRatingById(ratingId, token);
             return ResponseEntity.ok(rating);
         }catch(Exception e){
             e.printStackTrace();
@@ -40,13 +38,17 @@ public class RatingController {
     @PostMapping
     public ResponseEntity<Rating> createRating(@RequestHeader HttpHeaders headers, @RequestBody Rating rating, @AuthenticationPrincipal UserPrincipal userDetails) throws Exception {
         try {
-            String token = headers.get("Authorization").get(0);
+            if(rating.getUserId() != null &&
+                    rating.getUserId() == Integer.parseInt(userDetails.getId())){
+                throw new Exception("Cannot provide rating to Self");
+            }
 
+            String token = headers.get("Authorization").get(0);
             // Check if User exists with user_id
             String requestURL = userinfoUrl + "/users/" +rating.getUserId();
             HttpHeaders header = new HttpHeaders();
             header.add("Authorization", token);
-
+            rating.setRatingUserid(Integer.parseInt(userDetails.getId()));
             HttpEntity request = new HttpEntity(header);
             try {
                 ResponseEntity<String> response = restTemplate.exchange(requestURL, HttpMethod.GET, request, String.class);
@@ -55,7 +57,7 @@ public class RatingController {
                 throw new Exception("User Does not exist");
             }
 
-            Rating newRating = ratingService.create(rating);
+            Rating newRating = ratingService.create(rating, token);
             return ResponseEntity.ok(newRating);
         }catch(Exception e){
             e.printStackTrace();

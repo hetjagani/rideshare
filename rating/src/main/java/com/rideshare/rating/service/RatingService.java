@@ -3,10 +3,18 @@ package com.rideshare.rating.service;
 import com.rideshare.rating.exception.RatingDoesNotExisitException;
 import com.rideshare.rating.mapper.TagMapper;
 import com.rideshare.rating.model.Rating;
+import com.rideshare.rating.webentity.User;
+import com.rideshare.rating.webentity.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +22,7 @@ import java.util.List;
 @Service
 public class RatingService implements IRatingService{
 
-    private final String createRating = "INSERT INTO \"rating\".\"rating\" (user_id, rating, description) VALUES (?, ?, ?) RETURNING id";
+    private final String createRating = "INSERT INTO \"rating\".\"rating\" (user_id, rating_user_id, rating, description) VALUES (?, ?, ?, ?) RETURNING id";
     private final String createTag = "INSERT INTO \"rating\".\"tags\" (name) VALUES (?) RETURNING id";
     private final String createRatingTag = "INSERT INTO \"rating\".\"rating_tags\" (rating_id, tag_id, feedback) VALUES (?, ?, ?) Returning id";
     private final String getTagByName = "SELECT id FROM \"rating\".\"tags\" WHERE name=?";
@@ -30,23 +38,32 @@ public class RatingService implements IRatingService{
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public Rating getRatingById(Integer id) throws Exception {
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Value("${app.userinfo.url}")
+    private String userInfoURL;
+
+    public com.rideshare.rating.webentity.Rating getRatingById(Integer id, String token) throws Exception {
         try {
             SqlRowSet rs = jdbcTemplate.queryForRowSet(getDetailedRatingById, id);
-            Rating rating = new Rating();
+            com.rideshare.rating.webentity.Rating rating = new com.rideshare.rating.webentity.Rating();
 
             List<String> liked = new ArrayList<>();
             List<String> disliked = new ArrayList<>();
+            Integer userId = null;
+            Integer ratingUserId = null;
             int rowCount = 0;
             while (rs.next()) {
                 rating.setId(rs.getInt(1));
-                rating.setUserId(rs.getInt(2));
-                rating.setRating(rs.getFloat(3));
-                rating.setDescription(rs.getString(4));
-                if (rs.getBoolean(8) == true) {
-                    liked.add(rs.getString(10));
+                userId = rs.getInt(2);
+                ratingUserId = rs.getInt(3);
+                rating.setRating(rs.getFloat(4));
+                rating.setDescription(rs.getString(5));
+                if (rs.getBoolean(9) == true) {
+                    liked.add(rs.getString(11));
                 } else {
-                    disliked.add(rs.getString(10));
+                    disliked.add(rs.getString(11));
                 }
                 rowCount++;
             }
@@ -54,6 +71,33 @@ public class RatingService implements IRatingService{
             if(rowCount == 0){
                 throw new RatingDoesNotExisitException("Rating does not exist");
             }
+
+            String requestURL = userInfoURL + "/users/" + userId;
+            HttpHeaders header = new HttpHeaders();
+            header.add("Authorization", token);
+
+            HttpEntity request = new HttpEntity(header);
+
+            ResponseEntity<UserInfo> userInfo = restTemplate.exchange(requestURL, HttpMethod.GET, request, UserInfo.class);
+            User user = null;
+
+            if(userInfo.getBody() != null){
+                user = new User(userInfo.getBody().getFirstName(), userInfo.getBody().getLastName(),
+                        userInfo.getBody().getProfileImage());;
+            }
+            rating.setUser(user);
+
+            String requestURLForRatingUser = userInfoURL + "/users/" + ratingUserId;
+            ResponseEntity<UserInfo> ratingUserInfo = restTemplate.exchange(requestURLForRatingUser, HttpMethod.GET,
+                                                        request, UserInfo.class);
+
+            User ratingUser = null;
+
+            if(ratingUserInfo.getBody() != null){
+                ratingUser = new User(ratingUserInfo.getBody().getFirstName(), ratingUserInfo.getBody().getLastName(),
+                        ratingUserInfo.getBody().getProfileImage());;
+            }
+            rating.setRatingUser(ratingUser);
             rating.setLiked(liked);
             rating.setDisliked(disliked);
             return rating;
@@ -69,9 +113,9 @@ public class RatingService implements IRatingService{
     }
 
     @Override
-    public Rating create(Rating rating) throws Exception {
+    public Rating create(Rating rating, String token) throws Exception {
         try {
-            Integer ratingId = jdbcTemplate.queryForObject(createRating, Integer.class, rating.getUserId(), rating.getRating(), rating.getDescription());
+            Integer ratingId = jdbcTemplate.queryForObject(createRating, Integer.class, rating.getUserId(), rating.getRatingUserid(), rating.getRating(), rating.getDescription());
             List<String> existingTags = jdbcTemplate.query(getAllTags, new TagMapper());
 
             for (String s : rating.getLiked()) {
@@ -93,7 +137,7 @@ public class RatingService implements IRatingService{
                 }
                 Integer ratingTag = jdbcTemplate.queryForObject(createRatingTag, Integer.class, ratingId, tagId, false);
             }
-            Rating newRating = getRatingById(ratingId);
+            com.rideshare.rating.webentity.Rating newRating = getRatingById(ratingId, token);
             return rating;
         }catch(Exception e){
             throw e;
