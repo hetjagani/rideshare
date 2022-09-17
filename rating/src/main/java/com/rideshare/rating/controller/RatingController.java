@@ -3,6 +3,7 @@ package com.rideshare.rating.controller;
 import com.rideshare.rating.model.Rating;
 import com.rideshare.rating.security.UserPrincipal;
 import com.rideshare.rating.service.IRatingService;
+import com.rideshare.rating.webentity.DeleteSuccess;
 import com.rideshare.rating.webentity.PaginatedEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,7 +58,7 @@ public class RatingController {
     }
 
     @PostMapping
-    public ResponseEntity<Rating> createRating(@RequestHeader HttpHeaders headers, @RequestBody Rating rating, @AuthenticationPrincipal UserPrincipal userDetails) throws Exception {
+    public ResponseEntity<com.rideshare.rating.webentity.Rating> createRating(@RequestHeader HttpHeaders headers, @RequestBody Rating rating, @AuthenticationPrincipal UserPrincipal userDetails) throws Exception {
         try {
             if(rating.getUserId() != null &&
                     rating.getUserId() == Integer.parseInt(userDetails.getId())){
@@ -78,9 +79,20 @@ public class RatingController {
                 throw new Exception("User Does not exist");
             }
 
-            Rating newRating = ratingService.create(rating, token);
+            com.rideshare.rating.webentity.Rating newRating = ratingService.create(rating, token);
             return ResponseEntity.ok(newRating);
         }catch(Exception e){
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    @DeleteMapping(path = "/{id}")
+    public ResponseEntity<DeleteSuccess> deleteRide(@PathVariable Integer id) throws Exception {
+        try {
+            boolean deleted = ratingService.delete(id);
+            return ResponseEntity.ok(new DeleteSuccess(deleted));
+        }catch (Exception e) {
             e.printStackTrace();
             throw e;
         }

@@ -78,6 +78,7 @@ public class RatingService implements IRatingService{
             "AND B.tag_id = C.id " +
             "LIMIT ? OFFSET ?;";
 
+    private final String deleteRating = "DELETE FROM \"rating\".\"rating\" WHERE id = ?";
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -188,12 +189,13 @@ public class RatingService implements IRatingService{
     }
 
     @Override
-    public Rating getById(Integer ratingId) throws Exception {
-        return null;
+    public Boolean delete(Integer id) throws Exception {
+        Integer rowsAffected = jdbcTemplate.update(deleteRating, id);
+        return rowsAffected != 0;
     }
 
     @Override
-    public Rating create(Rating rating, String token) throws Exception {
+    public com.rideshare.rating.webentity.Rating create(Rating rating, String token) throws Exception {
         try {
             Integer ratingId = jdbcTemplate.queryForObject(createRating, Integer.class, rating.getUserId(), rating.getRatingUserid(), rating.getRating(), rating.getDescription());
             List<String> existingTags = jdbcTemplate.query(getAllTags, new TagMapper());
@@ -218,7 +220,7 @@ public class RatingService implements IRatingService{
                 Integer ratingTag = jdbcTemplate.queryForObject(createRatingTag, Integer.class, ratingId, tagId, false);
             }
             com.rideshare.rating.webentity.Rating newRating = getRatingById(ratingId, token);
-            return rating;
+            return newRating;
         }catch(Exception e){
             throw e;
         }
