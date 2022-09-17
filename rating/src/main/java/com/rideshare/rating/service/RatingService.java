@@ -1,23 +1,29 @@
 package com.rideshare.rating.service;
 
 import com.rideshare.rating.exception.RatingDoesNotExisitException;
+import com.rideshare.rating.mapper.RatingIdMapper;
 import com.rideshare.rating.mapper.TagMapper;
 import com.rideshare.rating.model.Rating;
+import com.rideshare.rating.util.Pagination;
+import com.rideshare.rating.webentity.PaginatedEntity;
 import com.rideshare.rating.webentity.User;
 import com.rideshare.rating.webentity.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.SqlParameterValue;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.sql.Types;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class RatingService implements IRatingService{
@@ -35,6 +41,43 @@ public class RatingService implements IRatingService{
             "WHERE A.id = B.rating_id\n" +
             "AND B.tag_id = C.id\n" +
             "AND A.id = ?;";
+
+    private final String getDetailedRatingByUserId = "SELECT DISTINCT A.id\n" +
+            "FROM \"rating\".\"rating\" as A,\n" +
+            "\"rating\".\"rating_tags\" as B,\n" +
+            "\"rating\".\"tags\" as C\n" +
+            "WHERE A.id = B.rating_id\n" +
+            "AND B.tag_id = C.id\n" +
+            "AND A.user_id = ? " +
+            "LIMIT ? OFFSET ?;";
+
+    private final String getDetailedRatingByRatingUserId = "SELECT DISTINCT A.id\n" +
+            "FROM \"rating\".\"rating\" as A,\n" +
+            "\"rating\".\"rating_tags\" as B,\n" +
+            "\"rating\".\"tags\" as C\n" +
+            "WHERE A.id = B.rating_id\n" +
+            "AND B.tag_id = C.id\n" +
+            "AND A.rating_user_id = ? " +
+            "LIMIT ? OFFSET ?;";
+
+    private final String getDetailedRatingByRatingUserIdAndUserId = "SELECT DISTINCT A.id\n" +
+            "FROM \"rating\".\"rating\" as A,\n" +
+            "\"rating\".\"rating_tags\" as B,\n" +
+            "\"rating\".\"tags\" as C\n" +
+            "WHERE A.id = B.rating_id\n" +
+            "AND B.tag_id = C.id\n" +
+            "AND A.user_id = ? " +
+            "AND A.rating_user_id = ?" +
+            "LIMIT ? OFFSET ?;";
+
+    private final String getAllDetailedRating = "SELECT DISTINCT A.id\n" +
+            "FROM \"rating\".\"rating\" as A,\n" +
+            "\"rating\".\"rating_tags\" as B,\n" +
+            "\"rating\".\"tags\" as C\n" +
+            "WHERE A.id = B.rating_id\n" +
+            "AND B.tag_id = C.id " +
+            "LIMIT ? OFFSET ?;";
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -101,6 +144,43 @@ public class RatingService implements IRatingService{
             rating.setLiked(liked);
             rating.setDisliked(disliked);
             return rating;
+        }catch (Exception e){
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    @Override
+    public PaginatedEntity<com.rideshare.rating.webentity.Rating> getAllRatings(String token,
+                                                                                Integer page,
+                                                                                Integer limit,
+                                                                                Integer userId,
+                                                                                Integer ratingUserId) throws Exception {
+        try {
+            Integer offset = Pagination.getOffset(page, limit);
+            List<Integer> listOfRatings;
+            if (userId != null && ratingUserId == null) {
+                listOfRatings = jdbcTemplate.query(getDetailedRatingByUserId, new RatingIdMapper(), userId, limit, offset);
+            } else if (userId == null && ratingUserId != null) {
+                listOfRatings = jdbcTemplate.query(getDetailedRatingByRatingUserId, new RatingIdMapper(), ratingUserId, limit, offset);
+            }else if (userId != null && ratingUserId != null) {
+                listOfRatings = jdbcTemplate.query(getDetailedRatingByRatingUserIdAndUserId, new RatingIdMapper(), userId, ratingUserId, limit, offset);
+            }
+            else {
+                listOfRatings = jdbcTemplate.query(getAllDetailedRating, new RatingIdMapper(), limit, offset);
+            }
+
+            if(listOfRatings.size() == 0){
+                throw new RatingDoesNotExisitException("No Ratings Found!!");
+            }
+            List<com.rideshare.rating.webentity.Rating> listOfDetailedRating = new ArrayList<>();
+
+            for (Integer id : listOfRatings) {
+                com.rideshare.rating.webentity.Rating rating = getRatingById(id, token);
+                listOfDetailedRating.add(rating);
+            }
+
+            return new PaginatedEntity<>(listOfDetailedRating, page, limit);
         }catch (Exception e){
             e.printStackTrace();
             throw e;

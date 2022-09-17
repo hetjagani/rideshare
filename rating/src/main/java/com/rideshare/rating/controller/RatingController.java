@@ -3,6 +3,7 @@ package com.rideshare.rating.controller;
 import com.rideshare.rating.model.Rating;
 import com.rideshare.rating.security.UserPrincipal;
 import com.rideshare.rating.service.IRatingService;
+import com.rideshare.rating.webentity.PaginatedEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -23,8 +24,28 @@ public class RatingController {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @GetMapping
+    public ResponseEntity<PaginatedEntity<com.rideshare.rating.webentity.Rating>> getPaginatedRatings(@RequestHeader HttpHeaders headers,
+                                                                                                      @RequestParam(required = false) Integer page,
+                                                                                                      @RequestParam(required = false) Integer limit,
+                                                                                                      @RequestParam(required = false) Integer userId,
+                                                                                                      @RequestParam(required = false) Integer ratingUserId)
+        throws Exception{
+        String token = headers.get("Authorization").get(0);
+        try {
+            PaginatedEntity<com.rideshare.rating.webentity.Rating> ratings = ratingService.getAllRatings(token, page, limit, userId, ratingUserId);
+            return ResponseEntity.ok(ratings);
+        }catch(Exception e){
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
     @GetMapping(path = "/{ratingId}")
-    public ResponseEntity<com.rideshare.rating.webentity.Rating> getRatingById(@RequestHeader HttpHeaders headers, @PathVariable Integer ratingId) throws Exception {
+    public ResponseEntity<com.rideshare.rating.webentity.Rating> getRatingById(@RequestHeader HttpHeaders headers,
+                                                                               @PathVariable Integer ratingId)
+            throws Exception {
         try{
             String token = headers.get("Authorization").get(0);
             com.rideshare.rating.webentity.Rating rating = ratingService.getRatingById(ratingId, token);
