@@ -88,7 +88,7 @@ public class RatingController {
     }
 
     @DeleteMapping(path = "/{id}")
-    public ResponseEntity<DeleteSuccess> deleteRide(@PathVariable Integer id) throws Exception {
+    public ResponseEntity<DeleteSuccess> deleteRating(@PathVariable Integer id) throws Exception {
         try {
             boolean deleted = ratingService.delete(id);
             return ResponseEntity.ok(new DeleteSuccess(deleted));
