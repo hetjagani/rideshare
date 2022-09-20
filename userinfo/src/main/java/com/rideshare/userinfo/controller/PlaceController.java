@@ -56,23 +56,26 @@ public class PlaceController {
 
     @PostMapping
     public ResponseEntity<Place> createPlace(@RequestHeader HttpHeaders headers, @AuthenticationPrincipal UserPrincipal userDetails, @RequestBody com.rideshare.userinfo.webentity.Place place) throws Exception {
+        try {
+            Integer userId = Integer.parseInt(userDetails.getId());
+            String token = headers.get("Authorization").get(0);
 
-        Integer userId = Integer.parseInt(userDetails.getId());
-        String token = headers.get("Authorization").get(0);
+            Integer addressId = place.getAddressId();
 
-        Integer addressId = place.getAddressId();
+            //Checks if address is present with Address Id provided. Throws Exception if not found.
+            rideService.checkIfAddressIsValid(token, addressId);
 
-        //Checks if address is present with Address Id provided. Throws Exception if not found.
-        rideService.checkIfAddressIsValid(token, addressId);
+            Place toCreatePlace = new Place();
+            toCreatePlace.setName(place.getName());
+            toCreatePlace.setAddressId(addressId);
+            toCreatePlace.setUserId(userId);
 
-        Place toCreatePlace = new Place();
-        toCreatePlace.setName(place.getName());
-        toCreatePlace.setAddressId(addressId);
-        toCreatePlace.setUserId(userId);
+            Place createdPlace = placesService.create(toCreatePlace);
 
-        Place createdPlace = placesService.create(toCreatePlace);
-
-        return ResponseEntity.ok(createdPlace);
+            return ResponseEntity.ok(createdPlace);
+        }catch(Exception e){
+            throw e;
+        }
     }
 
     @PutMapping(path = "/{placeId}")
