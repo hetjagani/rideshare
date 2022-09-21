@@ -1,6 +1,14 @@
 package com.rideshare.payment.controller;
 
+import com.rideshare.payment.facade.RideServiceFacade;
+import com.rideshare.payment.facade.StripeServiceFacade;
+import com.rideshare.payment.model.Payment;
+import com.rideshare.payment.model.PaymentStatus;
+import com.rideshare.payment.security.UserPrincipal;
+import com.rideshare.payment.service.IPaymentService;
+import com.rideshare.payment.webentity.CheckoutRequest;
 import com.rideshare.payment.webentity.PaymentIntentData;
+import com.rideshare.payment.webentity.Request;
 import com.stripe.Stripe;
 import com.stripe.model.Customer;
 import com.stripe.model.EphemeralKey;
@@ -12,11 +20,12 @@ import com.stripe.param.EphemeralKeyCreateParams;
 import com.stripe.param.PaymentIntentCreateParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,65 +37,54 @@ public class PaymentController {
     @Value("${app.stripe.publishableKey}")
     private String publishableKey;
 
-    @Value("${app.stripe.apiKey}")
-    private String apiKey;
+    @Autowired
+    private RideServiceFacade rideService;
 
+    @Autowired
+    private StripeServiceFacade stripeService;
+
+    @Autowired
+    private IPaymentService paymentService;
 
     private Logger logger = LoggerFactory.getLogger(PaymentController.class);
 
+    @PostMapping(path = "/checkout")
+    public ResponseEntity<PaymentIntentData> checkout(@RequestHeader HttpHeaders headers, @AuthenticationPrincipal UserPrincipal user, @RequestBody CheckoutRequest request) throws Exception {
+        try {
+            String token = headers.get("Authorization").get(0);
+            Request rideRequest = rideService.getRequest(request.getRequestId(), token);
 
-    // TODO: take requestId as input and fetch that request/ride from ride service for payment amount
-    @GetMapping(path = "/checkout")
-    public ResponseEntity<PaymentIntentData> checkout() throws Exception {
+            Customer customer = stripeService.createCustomer(user);
 
-        Stripe.apiKey = apiKey;
+            EphemeralKey ephemeralKey = stripeService.createEphemeralKey(customer.getId());
 
-        // Get stripe customer id from DB based on the userID from AuthenticationPrinciple
-        // OR
-        // Create new stripe customer and save its info in db
-        // TODO: Add metadata for customer
-        CustomerCreateParams customerParams = CustomerCreateParams.builder().build();
-        Customer customer = Customer.create(customerParams);
+            Long amount = rideRequest.getRide().getPricePerPerson().longValue() * 100;
 
-        // Get Ephemeral Key for the customer
-        EphemeralKeyCreateParams ephemeralKeyParams = EphemeralKeyCreateParams.builder()
-                .setCustomer(customer.getId())
-                .build();
+            PaymentIntent paymentIntent = stripeService.createPaymentIntent(amount, customer.getId(), request.getRequestId());
 
-        RequestOptions ephemeralKeyRequestOptions = new RequestOptions.RequestOptionsBuilder()
-                .setStripeVersionOverride("2022-08-01")
-                .build();
+            // Save paymentIntentId, requestId, stripeCustomerId in db
+            Payment paymentData = new Payment();
+            paymentData.setStripePaymentId(paymentIntent.getId());
+            paymentData.setRequestId(request.getRequestId());
+            paymentData.setUserId(Integer.parseInt(user.getId()));
+            paymentData.setStripeCustomerId(customer.getId());
+            paymentData.setStatus(PaymentStatus.CREATED);
 
-        EphemeralKey ephemeralKey = EphemeralKey.create(ephemeralKeyParams, ephemeralKeyRequestOptions);
+            Payment payment = paymentService.create(paymentData);
 
+            // Return data to open payment sheet on app
+            PaymentIntentData paymentIntentData = new PaymentIntentData(
+                    paymentIntent.getClientSecret(),
+                    ephemeralKey.getSecret(),
+                    payment.getStripeCustomerId(),
+                    publishableKey
+            );
 
-        PaymentIntentCreateParams.PaymentMethodOptions paymentMethodOptions = PaymentIntentCreateParams.PaymentMethodOptions.builder()
-                .setCard(PaymentIntentCreateParams.PaymentMethodOptions.Card.builder().build())
-                .build();
-
-
-        // TODO: add metadata for the payment
-        // TODO: add requestId in the metadata to associate payment with request
-        // Create Payment Intent
-        PaymentIntentCreateParams paymentIntentParams = PaymentIntentCreateParams.builder()
-                .setAmount(1099L)
-                .setCurrency("usd")
-                .setCustomer(customer.getId())
-                .setPaymentMethodOptions(paymentMethodOptions)
-                .build();
-
-        PaymentIntent paymentIntent = PaymentIntent.create(paymentIntentParams);
-
-        // TODO: save paymentIntentId, requestId, stripeCustomerId in db
-        // Return data to open payment sheet on app
-        PaymentIntentData paymentIntentData = new PaymentIntentData(
-                paymentIntent.getClientSecret(),
-                ephemeralKey.getSecret(),
-                customer.getId(),
-                publishableKey
-        );
-
-        return ResponseEntity.ok(paymentIntentData);
+            return ResponseEntity.ok(paymentIntentData);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
 }

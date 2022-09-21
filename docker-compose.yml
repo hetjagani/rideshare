@@ -34,21 +34,101 @@ services:
     networks:
       - rideshare
 
-  # payment:
-  #   depends_on:
-  #     - postgres
-  #   build:
-  #     context: ./payment
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - 8081:8080
-  #   volumes:
-  #     - type: bind
-  #       source: ./payment
-  #       target: /app
-  #   restart: unless-stopped
-  #   networks:
-  #     - rideshare
+  userinfo:
+    depends_on:
+      - postgres
+    build:
+      context: ./userinfo
+      dockerfile: Dockerfile
+    ports:
+      - 8081:8080
+    volumes:
+      - type: bind
+        source: ./userinfo
+        target: /app
+    restart: unless-stopped
+    networks:
+      - rideshare
+
+  ride:
+    depends_on:
+      - postgres
+    build:
+      context: ./ride
+      dockerfile: Dockerfile
+    ports:
+      - 8082:8080
+    volumes:
+      - type: bind
+        source: ./ride
+        target: /app
+    restart: unless-stopped
+    networks:
+      - rideshare
+
+  post:
+    depends_on:
+      - postgres
+    build:
+      context: ./post
+      dockerfile: Dockerfile
+    ports:
+      - 8083:8080
+    volumes:
+      - type: bind
+        source: ./post
+        target: /app
+    restart: unless-stopped
+    networks:
+      - rideshare
+
+  rating:
+    depends_on:
+      - postgres
+    build:
+      context: ./rating
+      dockerfile: Dockerfile
+    ports:
+      - 8084:8080
+    volumes:
+      - type: bind
+        source: ./rating
+        target: /app
+    restart: unless-stopped
+    networks:
+      - rideshare
+
+  chat:
+    depends_on:
+      - postgres
+    build:
+      context: ./chat
+      dockerfile: Dockerfile
+    ports:
+      - 8085:8080
+    volumes:
+      - type: bind
+        source: ./chat
+        target: /app
+    restart: unless-stopped
+    networks:
+      - rideshare
+
+  payment:
+    depends_on:
+      - postgres
+    build:
+      context: ./payment
+      dockerfile: Dockerfile
+    ports:
+      - 8086:8080
+    volumes:
+      - type: bind
+        source: ./payment
+        target: /app
+    restart: unless-stopped
+    networks:
+      - rideshare
 
   nginx:
     depends_on:

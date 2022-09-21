@@ -1,0 +1,2 @@
+CREATE TABLE IF NOT EXISTS "payment"."customerData"(user_id INTEGER, stripe_customer_id VARCHAR, PRIMARY KEY (user_id, stripe_customer_id));
+CREATE TABLE IF NOT EXISTS "payment"."payment"(id SERIAL PRIMARY KEY, request_id INTEGER, user_id INTEGER, stripe_customer_id VARCHAR, stripe_payment_id VARCHAR, status VARCHAR, FOREIGN KEY(user_id, stripe_customer_id) REFERENCES "payment"."customerData"(user_id, stripe_customer_id));
