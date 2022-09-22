@@ -59,6 +59,7 @@ public class RequestController {
     @PostMapping
     public ResponseEntity<Request> create(@AuthenticationPrincipal UserPrincipal user, @RequestBody com.rideshare.ride.model.Request request) throws Exception {
         try {
+            // TODO: user should not be able to request his own ride
             Integer userId = Integer.parseInt(user.getId());
 
             request.setUserId(userId);

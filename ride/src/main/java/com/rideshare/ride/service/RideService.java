@@ -159,9 +159,11 @@ public class RideService implements IRideService {
     public Ride create(com.rideshare.ride.model.Ride ride) throws Exception {
         Integer id = jdbcTemplate.queryForObject(insertRideQuery, Integer.class, ride.getPostId(), ride.getUserId(), ride.getPricePerPerson(), ride.getNoPassengers(), ride.getNoPassengers(), RideStatus.CREATED, ride.getStartAddress(), ride.getEndAddress());
 
-        ride.getTagIds().stream().forEach((Integer tagId) -> {
-            jdbcTemplate.update(insertRideTagQuery, id, tagId);
-        });
+        if (ride.getTagIds() != null) {
+            ride.getTagIds().stream().forEach((Integer tagId) -> {
+                jdbcTemplate.update(insertRideTagQuery, id, tagId);
+            });
+        }
 
         Ride createdRide = getById(id);
         return createdRide;

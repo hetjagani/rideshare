@@ -1,6 +1,7 @@
 package com.rideshare.payment.facade;
 
 import com.rideshare.payment.model.CustomerData;
+import com.rideshare.payment.model.Payment;
 import com.rideshare.payment.security.UserPrincipal;
 import com.rideshare.payment.service.ICustomerDataService;
 import com.stripe.Stripe;
@@ -90,5 +91,15 @@ public class StripeServiceFacade {
 
         PaymentIntent paymentIntent = PaymentIntent.create(paymentIntentParams);
         return paymentIntent;
+    }
+
+    public PaymentIntent getPaymentIntent(String id) throws StripeException {
+        Stripe.apiKey = this.apiKey;
+        return PaymentIntent.retrieve(id);
+    }
+
+    public Customer getCustomer(String id) throws StripeException {
+        Stripe.apiKey = this.apiKey;
+        return Customer.retrieve(id);
     }
 }
