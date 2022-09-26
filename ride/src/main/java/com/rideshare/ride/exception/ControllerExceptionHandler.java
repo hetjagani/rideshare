@@ -82,4 +82,16 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
         return new ResponseEntity(errorResponse, HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<?> badRequestException(BadRequestException ex, WebRequest r) {
+        String uri = ((ServletWebRequest)r).getRequest().getRequestURI();
+        ErrorResponse errorResponse = new ErrorResponse(new Date(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.name(),
+                ex.getMessage(),
+                uri );
+
+        return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
+    }
 }

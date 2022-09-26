@@ -1,5 +1,6 @@
 package com.rideshare.ride.controller;
 
+import com.rideshare.ride.exception.BadRequestException;
 import com.rideshare.ride.exception.EntityNotFoundException;
 import com.rideshare.ride.model.User;
 import com.rideshare.ride.security.UserPrincipal;
@@ -16,6 +17,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Locale;
+import java.util.Objects;
 
 @RestController
 @RequestMapping(path = "/rides/requests")
@@ -59,8 +61,12 @@ public class RequestController {
     @PostMapping
     public ResponseEntity<Request> create(@AuthenticationPrincipal UserPrincipal user, @RequestBody com.rideshare.ride.model.Request request) throws Exception {
         try {
-            // TODO: user should not be able to request his own ride
             Integer userId = Integer.parseInt(user.getId());
+
+            Ride requestedRide = rideService.getById(request.getRideId());
+            if (Objects.equals(requestedRide.getUserId(), userId)) {
+                throw new BadRequestException("user cannot request his own ride");
+            }
 
             request.setUserId(userId);
 
