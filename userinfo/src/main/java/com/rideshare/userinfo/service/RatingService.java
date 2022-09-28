@@ -1,6 +1,7 @@
 package com.rideshare.userinfo.service;
 
 import com.rideshare.userinfo.model.User;
+import com.rideshare.userinfo.webentity.DeleteSuccess;
 import com.rideshare.userinfo.webentity.PaginatedEntity;
 import com.rideshare.userinfo.webentity.Rating;
 import org.apache.logging.log4j.LogManager;
@@ -63,6 +64,22 @@ public class RatingService {
             ResponseEntity<Rating> responseEntity = restTemplate.exchange(requestURL, HttpMethod.POST, entity, Rating.class);
 
             return responseEntity.getBody();
+        }catch(Exception e){
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public Boolean delete(String token, Integer id) throws Exception{
+        try {
+            String requestURL = ratingURL + "/ratings/"+ id;
+            HttpHeaders header = new HttpHeaders();
+            header.add("Authorization", token);
+
+            HttpEntity request = new HttpEntity(header);
+
+            ResponseEntity<DeleteSuccess> responseEntity = restTemplate.exchange(requestURL, HttpMethod.DELETE, request, DeleteSuccess.class);
+            return responseEntity.getBody().getSuccess();
         }catch(Exception e){
             e.printStackTrace();
             throw e;

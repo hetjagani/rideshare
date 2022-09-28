@@ -3,6 +3,7 @@ package com.rideshare.userinfo.controller;
 import com.rideshare.userinfo.model.UserInfo;
 import com.rideshare.userinfo.security.UserPrincipal;
 import com.rideshare.userinfo.service.RatingService;
+import com.rideshare.userinfo.webentity.DeleteSuccess;
 import com.rideshare.userinfo.webentity.PaginatedEntity;
 import com.rideshare.userinfo.webentity.Rating;
 import org.apache.logging.log4j.LogManager;
@@ -72,5 +73,17 @@ public class RatingController {
         String token = headers.get("Authorization").get(0);
         Rating response = ratingService.create(token, rating);
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping(path = "/{id}")
+    public ResponseEntity<DeleteSuccess> deleteRating(@RequestHeader HttpHeaders headers, @PathVariable Integer id) throws Exception {
+        try {
+            String token = headers.get("Authorization").get(0);
+            boolean deleted = ratingService.delete(token, id);
+            return ResponseEntity.ok(new DeleteSuccess(deleted));
+        }catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 }

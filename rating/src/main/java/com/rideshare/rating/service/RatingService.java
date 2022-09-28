@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.sql.ResultSet;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -204,9 +205,21 @@ public class RatingService implements IRatingService{
     }
 
     @Override
-    public Boolean delete(Integer id) throws Exception {
-        Integer rowsAffected = jdbcTemplate.update(deleteRating, id);
-        return rowsAffected != 0;
+    public Boolean delete(Integer userId, Integer id) throws Exception {
+        try {
+            SqlRowSet rs = jdbcTemplate.queryForRowSet("SELECT COUNT(*) FROM \"rating\".\"rating\" WHERE id = " + id + " AND rating_user_id = " + userId);
+            while(rs.next()) {
+                if (rs.getInt(1) == 1) {
+                    Integer rowsAffected = jdbcTemplate.update(deleteRating, id);
+                    return rowsAffected != 0;
+                }
+                break;
+            }
+            throw new Exception("No Rating found for given user");
+        }catch(Exception e){
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @Override
