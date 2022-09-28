@@ -47,7 +47,25 @@ public class RatingService {
         HttpEntity request = new HttpEntity(header);
         ResponseEntity<PaginatedEntity<Rating>> responseEntity = restTemplate.exchange(requestURL, HttpMethod.GET,
                                     request, new ParameterizedTypeReference<PaginatedEntity<Rating>>() {}, queryParams);
-
         return responseEntity.getBody();
+    }
+
+    public Rating create(String token, com.rideshare.userinfo.model.Rating rating) throws Exception{
+        try {
+            String requestURL = ratingURL + "/ratings";
+            HttpHeaders header = new HttpHeaders();
+            header.add("Authorization", token);
+
+            HttpEntity request = new HttpEntity(header);
+            HttpEntity<com.rideshare.userinfo.model.Rating> entity
+                    = new HttpEntity<com.rideshare.userinfo.model.Rating>(rating,header);
+
+            ResponseEntity<Rating> responseEntity = restTemplate.exchange(requestURL, HttpMethod.POST, entity, Rating.class);
+
+            return responseEntity.getBody();
+        }catch(Exception e){
+            e.printStackTrace();
+            throw e;
+        }
     }
 }

@@ -63,4 +63,14 @@ public class RatingController {
         }
     }
 
+    @PostMapping
+    public ResponseEntity<Rating> createRating(@RequestBody com.rideshare.userinfo.model.Rating rating,
+                                               @RequestHeader HttpHeaders headers,
+                                               @PathVariable Integer userId,
+                                               @AuthenticationPrincipal UserPrincipal userDetails) throws Exception {
+
+        String token = headers.get("Authorization").get(0);
+        Rating response = ratingService.create(token, rating);
+        return ResponseEntity.ok(response);
+    }
 }

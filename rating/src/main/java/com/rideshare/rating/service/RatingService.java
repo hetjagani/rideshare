@@ -163,9 +163,9 @@ public class RatingService implements IRatingService{
 
 
         try {
+
             Integer offset = Pagination.getOffset(page, limit);
             List<Integer> listOfRatings;
-            System.out.println("Value of all "+ all);
             if(all == true){
                 listOfRatings = jdbcTemplate.query(getAllDetailedRating + "LIMIT " + limit + " OFFSET " + offset, new RatingIdMapper());
             }  else {
