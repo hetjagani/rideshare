@@ -28,6 +28,7 @@ public class RatingController {
 
     @GetMapping
     public ResponseEntity<PaginatedEntity<com.rideshare.rating.webentity.Rating>> getPaginatedRatings(@RequestHeader HttpHeaders headers,
+                                                                                                      @RequestParam(required = false) Boolean all,
                                                                                                       @RequestParam(required = false) Integer page,
                                                                                                       @RequestParam(required = false) Integer limit,
                                                                                                       @RequestParam(required = false) Integer userId,
@@ -35,7 +36,7 @@ public class RatingController {
         throws Exception{
         String token = headers.get("Authorization").get(0);
         try {
-            PaginatedEntity<com.rideshare.rating.webentity.Rating> ratings = ratingService.getAllRatings(token, page, limit, userId, ratingUserId);
+            PaginatedEntity<com.rideshare.rating.webentity.Rating> ratings = ratingService.getAllRatings(token, page, limit, userId, ratingUserId, all);
             return ResponseEntity.ok(ratings);
         }catch(Exception e){
             e.printStackTrace();
