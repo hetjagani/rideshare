@@ -8,6 +8,6 @@ public interface IRatingService {
     com.rideshare.rating.webentity.Rating getRatingById(Integer id, String token) throws Exception;
 
     PaginatedEntity<com.rideshare.rating.webentity.Rating> getAllRatings(String token, Integer page, Integer limit, Integer userId,
-                                                                         Integer ratingUserId) throws Exception;
-    Boolean delete(Integer id) throws Exception;
+                                                                         Integer ratingUserId, Boolean all) throws Exception;
+    Boolean delete(Integer userId, Integer id) throws Exception;
 }
