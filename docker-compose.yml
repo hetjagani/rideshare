@@ -21,6 +21,7 @@ services:
   auth:
     depends_on:
       - postgres
+    image: hetpatel572/rideshare-be_auth
     build:
       context: ./auth
       dockerfile: Dockerfile
@@ -37,6 +38,7 @@ services:
   userinfo:
     depends_on:
       - postgres
+    image: hetpatel572/rideshare-be_userinfo
     build:
       context: ./userinfo
       dockerfile: Dockerfile
@@ -53,6 +55,7 @@ services:
   ride:
     depends_on:
       - postgres
+    image: hetpatel572/rideshare-be_ride
     build:
       context: ./ride
       dockerfile: Dockerfile
@@ -69,6 +72,7 @@ services:
   post:
     depends_on:
       - postgres
+    image: hetpatel572/rideshare-be_post
     build:
       context: ./post
       dockerfile: Dockerfile
@@ -85,6 +89,7 @@ services:
   rating:
     depends_on:
       - postgres
+    image: hetpatel572/rideshare-be_rating
     build:
       context: ./rating
       dockerfile: Dockerfile
@@ -101,6 +106,7 @@ services:
   chat:
     depends_on:
       - postgres
+    image: hetpatel572/rideshare-be_chat
     build:
       context: ./chat
       dockerfile: Dockerfile
@@ -117,6 +123,7 @@ services:
   payment:
     depends_on:
       - postgres
+    image: hetpatel572/rideshare-be_payment
     build:
       context: ./payment
       dockerfile: Dockerfile
