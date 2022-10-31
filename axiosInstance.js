@@ -1,6 +1,7 @@
 import axios from "axios";
 import Toast from "react-native-toast-message";
 import { BACKEND_URL } from "./Config";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const axiosInstance = axios.create({
   baseURL: BACKEND_URL,
@@ -9,8 +10,19 @@ const axiosInstance = axios.create({
   },
 });
 
-axiosInstance.interceptors.request.use((config) => {
+axiosInstance.interceptors.request.use(async (config) => {
   console.log("Request URL: ", config.url);
+  try {
+    const authDataSerialized = await AsyncStorage.getItem("@AuthData");
+    if (authDataSerialized) {
+      //If there are data, it's converted to an Object and the state is updated.
+      const _authData = JSON.parse(authDataSerialized);
+      config.headers.Authorization = _authData.data.token;
+      console.log("Sending token: ", _authData.data.token);
+    }
+  } catch (e) {
+    console.log(e);
+  }
   // const token = getCookie('token');
   // if ((config.url === '/users/signup' || config.url === '/users/login')) {
   //   return config;
