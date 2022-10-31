@@ -3,7 +3,7 @@ IF NOT EXISTS "rating"."rating"
         (id SERIAL PRIMARY KEY,
         user_id Integer,
         rating_user_id INTEGER,
-        rating Integer,
+        rating FLOAT,
         description VARCHAR(1024));
 
 CREATE TABLE

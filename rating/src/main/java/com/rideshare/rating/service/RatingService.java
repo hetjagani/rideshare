@@ -14,11 +14,13 @@ import org.springframework.http.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.SqlParameterValue;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.sql.ResultSet;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,7 +42,7 @@ public class RatingService implements IRatingService{
             "\"rating\".\"tags\" as C\n" +
             "WHERE A.id = B.rating_id\n" +
             "AND B.tag_id = C.id\n" +
-            "AND A.id = ?;";
+            "AND A.id = ";
 
     private final String getDetailedRatingByUserId = "SELECT DISTINCT A.id\n" +
             "FROM \"rating\".\"rating\" as A,\n" +
@@ -75,8 +77,7 @@ public class RatingService implements IRatingService{
             "\"rating\".\"rating_tags\" as B,\n" +
             "\"rating\".\"tags\" as C\n" +
             "WHERE A.id = B.rating_id\n" +
-            "AND B.tag_id = C.id " +
-            "LIMIT ? OFFSET ?;";
+            "AND B.tag_id = C.id ";
 
     private final String deleteRating = "DELETE FROM \"rating\".\"rating\" WHERE id = ?";
     @Autowired
@@ -90,7 +91,7 @@ public class RatingService implements IRatingService{
 
     public com.rideshare.rating.webentity.Rating getRatingById(Integer id, String token) throws Exception {
         try {
-            SqlRowSet rs = jdbcTemplate.queryForRowSet(getDetailedRatingById, id);
+            SqlRowSet rs = jdbcTemplate.queryForRowSet(getDetailedRatingById + (Integer)id);
             com.rideshare.rating.webentity.Rating rating = new com.rideshare.rating.webentity.Rating();
 
             List<String> liked = new ArrayList<>();
@@ -156,19 +157,34 @@ public class RatingService implements IRatingService{
                                                                                 Integer page,
                                                                                 Integer limit,
                                                                                 Integer userId,
-                                                                                Integer ratingUserId) throws Exception {
+                                                                                Integer ratingUserId,
+                                                                                Boolean all
+                                                                                ) throws Exception {
+
+
+
         try {
+
             Integer offset = Pagination.getOffset(page, limit);
             List<Integer> listOfRatings;
-            if (userId != null && ratingUserId == null) {
-                listOfRatings = jdbcTemplate.query(getDetailedRatingByUserId, new RatingIdMapper(), userId, limit, offset);
-            } else if (userId == null && ratingUserId != null) {
-                listOfRatings = jdbcTemplate.query(getDetailedRatingByRatingUserId, new RatingIdMapper(), ratingUserId, limit, offset);
-            }else if (userId != null && ratingUserId != null) {
-                listOfRatings = jdbcTemplate.query(getDetailedRatingByRatingUserIdAndUserId, new RatingIdMapper(), userId, ratingUserId, limit, offset);
-            }
-            else {
-                listOfRatings = jdbcTemplate.query(getAllDetailedRating, new RatingIdMapper(), limit, offset);
+            if(all == true){
+                listOfRatings = jdbcTemplate.query(getAllDetailedRating + "LIMIT " + limit + " OFFSET " + offset, new RatingIdMapper());
+            }  else {
+                if (userId != null && ratingUserId == null) {
+                    listOfRatings = jdbcTemplate.query(getDetailedRatingByUserId, new RatingIdMapper(), userId, limit, offset);
+                } else if (userId == null && ratingUserId != null) {
+                    Map<String, Integer> urlParameters = new HashMap<>();
+                    urlParameters.put("id", ratingUserId);
+                    urlParameters.put("limit", limit);
+                    urlParameters.put("offset", offset);
+
+                    listOfRatings = jdbcTemplate.query(getDetailedRatingByRatingUserId, new RatingIdMapper(), ratingUserId, limit, offset);
+                }else if (userId != null && ratingUserId != null) {
+                    listOfRatings = jdbcTemplate.query(getDetailedRatingByRatingUserIdAndUserId, new RatingIdMapper(), userId, ratingUserId, limit, offset);
+                }
+                else {
+                    listOfRatings = jdbcTemplate.query(getAllDetailedRating + "LIMIT " + limit + " OFFSET " + offset, new RatingIdMapper());
+                }
             }
 
             if(listOfRatings.size() == 0){
@@ -177,7 +193,7 @@ public class RatingService implements IRatingService{
             List<com.rideshare.rating.webentity.Rating> listOfDetailedRating = new ArrayList<>();
 
             for (Integer id : listOfRatings) {
-                com.rideshare.rating.webentity.Rating rating = getRatingById(id, token);
+                com.rideshare.rating.webentity.Rating rating = getRatingById((Integer)id, token);
                 listOfDetailedRating.add(rating);
             }
 
@@ -189,9 +205,21 @@ public class RatingService implements IRatingService{
     }
 
     @Override
-    public Boolean delete(Integer id) throws Exception {
-        Integer rowsAffected = jdbcTemplate.update(deleteRating, id);
-        return rowsAffected != 0;
+    public Boolean delete(Integer userId, Integer id) throws Exception {
+        try {
+            SqlRowSet rs = jdbcTemplate.queryForRowSet("SELECT COUNT(*) FROM \"rating\".\"rating\" WHERE id = " + id + " AND rating_user_id = " + userId);
+            while(rs.next()) {
+                if (rs.getInt(1) == 1) {
+                    Integer rowsAffected = jdbcTemplate.update(deleteRating, id);
+                    return rowsAffected != 0;
+                }
+                break;
+            }
+            throw new Exception("No Rating found for given user");
+        }catch(Exception e){
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @Override
