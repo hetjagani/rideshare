@@ -1,0 +1,110 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config-file
+  namespace: rideshare
+data:
+  default.conf:
+    server {
+      listen 80;
+
+      client_max_body_size 100M;
+
+      location / {
+          if ($request_method = 'OPTIONS') {
+              add_header 'Access-Control-Allow-Origin' '*';
+              add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS';
+              add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
+              add_header 'Access-Control-Max-Age' 1728000;
+              add_header 'Content-Type' 'text/plain charset=UTF-8';
+              add_header 'Content-Length' 0;
+              return 204;
+          }
+        if ($request_method ~* "(GET|POST)") {
+            add_header "Access-Control-Allow-Origin"  *;
+        }
+      }
+
+      location /auth {
+        proxy_pass http://auth:8080;
+      }
+
+      location /payments {
+        proxy_pass http://payment:8080;
+      }
+
+      location /ratings {
+        proxy_pass http://rating:8080;
+      }
+
+      location ~ ^/(addresses|requests|rides|tags) {
+        proxy_pass http://ride:8080;
+      }
+
+      location ~ ^/(users|places) {
+        proxy_pass http://userinfo:8080;
+      }
+    }
+
+---
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: rideshare-nginx
+  namespace: rideshare
+  labels:
+    app: nginx
+    tier: gateway
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+      tier: gateway
+  template:
+    metadata:
+      labels:
+        app: nginx
+        tier: gateway
+    spec:
+      containers:
+        - image: nginx:alpine
+          name: nginx
+          ports:
+            - containerPort: 80
+              name: nginx
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/
+          resources:
+            requests:
+              memory: "265Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: nginx-config-file
+            items:
+            - key: default.conf
+              path: default.conf
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  namespace: rideshare
+  labels:
+    app: nginx
+    tier: gateway
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  type: LoadBalancer
+  selector:
+    app: nginx
+    tier: gateway
