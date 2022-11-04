@@ -1,0 +1,51 @@
+---
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: rideshare-payment
+  namespace: rideshare
+  labels:
+    app: payment
+    tier: app
+spec:
+  selector:
+    matchLabels:
+      app: payment
+      tier: app
+  template:
+    metadata:
+      labels:
+        app: payment
+        tier: app
+    spec:
+      containers:
+        - image: hetpatel572/rideshare-be_payment
+          name: payment
+          ports:
+            - containerPort: 8080
+              name: payment
+          resources:
+            requests:
+              memory: "265Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment
+  namespace: rideshare
+  labels:
+    app: payment
+    tier: app
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  type: LoadBalancer
+  selector:
+    app: payment
+    tier: app

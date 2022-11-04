@@ -1,0 +1,51 @@
+---
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: rideshare-ride
+  namespace: rideshare
+  labels:
+    app: ride
+    tier: app
+spec:
+  selector:
+    matchLabels:
+      app: ride
+      tier: app
+  template:
+    metadata:
+      labels:
+        app: ride
+        tier: app
+    spec:
+      containers:
+        - image: hetpatel572/rideshare-be_ride
+          name: ride
+          ports:
+            - containerPort: 8080
+              name: ride
+          resources:
+            requests:
+              memory: "265Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ride
+  namespace: rideshare
+  labels:
+    app: ride
+    tier: app
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  type: LoadBalancer
+  selector:
+    app: ride
+    tier: app
