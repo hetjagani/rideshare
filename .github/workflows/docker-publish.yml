@@ -3,12 +3,10 @@ on:
   push:
     tags:
       - "*"
-    paths:
-      - "auth/**"
 
 jobs:
   push_to_registry:
-    name: Push Docker image to Docker Hub
+    name: Push Docker images to Docker Hub
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
@@ -47,3 +45,73 @@ jobs:
           push: true
           tags: ${{ steps.userinfo_meta.outputs.tags }}
           labels: ${{ steps.userinfo_meta.outputs.labels }}
+
+      - name: Extract metadata of Ride (tags, labels) for Docker
+        id: ride_meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: hetpatel572/rideshare-be_ride
+      
+      - name: Build and push Ride Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: ./ride
+          push: true
+          tags: ${{ steps.ride_meta.outputs.tags }}
+          labels: ${{ steps.ride_meta.outputs.labels }}
+
+      - name: Extract metadata of Rating (tags, labels) for Docker
+        id: rating_meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: hetpatel572/rideshare-be_rating
+      
+      - name: Build and push Rating Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: ./rating
+          push: true
+          tags: ${{ steps.rating_meta.outputs.tags }}
+          labels: ${{ steps.rating_meta.outputs.labels }}
+
+      - name: Extract metadata of Post (tags, labels) for Docker
+        id: post_meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: hetpatel572/rideshare-be_post
+      
+      - name: Build and push Post Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: ./post
+          push: true
+          tags: ${{ steps.post_meta.outputs.tags }}
+          labels: ${{ steps.post_meta.outputs.labels }}
+
+      - name: Extract metadata of Payment (tags, labels) for Docker
+        id: payment_meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: hetpatel572/rideshare-be_payment
+      
+      - name: Build and push Payment Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: ./payment
+          push: true
+          tags: ${{ steps.payment_meta.outputs.tags }}
+          labels: ${{ steps.payment_meta.outputs.labels }}
+
+      - name: Extract metadata of Chat (tags, labels) for Docker
+        id: chat_meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: hetpatel572/rideshare-be_chat
+      
+      - name: Build and push Chat Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: ./chat
+          push: true
+          tags: ${{ steps.chat_meta.outputs.tags }}
+          labels: ${{ steps.chat_meta.outputs.labels }}
