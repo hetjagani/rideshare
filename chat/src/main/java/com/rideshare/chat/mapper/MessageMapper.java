@@ -9,6 +9,12 @@ import java.sql.SQLException;
 public class MessageMapper implements RowMapper<Message> {
     @Override
     public Message mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return new Message(rs.getInt("id"), rs.getInt("initiatedBy"), rs.getInt("initiatedFor"), rs.getTimestamp("createdAt"));
+        Message.MessageStatus status;
+        if(rs.getString("status").equals(Message.MessageStatus.DELIVERED.toString())){
+            status = Message.MessageStatus.DELIVERED;
+        }else{
+            status = Message.MessageStatus.RECEIVED;
+        }
+        return new Message(rs.getInt("id"),rs.getInt("room_id"),rs.getInt("sender_id"),rs.getInt("receiver_id"),rs.getString("content"),status,rs.getTime("created_at"));
     }
 }

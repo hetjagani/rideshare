@@ -33,6 +33,16 @@ public class Message {
         this.status = status;
     }
 
+    public Message(Integer id, Integer roomId, Integer senderId, Integer receiverId, String content, MessageStatus status, Date createdAt) {
+        this.id = id;
+        this.roomId = roomId;
+        this.senderId = senderId;
+        this.receiverId = receiverId;
+        this.content = content;
+        this.status = status;
+        this.createdAt = createdAt;
+    }
+
     public Integer getId() {
         return id;
     }
