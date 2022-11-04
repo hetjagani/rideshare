@@ -21,6 +21,7 @@ spec:
       containers:
         - image: hetpatel572/rideshare-be_auth
           name: auth
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
               name: auth

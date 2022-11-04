@@ -21,6 +21,7 @@ spec:
       containers:
         - image: hetpatel572/rideshare-be_payment
           name: payment
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
               name: payment
