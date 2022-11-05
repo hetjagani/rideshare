@@ -1,6 +1,6 @@
 CREATE TABLE
 IF NOT EXISTS "post"."post"
-    (id INTEGER PRIMARY KEY,
+    (id SERIAL PRIMARY KEY,
     user_id INTEGER,
     title VARCHAR(255),
     description VARCHAR(1024),
@@ -12,14 +12,14 @@ IF NOT EXISTS "post"."post"
 
 CREATE TABLE
 IF NOT EXISTS "post"."image"
-    (id INTEGER,
+    (id SERIAL PRIMARY KEY,
     post_id Integer,
     url VARCHAR(1024),
     CONSTRAINT fk_post_id FOREIGN KEY(post_id) REFERENCES "post"."post"(id) ON DELETE CASCADE);
 
 CREATE TABLE
 IF NOT EXISTS "post"."reported_post"
-    (id INTEGER,
+    (id SERIAL PRIMARY KEY,
     post_id INTEGER,
     user_id INTEGER,
     reason VARCHAR(1024),
