@@ -6,10 +6,8 @@ import com.rideshare.post.mapper.PostMapper;
 import com.rideshare.post.model.Post;
 import com.rideshare.post.model.PostRating;
 import com.rideshare.post.model.PostRide;
-import com.rideshare.post.webentity.PostEntity;
-import com.rideshare.post.webentity.PostImage;
-import com.rideshare.post.webentity.Rating;
-import com.rideshare.post.webentity.Ride;
+import com.rideshare.post.util.Pagination;
+import com.rideshare.post.webentity.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +20,7 @@ import org.springframework.http.*;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -38,6 +37,35 @@ public class PostService {
 
     @Value("${app.rating.url}")
     private String ratingUrl;
+
+    public PaginatedEntity<Post> getPaginatedPosts(String token,
+                                                   Integer page,
+                                                   Integer limit,
+                                                   Integer userId) throws Exception{
+        try {
+            Integer offset = Pagination.getOffset(page, limit);
+
+            String getAllPostsQuery = "SELECT id FROM \"post\".\"post\"";
+            if(userId != null){
+                getAllPostsQuery += " WHERE user_id=" + userId;
+            }
+
+            if(limit != null && page != null){
+                getAllPostsQuery += " LIMIT " + limit + "OFFSET " + offset;
+            }
+            List<Integer> postIds = jdbcTemplate.queryForList(getAllPostsQuery, Integer.class);
+            List<Post> posts = new ArrayList<>();
+
+            for (Integer n : postIds) {
+                posts.add(getPostById(n, token));
+            }
+
+            return new PaginatedEntity<>(posts, page, limit);
+        }catch(Exception e){
+            e.printStackTrace();
+            throw e;
+        }
+    }
 
     public Post getPostById(Integer id, String token) throws Exception{
         try{

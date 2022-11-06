@@ -4,6 +4,7 @@ import com.rideshare.post.Service.PostService;
 import com.rideshare.post.model.Post;
 import com.rideshare.post.security.UserPrincipal;
 import com.rideshare.post.webentity.DeleteSuccess;
+import com.rideshare.post.webentity.PaginatedEntity;
 import com.rideshare.post.webentity.PostEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,13 +22,27 @@ public class PostController {
     private PostService postService;
     private Logger logger = LogManager.getLogger(PostController.class);
     @GetMapping
-    public ResponseEntity getPosts() {
-        return ResponseEntity.ok("Getting all the posts");
+    public ResponseEntity<PaginatedEntity<Post>> getPosts(@RequestHeader HttpHeaders headers,
+                                                          @RequestParam(required = false) Integer page,
+                                                          @RequestParam(required = false) Integer limit,
+                                                          @RequestParam(required = false) Integer userId) throws Exception {
+        try {
+            String token = headers.get("Authorization").get(0);
+            return ResponseEntity.ok(postService.getPaginatedPosts(token, page, limit, userId));
+        }catch(Exception e){
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Post> getPostById(@RequestHeader HttpHeaders headers, @PathVariable Integer id) throws Exception {
-        return ResponseEntity.ok(postService.getPostById(id, headers.get("Authorization").get(0)));
+        try {
+            return ResponseEntity.ok(postService.getPostById(id, headers.get("Authorization").get(0)));
+        }catch(Exception e){
+            e.printStackTrace();
+            throw e;
+        }
     }
     @PostMapping
     public ResponseEntity<Post> createPost(@RequestHeader HttpHeaders headers, @RequestBody PostEntity postData, @AuthenticationPrincipal UserPrincipal userDetails) throws Exception{
