@@ -45,8 +45,8 @@ public class PostService {
 
     public Post create(PostEntity post) throws Exception{
         try{
-            String creatPostQuery = "INSERT INTO \"post\".\"post\" (user_id, title, description, created_at, updated_at, type, ride_id, no_of_likes) VALUES (?,?,?,?,?,?,?,?) RETURNING id";
-            Integer createdPostId = jdbcTemplate.queryForObject(creatPostQuery, Integer.class, post.getUserId(), post.getTitle(), post.getDescription(), Timestamp.from(Instant.now()), Timestamp.from(Instant.now()), post.getType(), post.getRideId(), post.getNoOfLikes());
+            String createPostQuery = "INSERT INTO \"post\".\"post\" (user_id, title, description, created_at, updated_at, type, ride_id, no_of_likes) VALUES (?,?,?,?,?,?,?,?) RETURNING id";
+            Integer createdPostId = jdbcTemplate.queryForObject(createPostQuery, Integer.class, post.getUserId(), post.getTitle(), post.getDescription(), Timestamp.from(Instant.now()), Timestamp.from(Instant.now()), post.getType(), post.getRideId(), post.getNoOfLikes());
 
             if(!post.getImageUrls().isEmpty()){
                 for(String s: post.getImageUrls()){
@@ -57,6 +57,49 @@ public class PostService {
 
             Post retrievedPost = getPostById(createdPostId);
             return retrievedPost;
+        }catch(Exception e){
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public Post update(PostEntity post, Integer id) throws Exception{
+        try{
+            Post fetchedPost = getPostById(id);
+            if(fetchedPost.getUserId() != post.getUserId()){
+                throw new Exception("Cannot update post from different user");
+            }
+            String updatePostQuery = "UPDATE \"post\".\"post\" SET title = ?, description = ?, updated_at = ?, type = ?, ride_id = ?, no_of_likes = ?";
+            jdbcTemplate.update(updatePostQuery, post.getTitle(), post.getDescription(), Timestamp.from(Instant.now()), post.getType(), post.getRideId(), post.getNoOfLikes());
+
+            if(!post.getImageUrls().isEmpty()){
+                String deleteImageQuery = "DELETE FROM \"post\".\"image\" WHERE post_id =" + fetchedPost.getId();
+                jdbcTemplate.update(deleteImageQuery);
+
+                for(String s: post.getImageUrls()){
+                    String createImageQuery = "INSERT INTO \"post\".\"image\" (post_id, url) VALUES (?,?) RETURNING id";
+                    Integer newId = jdbcTemplate.queryForObject(createImageQuery, Integer.class, id, s);
+                }
+            }
+
+            Post retrievedPost = getPostById(id);
+            return retrievedPost;
+        }catch(Exception e){
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public Boolean delete(Integer id, Integer userId) throws Exception{
+        try{
+            Post fetchedPost = getPostById(id);
+            if(fetchedPost.getUserId() != userId){
+                throw new Exception("Cannot delete post of different user");
+            }
+            String deletePostQuery = "DELETE FROM \"post\".\"post\" WHERE id =" + id;
+            Integer affectedRows = jdbcTemplate.update(deletePostQuery);
+
+            return affectedRows != 0;
         }catch(Exception e){
             e.printStackTrace();
             throw e;

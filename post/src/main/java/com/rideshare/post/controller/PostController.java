@@ -3,6 +3,7 @@ package com.rideshare.post.controller;
 import com.rideshare.post.Service.PostService;
 import com.rideshare.post.model.Post;
 import com.rideshare.post.security.UserPrincipal;
+import com.rideshare.post.webentity.DeleteSuccess;
 import com.rideshare.post.webentity.PostEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,6 +35,33 @@ public class PostController {
             Post post = postService.create(postData);
             return ResponseEntity.ok(post);
         }catch(Exception e){
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Post> updatePostById(@RequestBody PostEntity postData, @PathVariable Integer id, @AuthenticationPrincipal UserPrincipal userDetails) throws Exception{
+        try{
+            postData.setUserId(Integer.parseInt(userDetails.getId()));
+            Post post = postService.update(postData, id);
+            return ResponseEntity.ok(post);
+        }catch(Exception e){
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    @DeleteMapping(path = "/{postId}")
+    public ResponseEntity<DeleteSuccess> deletePlace(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Integer postId) throws Exception {
+        try {
+            Integer userId = Integer.parseInt(userPrincipal.getId());
+
+            if(postService.delete(postId, userId)) {
+                return ResponseEntity.ok(new DeleteSuccess(true));
+            }
+            return ResponseEntity.ok(new DeleteSuccess(false));
+        } catch (Exception e) {
             e.printStackTrace();
             throw e;
         }
