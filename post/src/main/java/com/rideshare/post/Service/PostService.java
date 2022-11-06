@@ -4,20 +4,25 @@ import com.rideshare.post.controller.PostController;
 import com.rideshare.post.mapper.PostImageMapper;
 import com.rideshare.post.mapper.PostMapper;
 import com.rideshare.post.model.Post;
+import com.rideshare.post.model.PostRating;
+import com.rideshare.post.model.PostRide;
 import com.rideshare.post.webentity.PostEntity;
 import com.rideshare.post.webentity.PostImage;
+import com.rideshare.post.webentity.Rating;
+import com.rideshare.post.webentity.Ride;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.http.*;
+
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class PostService {
@@ -28,7 +33,13 @@ public class PostService {
     private RestTemplate restTemplate;
     private Logger logger = LogManager.getLogger(PostController.class);
 
-    public Post getPostById(Integer id) throws Exception{
+    @Value("${app.ride.url}")
+    private String rideUrl;
+
+    @Value("${app.rating.url}")
+    private String ratingUrl;
+
+    public Post getPostById(Integer id, String token) throws Exception{
         try{
             String getPostQuery = "SELECT * FROM \"post\".\"post\" WHERE id = " + id;
             Post post =  jdbcTemplate.queryForObject(getPostQuery, new PostMapper());
@@ -36,6 +47,35 @@ public class PostService {
             String getPostImagesQuery = "SELECT * FROM \"post\".\"image\" WHERE post_id = " + id;
             List<PostImage> postImages = jdbcTemplate.query(getPostImagesQuery, new PostImageMapper());
             post.setImageList(postImages);
+
+            // Adding ride information if Post is for a RIDE
+            if(post.getType().compareTo("RIDE") == 0){
+                PostRide ridePost = new PostRide(post);
+                String requestURL = rideUrl + "/rides/" + post.getRefId();
+
+                HttpHeaders header = new HttpHeaders();
+                header.add("Authorization", token);
+
+                HttpEntity request = new HttpEntity(header);
+
+                ResponseEntity<Ride> response = restTemplate.exchange(requestURL, HttpMethod.GET, request, Ride.class);
+                Ride rideInfo = response.getBody();
+                ridePost.setRide(rideInfo);
+                return ridePost;
+            } else if(post.getType().compareTo("RATING") == 0){ // Adding RATING information if Post is for a RATING
+                PostRating ratingPost = new PostRating(post);
+                String requestURL = ratingUrl + "/ratings/" + post.getRefId();
+
+                HttpHeaders header = new HttpHeaders();
+                header.add("Authorization", token);
+
+                HttpEntity request = new HttpEntity(header);
+
+                ResponseEntity<Rating> response = restTemplate.exchange(requestURL, HttpMethod.GET, request, Rating.class);
+                Rating rating = response.getBody();
+                ratingPost.setRating(rating);
+                return ratingPost;
+            }
             return post;
         }catch(Exception e){
             e.printStackTrace();
@@ -43,10 +83,10 @@ public class PostService {
         }
     }
 
-    public Post create(PostEntity post) throws Exception{
+    public Post create(PostEntity post, String token) throws Exception{
         try{
-            String createPostQuery = "INSERT INTO \"post\".\"post\" (user_id, title, description, created_at, updated_at, type, ride_id, no_of_likes) VALUES (?,?,?,?,?,?,?,?) RETURNING id";
-            Integer createdPostId = jdbcTemplate.queryForObject(createPostQuery, Integer.class, post.getUserId(), post.getTitle(), post.getDescription(), Timestamp.from(Instant.now()), Timestamp.from(Instant.now()), post.getType(), post.getRideId(), post.getNoOfLikes());
+            String createPostQuery = "INSERT INTO \"post\".\"post\" (user_id, title, description, created_at, updated_at, type, ref_id, no_of_likes) VALUES (?,?,?,?,?,?,?,?) RETURNING id";
+            Integer createdPostId = jdbcTemplate.queryForObject(createPostQuery, Integer.class, post.getUserId(), post.getTitle(), post.getDescription(), Timestamp.from(Instant.now()), Timestamp.from(Instant.now()), post.getType(), post.getRefId(), post.getNoOfLikes());
 
             if(!post.getImageUrls().isEmpty()){
                 for(String s: post.getImageUrls()){
@@ -55,7 +95,7 @@ public class PostService {
                 }
             }
 
-            Post retrievedPost = getPostById(createdPostId);
+            Post retrievedPost = getPostById(createdPostId, token);
             return retrievedPost;
         }catch(Exception e){
             e.printStackTrace();
@@ -63,14 +103,14 @@ public class PostService {
         }
     }
 
-    public Post update(PostEntity post, Integer id) throws Exception{
+    public Post update(PostEntity post, Integer id, String token) throws Exception{
         try{
-            Post fetchedPost = getPostById(id);
+            Post fetchedPost = getPostById(id, token);
             if(fetchedPost.getUserId() != post.getUserId()){
                 throw new Exception("Cannot update post from different user");
             }
-            String updatePostQuery = "UPDATE \"post\".\"post\" SET title = ?, description = ?, updated_at = ?, type = ?, ride_id = ?, no_of_likes = ?";
-            jdbcTemplate.update(updatePostQuery, post.getTitle(), post.getDescription(), Timestamp.from(Instant.now()), post.getType(), post.getRideId(), post.getNoOfLikes());
+            String updatePostQuery = "UPDATE \"post\".\"post\" SET title = ?, description = ?, updated_at = ?, type = ?, ref_id = ?, no_of_likes = ? WHERE id=?";
+            jdbcTemplate.update(updatePostQuery, post.getTitle(), post.getDescription(), Timestamp.from(Instant.now()), post.getType(), post.getRefId(), post.getNoOfLikes(), id);
 
             if(!post.getImageUrls().isEmpty()){
                 String deleteImageQuery = "DELETE FROM \"post\".\"image\" WHERE post_id =" + fetchedPost.getId();
@@ -82,7 +122,7 @@ public class PostService {
                 }
             }
 
-            Post retrievedPost = getPostById(id);
+            Post retrievedPost = getPostById(id, token);
             return retrievedPost;
         }catch(Exception e){
             e.printStackTrace();
@@ -90,9 +130,9 @@ public class PostService {
         }
     }
 
-    public Boolean delete(Integer id, Integer userId) throws Exception{
+    public Boolean delete(Integer id, Integer userId, String token) throws Exception{
         try{
-            Post fetchedPost = getPostById(id);
+            Post fetchedPost = getPostById(id, token);
             if(fetchedPost.getUserId() != userId){
                 throw new Exception("Cannot delete post of different user");
             }

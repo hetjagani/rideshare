@@ -7,7 +7,7 @@ IF NOT EXISTS "post"."post"
     created_at TIMESTAMP,
     updated_at TIMESTAMP,
     type VARCHAR(255),
-    ride_id INTEGER,
+    ref_id INTEGER,
     no_of_likes INTEGER);
 
 CREATE TABLE

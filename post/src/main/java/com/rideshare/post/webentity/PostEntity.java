@@ -10,18 +10,18 @@ public class PostEntity {
     private String title;
     private String description;
     private String type;
-    private Integer rideId;
+    private Integer refId;
     private Integer noOfLikes;
     private List<String> imageUrls;
 
     public PostEntity(){}
 
-    public PostEntity(Integer userId, String title, String description, String type, Integer rideId, Integer noOfLikes, List<String> imageUrls) {
+    public PostEntity(Integer userId, String title, String description, String type, Integer refId, Integer noOfLikes, List<String> imageUrls) {
         this.userId = userId;
         this.title = title;
         this.description = description;
         this.type = type;
-        this.rideId = rideId;
+        this.refId = refId;
         this.noOfLikes = noOfLikes;
         this.imageUrls = imageUrls;
     }

@@ -8,6 +8,7 @@ import com.rideshare.post.webentity.PostEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -25,14 +26,15 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Post> getPostById(@PathVariable Integer id) throws Exception {
-        return ResponseEntity.ok(postService.getPostById(id));
+    public ResponseEntity<Post> getPostById(@RequestHeader HttpHeaders headers, @PathVariable Integer id) throws Exception {
+        return ResponseEntity.ok(postService.getPostById(id, headers.get("Authorization").get(0)));
     }
     @PostMapping
-    public ResponseEntity<Post> createPost(@RequestBody PostEntity postData, @AuthenticationPrincipal UserPrincipal userDetails) throws Exception{
+    public ResponseEntity<Post> createPost(@RequestHeader HttpHeaders headers, @RequestBody PostEntity postData, @AuthenticationPrincipal UserPrincipal userDetails) throws Exception{
         try{
+            String token = headers.get("Authorization").get(0);
             postData.setUserId(Integer.parseInt(userDetails.getId()));
-            Post post = postService.create(postData);
+            Post post = postService.create(postData, token);
             return ResponseEntity.ok(post);
         }catch(Exception e){
             e.printStackTrace();
@@ -41,10 +43,11 @@ public class PostController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Post> updatePostById(@RequestBody PostEntity postData, @PathVariable Integer id, @AuthenticationPrincipal UserPrincipal userDetails) throws Exception{
+    public ResponseEntity<Post> updatePostById(@RequestHeader HttpHeaders headers, @RequestBody PostEntity postData, @PathVariable Integer id, @AuthenticationPrincipal UserPrincipal userDetails) throws Exception{
         try{
             postData.setUserId(Integer.parseInt(userDetails.getId()));
-            Post post = postService.update(postData, id);
+            String token = headers.get("Authorization").get(0);
+            Post post = postService.update(postData, id, token);
             return ResponseEntity.ok(post);
         }catch(Exception e){
             e.printStackTrace();
@@ -53,11 +56,11 @@ public class PostController {
     }
 
     @DeleteMapping(path = "/{postId}")
-    public ResponseEntity<DeleteSuccess> deletePlace(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Integer postId) throws Exception {
+    public ResponseEntity<DeleteSuccess> deletePlace(@RequestHeader HttpHeaders headers, @AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Integer postId) throws Exception {
         try {
             Integer userId = Integer.parseInt(userPrincipal.getId());
-
-            if(postService.delete(postId, userId)) {
+            String token = headers.get("Authorizarion").get(0);
+            if(postService.delete(postId, userId, token)) {
                 return ResponseEntity.ok(new DeleteSuccess(true));
             }
             return ResponseEntity.ok(new DeleteSuccess(false));

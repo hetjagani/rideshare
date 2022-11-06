@@ -15,25 +15,25 @@ public class Post {
     private Timestamp createdAt;
     private Timestamp updatedAt;
     private String type;
-    private Integer rideId;
+    private Integer refId;
     private Integer noOfLikes;
     private List<PostImage> imageList;
 
     public Post(){}
 
-    public Post(Integer userId, String title, String description, Timestamp createdAt, Timestamp updatedAt, String type, Integer rideId, Integer noOfLikes, List<PostImage> imageList) {
+    public Post(Integer userId, String title, String description, Timestamp createdAt, Timestamp updatedAt, String type, Integer refId, Integer noOfLikes, List<PostImage> imageList) {
         this.userId = userId;
         this.title = title;
         this.description = description;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.type = type;
-        this.rideId = rideId;
+        this.refId = refId;
         this.noOfLikes = noOfLikes;
         this.imageList = imageList;
     }
 
-    public Post(Integer id, Integer userId, String title, String description, Timestamp createdAt, Timestamp updatedAt, String type, Integer rideId, Integer noOfLikes, List<PostImage> imageList) {
+    public Post(Integer id, Integer userId, String title, String description, Timestamp createdAt, Timestamp updatedAt, String type, Integer refId, Integer noOfLikes, List<PostImage> imageList) {
         this.id = id;
         this.userId = userId;
         this.title = title;
@@ -41,7 +41,7 @@ public class Post {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.type = type;
-        this.rideId = rideId;
+        this.refId = refId;
         this.noOfLikes = noOfLikes;
         this.imageList = imageList;
     }
