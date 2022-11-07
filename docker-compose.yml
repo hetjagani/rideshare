@@ -142,7 +142,7 @@ services:
       - postgres
     image: nginx:alpine
     ports:
-      - 8000:8000
+      - 8000:80
     volumes:
       - type: bind
         source: ./nginx/nginx.conf

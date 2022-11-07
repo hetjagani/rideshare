@@ -21,10 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -58,21 +55,15 @@ public class AuthController {
     @PostMapping(path = "/signup")
     public ResponseEntity<AuthResponse> signUpUser(@RequestBody User user) throws BadRequestException {
         try {
-            userService.getUserByEmail(user.getEmail());
+            userService.getUserByEmail(user.getEmail().toLowerCase());
         } catch (EmptyResultDataAccessException ex) {
             try {
-                // check for valid role
-                for(String role: user.getRoles()) {
-                    if(!validRoles.contains(role)) {
-                        throw new BadRequestException("Invalid role in roles list, roles should be: DRIVER, RIDER or ADMIN");
-                    }
-                }
 
-                com.rideshare.auth.model.User dbUser = new com.rideshare.auth.model.User(user.getEmail(),
+                com.rideshare.auth.model.User dbUser = new com.rideshare.auth.model.User(user.getEmail().toLowerCase(),
                         user.getPassword(),
                         user.getPhoneNo(),
                         true,
-                        user.getRoles());
+                        Collections.singletonList("RIDER"));
                 dbUser.setPassword(passwordEncoder.encode(user.getPassword()));
                 com.rideshare.auth.model.User createdUser = userService.createUser(dbUser);
 
@@ -97,7 +88,7 @@ public class AuthController {
     @PostMapping(path = "/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginInfo loginInfo) throws Exception {
         try {
-            Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginInfo.getEmail(), loginInfo.getPassword()));
+            Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginInfo.getEmail().toLowerCase(), loginInfo.getPassword()));
 
             SecurityContextHolder.getContext().setAuthentication(auth);
 
