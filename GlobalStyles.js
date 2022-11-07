@@ -14,11 +14,6 @@ export const globalStyles = StyleSheet.create({
     alignItems: "center",
   },
   input: {
-    height: 50,
-    width: 330,
-    margin: 12,
-    borderWidth: 1,
-    borderColor: "#ffffff",
     padding: 10,
   },
   tinyLogo: {

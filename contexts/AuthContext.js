@@ -1,7 +1,8 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import Toast from "react-native-toast-message";
 import login from "../services/login";
+import signUpReq from "../services/signup";
 
 //Create the Auth Context with the data type specified
 //and a empty object
@@ -37,6 +38,42 @@ const AuthProvider = ({ children }) => {
   const signIn = async (authData) => {
     try {
       const _authData = await login(authData);
+      console.log(_authData)
+
+      if (_authData?.response?.status == 401) {
+        Toast.show({
+          type: "error",
+          text1: "Cannot login, please check the credentials",
+        });
+        return;
+      }
+
+      if (!_authData) return;
+
+      //Set the data in the context, so the App can be notified
+      //and send the user to the AuthStack
+      setAuthData(_authData.data.token);
+
+      //Persist the data in the Async Storage
+      //to be recovered in the next user session.
+      AsyncStorage.setItem("@AuthData", JSON.stringify(_authData));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const signUp = async (data) => {
+    try {
+      const _authData = await signUpReq(data);
+
+      if (_authData?.response?.status == 500) {
+        Toast.show({
+          type: "error",
+          text1: "Cannot signup, server error",
+        });
+        return;
+      }
+
       if (!_authData) return;
 
       //Set the data in the context, so the App can be notified
@@ -64,7 +101,7 @@ const AuthProvider = ({ children }) => {
   return (
     //This component will be used to encapsulate the whole App,
     //so all components will have access to the Context
-    <AuthContext.Provider value={{ authData, loading, signIn, signOut }}>
+    <AuthContext.Provider value={{ authData, loading, signIn, signOut, signUp }}>
       {children}
     </AuthContext.Provider>
   );

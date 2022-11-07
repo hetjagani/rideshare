@@ -1,6 +1,7 @@
 import { Button, Layout, Text } from "@ui-kitten/components";
 import React from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { PAYMENT_SCREEN } from "../routes/AppRoutes";
 
 function Home({ navigation }) {
   const auth = useAuth();
@@ -9,7 +10,7 @@ function Home({ navigation }) {
   };
 
   const payment = () => {
-    navigation.navigate("PaymentScreen");
+    navigation.navigate(PAYMENT_SCREEN);
   };
   return (
     <Layout>

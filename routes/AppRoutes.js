@@ -1,0 +1,5 @@
+export const HOME_NAVIGATOR = "HOME_NAVIGATOR";
+export const LOGIN_SCREEN = "LOGIN_SCREEN";
+export const HOME_SCREEN = "HOME_SCREEN";
+export const SIGNUP_SCREEN = "SIGNUP_SCREEN";
+export const PAYMENT_SCREEN = "PAYMENT_SCREEN";

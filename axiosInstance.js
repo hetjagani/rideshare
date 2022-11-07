@@ -40,7 +40,6 @@ axiosInstance.interceptors.request.use(async (config) => {
 axiosInstance.interceptors.response.use(
   (res) => res,
   (err) => {
-    console.log(err);
     if (!err.response) {
       Toast.show({
         type: "error",
@@ -48,29 +47,6 @@ axiosInstance.interceptors.response.use(
         text2: "Please retry after sometime",
       });
     }
-    // if (err && err.response && err.response.status === 401) {
-    //   if (err.response.data && err.response.data.message) {
-    //     console.log(err.response.data.message);
-    //   }
-    //   toast.error('Unauthorized request!');
-    //   return;
-    // }
-    // if (err && err.response && err.response.status === 403) {
-    //   if (err.response.data.message && typeof (err.response.data.message) === 'string') {
-    //     toast.error(err.response.data.message);
-    //   } else {
-    //     toast.error('Forbidden request!');
-    //   }
-    //   return;
-    // }
-    // if (err && err.response && err.response.data && err.response.data.error) {
-    //   if (typeof (err.response.data.message) === 'string') {
-    //     toast.error(err.response.data.error);
-    //   } else {
-    //     toast.error('Forbidden request!');
-    //   }
-    //   return;
-    // }
     if (err && err.response && err.response.data && err.response.data.message) {
       if (typeof err.response.data.message === "string") {
         Toast.show({
@@ -79,9 +55,10 @@ axiosInstance.interceptors.response.use(
           text2: err.response.data.message,
         });
       } else {
-        console.log(err.response.data.message);
+        console.log("Error: ", err.response.data.message);
       }
     }
+    return err;
   }
 );
 
