@@ -20,7 +20,7 @@ public class PostController {
 
     @Autowired
     private PostService postService;
-    private Logger logger = LogManager.getLogger(PostController.class);
+
     @GetMapping
     public ResponseEntity<PaginatedEntity<Post>> getPosts(@RequestHeader HttpHeaders headers,
                                                           @RequestParam(required = false) Integer page,

@@ -30,7 +30,6 @@ public class PostService {
 
     @Autowired
     private RestTemplate restTemplate;
-    private Logger logger = LogManager.getLogger(PostController.class);
 
     @Value("${app.ride.url}")
     private String rideUrl;
