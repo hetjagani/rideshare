@@ -77,10 +77,27 @@ public class UserInfoService implements IUserInfoService {
     }
 
     @Override
-    public UserInfo getById(Integer id) throws Exception {
+    public UserInfo getById(Integer id, String token) throws Exception {
         String sql = "SELECT * FROM \"userinfo\".\"userinfo\" WHERE id = ?;";
-        
-        return jdbcTemplate.queryForObject(sql, new UserInfoMapper(), id);
+        String requestURL = authURL + "/auth/users";
+        HttpHeaders header = new HttpHeaders();
+        header.add("Authorization", token);
+
+        HttpEntity request = new HttpEntity(header);
+
+        ResponseEntity<User[]> responseEntity = restTemplate.exchange(requestURL, HttpMethod.GET, request, User[].class);
+        List<User> userList = Arrays.asList(responseEntity.getBody());
+        UserInfo userInfo =  jdbcTemplate.queryForObject(sql, new UserInfoMapper(), id);
+
+        for(User u: userList){
+            if(u.getId() == id){
+                userInfo.setEmail(u.getEmail());
+                userInfo.setPhoneNo(u.getPhoneNo());
+                userInfo.setRoles(u.getRoles());
+                break;
+            }
+        }
+        return userInfo;
     }
 
     @Override

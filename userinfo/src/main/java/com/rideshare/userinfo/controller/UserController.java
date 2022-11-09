@@ -46,11 +46,11 @@ public class UserController {
     }
 
     @GetMapping(path = "/me")
-    public ResponseEntity<UserInfo> getSelfUserInfo(@AuthenticationPrincipal UserPrincipal userDetails) throws Exception {
+    public ResponseEntity<UserInfo> getSelfUserInfo(@RequestHeader HttpHeaders headers,@AuthenticationPrincipal UserPrincipal userDetails) throws Exception {
         try {
             Integer userID = Integer.parseInt(userDetails.getId());
-
-            UserInfo userInfo = userInfoService.getById(userID);
+            String token = headers.get("Authorization").get(0);
+            UserInfo userInfo = userInfoService.getById(userID, token);
             userInfo.setEmail(userDetails.getEmail());
             userInfo.setPhoneNo(userDetails.getPhoneNo());
             userInfo.setVerified(userDetails.isEnabled());
@@ -64,7 +64,7 @@ public class UserController {
     }
 
     @PutMapping
-    public ResponseEntity<UserInfo> saveUserInfo(@RequestBody @Valid com.rideshare.userinfo.webentity.UserInfo userInfo, @AuthenticationPrincipal UserPrincipal userDetails) throws Exception {
+    public ResponseEntity<UserInfo> saveUserInfo(@RequestHeader HttpHeaders headers, @RequestBody @Valid com.rideshare.userinfo.webentity.UserInfo userInfo, @AuthenticationPrincipal UserPrincipal userDetails) throws Exception {
         // prepare object to store in db
         UserInfo toSaveUserInfo = new UserInfo();
         toSaveUserInfo.setId(userInfo.getId());
@@ -81,7 +81,8 @@ public class UserController {
                 throw new ForbiddenException("cannot add userinfo of other user then self");
             }
 
-            UserInfo presentUser = userInfoService.getById(Integer.parseInt(userDetails.getId()));
+            String token = headers.get("Authorization").get(0);
+            UserInfo presentUser = userInfoService.getById(Integer.parseInt(userDetails.getId()), token);
             UserInfo result = null;
             if(presentUser != null) {
                 result = userInfoService.update(toSaveUserInfo);
@@ -99,9 +100,10 @@ public class UserController {
     }
 
     @GetMapping(path = "/{userID}")
-    public ResponseEntity<UserInfo> getUserInfoById(@PathVariable Integer userID) throws Exception {
+    public ResponseEntity<UserInfo> getUserInfoById(@RequestHeader HttpHeaders headers, @PathVariable Integer userID) throws Exception {
         try {
-            UserInfo userInfo = userInfoService.getById(userID);
+            String token = headers.get("Authorization").get(0);
+            UserInfo userInfo = userInfoService.getById(userID, token);
             return ResponseEntity.ok(userInfo);
         }catch (Exception e) {
             e.printStackTrace();
