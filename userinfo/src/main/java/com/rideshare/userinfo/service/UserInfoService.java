@@ -79,7 +79,7 @@ public class UserInfoService implements IUserInfoService {
     @Override
     public UserInfo getById(Integer id) throws Exception {
         String sql = "SELECT * FROM \"userinfo\".\"userinfo\" WHERE id = ?;";
-
+        
         return jdbcTemplate.queryForObject(sql, new UserInfoMapper(), id);
     }
 
