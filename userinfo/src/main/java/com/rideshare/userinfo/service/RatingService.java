@@ -57,7 +57,6 @@ public class RatingService {
             HttpHeaders header = new HttpHeaders();
             header.add("Authorization", token);
 
-            HttpEntity request = new HttpEntity(header);
             HttpEntity<com.rideshare.userinfo.model.Rating> entity
                     = new HttpEntity<com.rideshare.userinfo.model.Rating>(rating,header);
 
