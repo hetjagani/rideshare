@@ -64,4 +64,16 @@ public class UserService implements IUserService{
         List<String> roles = jdbcTemplate.query(sql, new RoleMapper(), new Object[]{id});
         return roles;
     }
+
+    @Override
+    public User updateRoles(Integer id, List<String> roles) throws DataAccessException {
+        String deleteSql = "DELETE FROM auth.role WHERE user_id = ?";
+        jdbcTemplate.update(deleteSql, id);
+
+        for (String role: roles) {
+            String createRoleSQL = "INSERT INTO \"auth\".\"role\"(user_id, role) VALUES(?,?);";
+            jdbcTemplate.update(createRoleSQL, id, role.toUpperCase());
+        }
+        return getUserById(id);
+    }
 }

@@ -2,7 +2,9 @@ package com.rideshare.userinfo.controller;
 
 import com.rideshare.userinfo.exception.BadRequestException;
 import com.rideshare.userinfo.exception.ForbiddenException;
+import com.rideshare.userinfo.facade.AuthServiceFacade;
 import com.rideshare.userinfo.model.License;
+import com.rideshare.userinfo.model.User;
 import com.rideshare.userinfo.model.UserInfo;
 import com.rideshare.userinfo.security.UserPrincipal;
 import com.rideshare.userinfo.service.ILicenseService;
@@ -14,9 +16,17 @@ import com.rideshare.userinfo.webentity.IdAnalyzerRequest;
 import com.rideshare.userinfo.webentity.IdAnalyzerResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/documents")
@@ -30,6 +40,9 @@ public class DocumentVerificationController {
 
     @Autowired
     private IUserInfoService userInfoService;
+
+    @Autowired
+    private AuthServiceFacade authService;
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<License> getLicense(@PathVariable Integer id) throws Exception {
@@ -53,7 +66,9 @@ public class DocumentVerificationController {
     }
 
     @PostMapping
-    private ResponseEntity<License> verifyDocument(@RequestBody DocumentVerificationRequest request, @AuthenticationPrincipal UserPrincipal userDetails) throws Exception {
+    private ResponseEntity<License> verifyDocument(@RequestBody DocumentVerificationRequest request,
+                                                   @AuthenticationPrincipal UserPrincipal userDetails,
+                                                   @RequestHeader HttpHeaders headers) throws Exception {
         try {
             Integer userId = Integer.parseInt(userDetails.getId());
 
@@ -105,7 +120,11 @@ public class DocumentVerificationController {
 
             License createdLicense = licenseService.create(license);
 
-            // TODO: Add DRIVER to roles of user
+            // Add DRIVER to roles of user
+            String token = headers.get("Authorization").get(0);
+            Set<String> userRoles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
+            userRoles.add("DRIVER");
+            authService.updateRoles(new ArrayList<String>(userRoles), token);
 
             return ResponseEntity.ok(createdLicense);
         } catch (DuplicateKeyException dke) {

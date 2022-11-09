@@ -4,17 +4,21 @@ import com.rideshare.auth.exception.BadRequestException;
 import com.rideshare.auth.exception.UserAlreadyExistsException;
 import com.rideshare.auth.exception.UserDoesNotExistException;
 import com.rideshare.auth.security.TokenProvider;
+import com.rideshare.auth.security.UserPrincipal;
 import com.rideshare.auth.service.IUserService;
 import com.rideshare.auth.webentity.AuthResponse;
 import com.rideshare.auth.webentity.LoginInfo;
+import com.rideshare.auth.webentity.UpdateRoleRequest;
 import com.rideshare.auth.webentity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -95,6 +99,23 @@ public class AuthController {
             final String token = tokenProvider.createToken(auth);
 
             return ResponseEntity.ok(new AuthResponse(token));
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    @PutMapping(path = "/roles")
+    public ResponseEntity<com.rideshare.auth.model.User> updateRoles(@RequestBody UpdateRoleRequest request, @RequestHeader HttpHeaders headers) throws Exception {
+        try {
+            String token = headers.get("Authorization").get(0);
+
+            tokenProvider.validateToken(token);
+            String stringId = tokenProvider.getUserIdFromToken(token);
+            Integer userId = Integer.parseInt(stringId);
+            com.rideshare.auth.model.User updatedUser = userService.updateRoles(userId, request.getRoles());
+
+            return ResponseEntity.ok(updatedUser);
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
