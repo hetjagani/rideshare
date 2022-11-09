@@ -3,6 +3,8 @@ package com.rideshare.post.Service;
 import com.rideshare.post.mapper.PostReportMapper;
 import com.rideshare.post.model.Post;
 import com.rideshare.post.model.PostReport;
+import com.rideshare.post.util.Pagination;
+import com.rideshare.post.webentity.PaginatedEntity;
 import com.rideshare.post.webentity.PostReportDetails;
 import com.rideshare.post.webentity.PostReportRequest;
 import com.rideshare.post.webentity.User;
@@ -15,6 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class PostReportService {
@@ -30,6 +35,32 @@ public class PostReportService {
     @Value("${app.userinfo.url}")
     private String userInfoUrl;
 
+    public PaginatedEntity<PostReport> getPaginatedPostReports(String token, Integer page, Integer limit, Integer userId) throws Exception {
+        try {
+            Integer offset = Pagination.getOffset(page, limit);
+
+            String getReportIdsQuery = "SELECT id FROM \"post\".\"reported_post\"";
+            if(userId != null){
+                getReportIdsQuery += " WHERE user_id=" + userId;
+            }
+
+            if(limit != null && page != null){
+                getReportIdsQuery += " LIMIT " + limit + "OFFSET " + offset;
+            }
+
+            List<Integer> reportIds = jdbcTemplate.queryForList(getReportIdsQuery, Integer.class);
+            List<PostReport> postReports = new ArrayList<>();
+
+            for(Integer id: reportIds){
+                postReports.add(getReportById(id, token));
+            }
+
+            return new PaginatedEntity<>(postReports, page, limit);
+        }catch(Exception e){
+            e.printStackTrace();
+            throw e;
+        }
+    }
     public PostReportDetails getReportById(Integer id, String token) throws Exception{
         try{
             String getReportQuery = "SELECT * FROM \"post\".\"reported_post\" WHERE id=" + id;
@@ -55,6 +86,7 @@ public class PostReportService {
             throw e;
         }
     }
+
 
     public PostReport create(PostReportRequest postReport, String token) throws Exception{
         try {
