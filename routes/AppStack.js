@@ -4,7 +4,8 @@ import Payment from "../screens/Payment";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Icon } from "@ui-kitten/components";
-import { HOME_SCREEN, PAYMENT_SCREEN, HOME_NAVIGATOR } from "./AppRoutes";
+import { HOME_SCREEN, PAYMENT_SCREEN, HOME_NAVIGATOR, PROFILE_SCREEN } from "./AppRoutes";
+import Profile from "../screens/Profile";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -49,6 +50,16 @@ export const AppStack = () => {
         options={{
           headerShown: false,
           tabBarIcon: tabIcon("home"),
+          title: "Home"
+        }}
+      />
+      <Tab.Screen 
+        name={PROFILE_SCREEN}
+        component={Profile}
+        options={{
+          headerShown: true,
+          title: "Profile",
+          tabBarIcon: tabIcon("person")
         }}
       />
     </Tab.Navigator>
