@@ -4,3 +4,4 @@ export const HOME_SCREEN = "HOME_SCREEN";
 export const SIGNUP_SCREEN = "SIGNUP_SCREEN";
 export const PAYMENT_SCREEN = "PAYMENT_SCREEN";
 export const PROFILE_SCREEN = "PROFILE_SCREEN";
+export const USER_INFO_SCREEN = "USER_INFO_SCREEN";
