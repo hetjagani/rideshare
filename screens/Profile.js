@@ -1,10 +1,38 @@
 import { Layout, Text, Menu, MenuItem, Icon } from '@ui-kitten/components';
 import { globalStyles } from '../GlobalStyles';
-import React from 'react';
+import React, {useEffect} from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 import { ProfileMenuItems } from './ProfileMenuItems';
+import { fetchUserDetails } from '../services/fetchUserDetails';
 
 const Profile = ({navigation}) => {
+  const [name, setName] = React.useState('Temp Name');
+  const getUserDetails = async () => {
+    const res = await fetchUserDetails();
+    if (res?.response?.status == 401) {
+      Toast.show({
+        type: 'error',
+        text1: 'Unauthorised',
+      });
+      return;
+    }
+
+    if (res?.response?.status == 500) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error Fetching Details',
+      });
+      return;
+    }
+    
+    const userName = res?.data?.firstName + " " + res?.data?.lastName;
+    setName(userName);
+  };
+
+  useEffect(() => {
+    getUserDetails();
+  }, [])
+  
   return (
     <View style={{ height: '100%', backgroundColor: 'white' }}>
       <Layout
@@ -26,7 +54,7 @@ const Profile = ({navigation}) => {
         </Layout>
         <Layout style={{ marginTop: '3%' }}>
           <Text style={{ fontWeight: 'bold', fontSize: '20px' }}>
-            Akash Rupapara
+            {name}
           </Text>
         </Layout>
         <View
@@ -79,7 +107,7 @@ const Profile = ({navigation}) => {
         </Layout>
         <Layout
        >
-          <ProfileMenuItems navigation={navigation}/>
+          <ProfileMenuItems navigation={navigation} />
         </Layout>
       </Layout>
     </View>

@@ -1,5 +1,14 @@
-import { Text, Input, Layout, Modal, Card, Button } from '@ui-kitten/components';
-import React from 'react';
+import {
+  Text,
+  Input,
+  Layout,
+  Modal,
+  Card,
+  Button,
+} from '@ui-kitten/components';
+import Toast from "react-native-toast-message";
+
+import React, { useEffect } from 'react';
 import {
   View,
   Image,
@@ -7,6 +16,8 @@ import {
   KeyboardAvoidingView,
   ScrollView,
 } from 'react-native';
+import { fetchUserDetails } from '../services/fetchUserDetails';
+import updateUserDetails from '../services/updateUserDetails';
 
 export const UserInfo = () => {
   const [email, setEmail] = React.useState('');
@@ -14,6 +25,12 @@ export const UserInfo = () => {
   const [lastName, setLastName] = React.useState('');
   const [contactNo, setContactNo] = React.useState('');
   const [visible, setVisible] = React.useState(false);
+  const [id, setId] = React.useState(0);
+  const [profileImage, setProfileImage] = React.useState('');
+
+  useEffect(() => {
+    getUserDetails();
+  }, []);
 
   const styles = StyleSheet.create({
     container: {
@@ -25,8 +42,68 @@ export const UserInfo = () => {
     },
   });
 
+  const getUserDetails = async () => {
+    const res = await fetchUserDetails();
+    if (res?.response?.status == 401) {
+      Toast.show({
+        type: 'error',
+        text1: 'Unauthorised',
+      });
+      return;
+    }
+
+    if (res?.response?.status == 500) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error Fetching Details',
+      });
+      return;
+    }
+
+    setEmail(res?.data?.email);
+    setFirstName(res?.data?.firstName);
+    setLastName(res?.data?.lastName);
+    setContactNo(res?.data?.phoneNo);
+    setId(res?.data?.id);
+    setProfileImage(res?.data?.profileImage);
+  };
+
+  const saveUserInfo = async () => {
+    const userDetails = {
+      id,
+      firstName,
+      lastName,
+      profileImage,
+    }
+
+    const res = await updateUserDetails(userDetails);
+    if (res?.response?.status == 401) {
+      Toast.show({
+        type: 'error',
+        text1: 'Unauthorised',
+      });
+      return;
+    }
+
+    if (res?.response?.status == 500) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error Updating Details',
+      });
+      return;
+    }
+
+    getUserDetails();
+
+    Toast.show({
+      type: 'success',
+      text1: 'Updated User Details',
+    });
+    
+  }
+
   return (
-    <KeyboardAvoidingView enabled behavior="padding">
+    <KeyboardAvoidingView enabled behavior="position">
       <View
         style={{
           height: '100%',
@@ -35,27 +112,6 @@ export const UserInfo = () => {
           backgroundColor: 'white',
         }}
       >
-        {/* <Layout
-          style={{
-            backgroundColor: 'red',
-            borderRadius: '90%',
-            height: 180,
-            width: 180,
-            marginTop: '10%',
-          }}
-        >
-          <Image
-            source={require('../assets/img_avatar.png')}
-            style={{
-              borderRadius: '90%',
-              height: 180,
-              width: 180,
-            }}
-          />
-        </Layout>
-        <Layout>
-          <Button title={'Change Profile Pic'} />
-        </Layout> */}
         <Layout
           style={{
             height: '50%',
@@ -97,6 +153,7 @@ export const UserInfo = () => {
           <Layout style={{ width: '90%', alignItems: 'center' }}>
             <Text>Contact Number: </Text>
             <Input
+              disabled={true}
               maxLength={10}
               style={styles.input}
               value={contactNo}
@@ -123,7 +180,13 @@ export const UserInfo = () => {
             }}
           />
         </Layout>
-        <Button style={{marginTop: "2%"}} onPress={() => setVisible(true)}> Change Profile Pic </Button>
+        <Button style={{ marginTop: '2%' }} onPress={() => setVisible(true)}>
+          Change Profile Pic
+        </Button>
+
+        <Button style={{ marginTop: '2%' }} status="warning" onPress={()=>saveUserInfo()}>
+          Save Details
+        </Button>
 
         <Modal
           visible={visible}

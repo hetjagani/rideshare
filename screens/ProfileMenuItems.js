@@ -1,13 +1,14 @@
 import { Layout, Menu, MenuItem, Icon } from '@ui-kitten/components';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 import { UserInfo } from './UserInfo';
 import { createStackNavigator, createAppContainer } from 'react-navigation';  
+import { fetchUserDetails } from '../services/fetchUserDetails';
 
 
-export const ProfileMenuItems = ({navigation}) => {
+export const ProfileMenuItems = ({navigation, props}) => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
-
+  
   const styles = StyleSheet.create({
     container: {
       flexDirection: 'row',
