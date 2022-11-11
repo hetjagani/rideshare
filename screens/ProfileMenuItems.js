@@ -1,9 +1,6 @@
 import { Layout, Menu, MenuItem, Icon } from '@ui-kitten/components';
-import React, { useState, useEffect } from 'react';
-import { View, Image, StyleSheet } from 'react-native';
-import { UserInfo } from './UserInfo';
-import { createStackNavigator, createAppContainer } from 'react-navigation';  
-import { fetchUserDetails } from '../services/fetchUserDetails';
+import React, { useState } from 'react';
+import {  StyleSheet } from 'react-native';
 
 
 export const ProfileMenuItems = ({navigation, props}) => {
