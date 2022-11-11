@@ -1,12 +1,13 @@
 import { Layout, Text, Menu, MenuItem, Icon } from '@ui-kitten/components';
 import { globalStyles } from '../GlobalStyles';
 import React, {useEffect} from 'react';
-import { View, Image, StyleSheet } from 'react-native';
+import { View, Image, StyleSheet, Button } from 'react-native';
 import { ProfileMenuItems } from './ProfileMenuItems';
 import { fetchUserDetails } from '../services/fetchUserDetails';
 
 const Profile = ({navigation}) => {
   const [name, setName] = React.useState('Temp Name');
+  
   const getUserDetails = async () => {
     const res = await fetchUserDetails();
     if (res?.response?.status == 401) {

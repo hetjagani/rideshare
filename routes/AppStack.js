@@ -43,7 +43,7 @@ const HomeNavigator = () => {
       <Stack.Screen 
         name={USER_INFO_SCREEN}
         component={UserInfo}
-        options={{ headerShown: true, title:"User Info Screen"}}
+        options={{ headerShown: true, title:"User Info Screen" }}
       />
     </Stack.Navigator>
   );

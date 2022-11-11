@@ -15,11 +15,12 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   ScrollView,
+  Button as Save,
 } from 'react-native';
 import { fetchUserDetails } from '../services/fetchUserDetails';
 import updateUserDetails from '../services/updateUserDetails';
 
-export const UserInfo = () => {
+export const UserInfo = ({navigation}) => {
   const [email, setEmail] = React.useState('');
   const [firstName, setFirstName] = React.useState('');
   const [lastName, setLastName] = React.useState('');
@@ -27,6 +28,12 @@ export const UserInfo = () => {
   const [visible, setVisible] = React.useState(false);
   const [id, setId] = React.useState(0);
   const [profileImage, setProfileImage] = React.useState('');
+
+  navigation.setOptions({
+    headerRight: () => (
+      <Save onPress={() => saveUserInfo()} title="Save"/>
+    ),
+  });
 
   useEffect(() => {
     getUserDetails();
@@ -183,11 +190,6 @@ export const UserInfo = () => {
         <Button style={{ marginTop: '2%' }} onPress={() => setVisible(true)}>
           Change Profile Pic
         </Button>
-
-        <Button style={{ marginTop: '2%' }} status="warning" onPress={()=>saveUserInfo()}>
-          Save Details
-        </Button>
-
         <Modal
           visible={visible}
           backdropStyle={styles.backdrop}
