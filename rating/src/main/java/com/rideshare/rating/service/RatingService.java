@@ -187,9 +187,6 @@ public class RatingService implements IRatingService{
                 }
             }
 
-            if(listOfRatings.size() == 0){
-                throw new RatingDoesNotExisitException("No Ratings Found!!");
-            }
             List<com.rideshare.rating.webentity.Rating> listOfDetailedRating = new ArrayList<>();
 
             for (Integer id : listOfRatings) {

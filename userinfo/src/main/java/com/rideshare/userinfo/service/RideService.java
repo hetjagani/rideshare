@@ -3,6 +3,7 @@ package com.rideshare.userinfo.service;
 import com.rideshare.userinfo.facade.RideServiceFacade;
 import com.rideshare.userinfo.webentity.PaginatedEntity;
 import com.rideshare.userinfo.webentity.Ride;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

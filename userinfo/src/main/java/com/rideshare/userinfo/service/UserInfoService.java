@@ -4,6 +4,7 @@ import com.rideshare.userinfo.mapper.UserInfoMapper;
 import com.rideshare.userinfo.model.User;
 import com.rideshare.userinfo.model.UserInfo;
 import com.rideshare.userinfo.webentity.PaginatedEntity;
+import com.rideshare.userinfo.webentity.Ride;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.sql.Date;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -79,16 +82,16 @@ public class UserInfoService implements IUserInfoService {
     @Override
     public UserInfo getById(Integer id) throws Exception {
         String sql = "SELECT * FROM \"userinfo\".\"userinfo\" WHERE id = ?;";
-        
+
         return jdbcTemplate.queryForObject(sql, new UserInfoMapper(), id);
     }
 
     @Override
     public UserInfo create(UserInfo object) throws Exception {
         // create user info object in the database and return the original object with all info
-        String createSQL = "INSERT INTO \"userinfo\".\"userinfo\"(id, first_name, last_name, profile_image) VALUES(?,?,?,?)";
-        jdbcTemplate.update(createSQL, object.getId(), object.getFirstName(), object.getLastName(), object.getProfileImage());
-        return object;
+        String createSQL = "INSERT INTO \"userinfo\".\"userinfo\"(id, first_name, last_name, profile_image, created_at) VALUES(?,?,?,?,?) RETURNING id";
+        Integer createdId = jdbcTemplate.queryForObject(createSQL, Integer.class, object.getId(), object.getFirstName(), object.getLastName(), object.getProfileImage(), Date.from(Instant.now()));
+        return getById(createdId);
     }
 
     @Override
@@ -96,7 +99,7 @@ public class UserInfoService implements IUserInfoService {
         // update user info object in the database and return the original object with all info
         String updateSQL = "UPDATE \"userinfo\".\"userinfo\" SET first_name=?, last_name=?, profile_image=? WHERE id=?";
         jdbcTemplate.update(updateSQL, object.getFirstName(), object.getLastName(), object.getProfileImage(), object.getId());
-        return object;
+        return getById(object.getId());
     }
 
     @Override

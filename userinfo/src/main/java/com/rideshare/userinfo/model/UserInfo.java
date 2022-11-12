@@ -1,8 +1,8 @@
 package com.rideshare.userinfo.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.sql.Date;
 import java.util.List;
 
 @Data
@@ -10,6 +10,11 @@ public class UserInfo extends User {
     private String firstName;
     private String lastName;
     private String profileImage;
+    private Float rating;
+    private Integer rides;
+    private Integer months;
+    private Date createdAt;
+
 
     public UserInfo() {}
 
@@ -24,10 +29,12 @@ public class UserInfo extends User {
         super(id, email, password, phoneNo, isVerified, roles);
     }
 
-    public UserInfo(String firstName, String lastName, String profileImage) {
+    public UserInfo(String firstName, String lastName, String profileImage, Date date, Integer months) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.profileImage = profileImage;
+        this.createdAt = date;
+        this.months = months;
     }
 
     @Override

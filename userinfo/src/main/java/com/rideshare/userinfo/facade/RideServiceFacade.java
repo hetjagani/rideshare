@@ -39,8 +39,8 @@ public class RideServiceFacade {
                                                              Boolean all) {
 
         // all = true only when user is Admin
-        String requestURL = rideUrl + "/rides" + "?all=" + all + (all != true ? "&userId=" +userId : "&page="+page
-                                +"&limit="+limit);
+        String requestURL = rideUrl + "/rides" + "?all=" + all + (all != true ? "&userId=" +userId : "&page="+(page != null ? page : "")
+                                +"&limit="+(limit != null ? limit : ""));
 
         HttpHeaders header = new HttpHeaders();
         header.add("Authorization", token);
