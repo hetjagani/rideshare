@@ -55,4 +55,20 @@ public class RideServiceFacade {
             throw e;
         }
     }
+
+    public Integer getNoOfRides(String token, Integer userId) throws Exception {
+        try{
+            String requestURL = rideUrl + "/rides/noOfRides/"+userId;
+
+            HttpHeaders header = new HttpHeaders();
+            header.add("Authorization", token);
+
+            HttpEntity request = new HttpEntity(header);
+            ResponseEntity<Integer> response = restTemplate.exchange(requestURL, HttpMethod.GET, request, Integer.class);
+            return response.getBody();
+        }catch(Exception e){
+            e.printStackTrace();
+            throw e;
+        }
+    }
 }

@@ -59,23 +59,17 @@ public class UserController {
             String token = headers.get("Authorization").get(0);
             Integer userID = Integer.parseInt(userDetails.getId());
 
-            UserInfo userInfo = userInfoService.getById(userID);
+            UserInfo userInfo = userInfoService.getById(token, userID);
             userInfo.setEmail(userDetails.getEmail());
             userInfo.setPhoneNo(userDetails.getPhoneNo());
             userInfo.setVerified(userDetails.isEnabled());
             userInfo.setRoles(userDetails.getAuthorities().stream().map((e)->e.toString()).collect(Collectors.toList()));
 
-            List<Ride> rides = rideService.getAllPaginated(token, null, null, userDetails.getId(), true).getNodes();
-            userInfo.setRides(rides.size());
+            Float avgRating = ratingService.getAvgRating(userID, token);
+            userInfo.setRating(avgRating);
 
-            List<Rating> ratings = ratingService.getAllPaginated(token, null, null, userID, true).getNodes();
-            Float total = 0F;
-            for(Rating r : ratings) {
-                total += r.getRating();
-            }
-            if (ratings.size() != 0)
-                userInfo.setRating(total/ratings.size());
-            else userInfo.setRating(0F);
+            Integer noOfRides = rideService.getNoOfRides(userID, token);
+            userInfo.setRides(noOfRides);
 
             return ResponseEntity.ok(userInfo);
         }catch (Exception e) {
@@ -85,7 +79,8 @@ public class UserController {
     }
 
     @PutMapping
-    public ResponseEntity<UserInfo> saveUserInfo(@RequestBody com.rideshare.userinfo.webentity.UserInfo userInfo, @AuthenticationPrincipal UserPrincipal userDetails) throws Exception {
+    public ResponseEntity<UserInfo> saveUserInfo(@RequestHeader HttpHeaders headers, @RequestBody com.rideshare.userinfo.webentity.UserInfo userInfo, @AuthenticationPrincipal UserPrincipal userDetails) throws Exception {
+        String token = headers.get("Authorization").get(0);
         Integer userId = Integer.parseInt(userDetails.getId());
         // prepare object to store in db
         UserInfo toSaveUserInfo = new UserInfo();
@@ -98,15 +93,15 @@ public class UserController {
         toSaveUserInfo.setLastName(userInfo.getLastName());
         toSaveUserInfo.setProfileImage(userInfo.getProfileImage());
         try {
-            UserInfo presentUser = userInfoService.getById(userId);
+            UserInfo presentUser = userInfoService.getById(token, userId);
             UserInfo result = null;
             if(presentUser != null) {
-                result = userInfoService.update(toSaveUserInfo);
+                result = userInfoService.update(token, toSaveUserInfo);
             }
 
             return ResponseEntity.ok(result);
         } catch (EmptyResultDataAccessException emptyEx) {
-            UserInfo result = userInfoService.create(toSaveUserInfo);
+            UserInfo result = userInfoService.create(token, toSaveUserInfo);
 
             return ResponseEntity.ok(result);
         } catch (Exception e) {
@@ -120,19 +115,13 @@ public class UserController {
         try {
             String token = headers.get("Authorization").get(0);
 
-            UserInfo userInfo = userInfoService.getById(userID);
+            UserInfo userInfo = userInfoService.getById(token, userID);
+            Float avgRating = ratingService.getAvgRating(userID, token);
+            userInfo.setRating(avgRating);
 
-            List<Ride> rides = rideService.getAllPaginated(token, null, null, String.valueOf(userID), true).getNodes();
-            userInfo.setRides(rides.size());
+            Integer noOfRides = rideService.getNoOfRides(userID, token);
+            userInfo.setRides(noOfRides);
 
-            List<Rating> ratings = ratingService.getAllPaginated(token, null, null, userID, true).getNodes();
-            Float total = 0F;
-            for(Rating r : ratings) {
-                total += r.getRating();
-            }
-            if (ratings.size() != 0)
-                userInfo.setRating(total/ratings.size());
-            else userInfo.setRating(0F);
             return ResponseEntity.ok(userInfo);
         }catch (Exception e) {
             e.printStackTrace();

@@ -10,4 +10,5 @@ public interface IRatingService {
     PaginatedEntity<com.rideshare.rating.webentity.Rating> getAllRatings(String token, Integer page, Integer limit, Integer userId,
                                                                          Integer ratingUserId, Boolean all) throws Exception;
     Boolean delete(Integer userId, Integer id) throws Exception;
+    Float getAvgRating(Integer userId) throws Exception;
 }

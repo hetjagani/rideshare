@@ -89,6 +89,16 @@ public class RatingService implements IRatingService{
     @Value("${app.userinfo.url}")
     private String userInfoURL;
 
+    public Float getAvgRating(Integer userId) throws Exception {
+        try{
+            String getAvgRatingQuery = "SELECT AVG(rating) FROM \"rating\".\"rating\" WHERE user_id = " + userId;
+            Float avgRating = jdbcTemplate.queryForObject(getAvgRatingQuery, Float.class);
+            return avgRating;
+        }catch(Exception e){
+            e.printStackTrace();
+            throw e;
+        }
+    }
     public com.rideshare.rating.webentity.Rating getRatingById(Integer id, String token) throws Exception {
         try {
             SqlRowSet rs = jdbcTemplate.queryForRowSet(getDetailedRatingById + (Integer)id);

@@ -26,6 +26,18 @@ public class RatingController {
     @Autowired
     private RestTemplate restTemplate;
 
+    @GetMapping("/avgRating/{userId}")
+    public ResponseEntity<Float> getAvgRatingForUser(@PathVariable Integer userId) throws Exception{
+        try {
+            Float avgRating = ratingService.getAvgRating(userId);
+            return ResponseEntity.ok(avgRating);
+        }catch(Exception e){
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+
     @GetMapping
     public ResponseEntity<PaginatedEntity<com.rideshare.rating.webentity.Rating>> getPaginatedRatings(@RequestHeader HttpHeaders headers,
                                                                                                       @RequestParam(required = false) Boolean all,
