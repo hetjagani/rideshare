@@ -4,11 +4,15 @@ import { View, Image } from 'react-native';
 import { ProfileMenuItems } from './ProfileMenuItems';
 import { fetchUserDetails } from '../services/fetchUserDetails';
 import LoadingView from './loadingView';
+import { set } from 'react-hook-form';
 
 const Profile = ({ navigation }) => {
   const [name, setName] = useState('Temp Name');
   const [image, setImage] = useState({});
   const [loading, setLoading] = useState(false);
+  const [rides, setRides] = useState(0);
+  const [ratings, setRatings] = useState(0.0);
+  const [months, setMonths] = useState(0.0);
   
 
   const getUserDetails = async () => {
@@ -36,6 +40,9 @@ const Profile = ({ navigation }) => {
     const userName = res?.data?.firstName + ' ' + res?.data?.lastName;
     setName(userName);
     setImage(res?.data?.profileImage);
+    setRatings(res?.data?.rating);
+    setRides(res?.data?.rides);
+    setMonths(res?.data?.months);
   };
 
   useEffect(() => {
@@ -91,7 +98,7 @@ const Profile = ({ navigation }) => {
         >
           <Layout style={{ flexDirection: 'column', alignItems: 'center' }}>
             <Layout>
-              <Text>50</Text>
+              <Text>{rides ?? 0}</Text>
             </Layout>
             <Layout>
               <Text>Rides</Text>
@@ -99,7 +106,7 @@ const Profile = ({ navigation }) => {
           </Layout>
           <Layout style={{ flexDirection: 'column', alignItems: 'center' }}>
             <Layout>
-              <Text>50</Text>
+              <Text>{ratings ?? 0.0}</Text>
             </Layout>
             <Layout>
               <Text>Ratings</Text>
@@ -107,10 +114,10 @@ const Profile = ({ navigation }) => {
           </Layout>
           <Layout style={{ flexDirection: 'column', alignItems: 'center' }}>
             <Layout>
-              <Text>50</Text>
+              <Text>{months ?? 0}</Text>
             </Layout>
             <Layout>
-              <Text>Years</Text>
+              <Text>Months</Text>
             </Layout>
           </Layout>
         </Layout>
