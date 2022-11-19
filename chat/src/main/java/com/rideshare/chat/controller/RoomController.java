@@ -9,19 +9,17 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path = "/room")
-@PreAuthorize("hasAuthority('DRIVER') or hasAuthority('RIDER')")
 public class RoomController {
 
     @Autowired
     private IRoomService roomService;
 
-    private final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     @GetMapping
     public ResponseEntity<PaginatedEntity<Room>> getPaginated(@AuthenticationPrincipal UserPrincipal userDetails, @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer limit) throws Exception {
@@ -36,7 +34,7 @@ public class RoomController {
     }
 
     @GetMapping(path = "/{roomId}")
-    public ResponseEntity<Room> getPlaceById(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Integer roomId) throws Exception {
+    public ResponseEntity<Room> getRoomById(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Integer roomId) throws Exception {
         try {
             return ResponseEntity.ok(roomService.getById(roomId));
         } catch (Exception e) {
@@ -50,16 +48,17 @@ public class RoomController {
         try {
             Integer userId = Integer.parseInt(userDetails.getId());
 
-            Room toCreateRoom = new Room(-1, userId, room.getInitiatedFor());
+            Room newRoom = new Room(-1, userId, room.getInitiatedFor());
+            Room created = roomService.createRoom(newRoom);
 
-            return ResponseEntity.ok(toCreateRoom);
+            return ResponseEntity.ok(created);
         }catch(Exception e){
             throw e;
         }
     }
 
     @DeleteMapping(path = "/{roomId}")
-    public ResponseEntity<DeleteSuccess> deletePlace(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Integer roomId) throws Exception {
+    public ResponseEntity<DeleteSuccess> deleteRoom(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Integer roomId) throws Exception {
         try {
             if(roomService.delete(roomId)) {
                 return ResponseEntity.ok(new DeleteSuccess(true));

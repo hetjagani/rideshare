@@ -6,9 +6,10 @@ import com.rideshare.chat.webentity.PaginatedEntity;
 import com.rideshare.chat.mapper.RoomMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+@Service
 class RoomService implements IRoomService{
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -17,7 +18,7 @@ class RoomService implements IRoomService{
     public PaginatedEntity<Room> getAllPaginated(Integer userId, Integer page, Integer limit) throws Exception {
         Integer offset = Pagination.getOffset(page,limit);
         String query = "SELECT * FROM \"chat\".\"room\" WHERE initiated_by = ? OR initiated_for = ? LIMIT ? OFFSET ?";
-        List<Room> roomListForUser = jdbcTemplate.query(query, new RoomMapper(), userId, limit, offset);
+        List<Room> roomListForUser = jdbcTemplate.query(query, new RoomMapper(), userId, userId, limit, offset);
         return new PaginatedEntity<Room>(roomListForUser, page, limit);
     }
 

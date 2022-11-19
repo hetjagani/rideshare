@@ -1,3 +1,2 @@
-CREATE TYPE message_status AS ENUM('RECEIVED','DELIVERED');
 CREATE TABLE IF NOT EXISTS "room"(id SERIAL PRIMARY KEY, initiated_by INT NOT NULL, initiated_for INT NOT NULL, created_at TIMESTAMP DEFAULT current_timestamp);
-CREATE TABLE IF NOT EXISTS "message"(id SERIAL PRIMARY KEY, room_id INT REFERENCES room(id) NOT NULL, sender_id INT NOT NULL, receiver_id INT NOT NULL,status message_status NOT NULL, content VARCHAR(512) NOT NULL, created_at TIMESTAMP DEFAULT current_timestamp);
+CREATE TABLE IF NOT EXISTS "message"(id SERIAL PRIMARY KEY, room_id INT REFERENCES room(id) NOT NULL, sender_id INT NOT NULL, receiver_id INT NOT NULL,status VARCHAR(20) NOT NULL, content VARCHAR(512) NOT NULL, created_at TIMESTAMP DEFAULT current_timestamp);

@@ -6,7 +6,7 @@ import com.rideshare.chat.webentity.PaginatedEntity;
 public interface IMessageService {
     PaginatedEntity<Message> getAllPaginated(Integer roomId, Integer page, Integer limit) throws Exception;
 
-    Message createMessage(Message object) throws Exception;
+    Message createMessage(com.rideshare.chat.webentity.Message object) throws Exception;
 
     boolean delete(Integer id) throws Exception;
 
