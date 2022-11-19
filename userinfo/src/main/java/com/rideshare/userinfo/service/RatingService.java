@@ -34,6 +34,22 @@ public class RatingService {
     @Value("${app.rating.url}")
     private String ratingURL;
 
+    public Float getAvgRating(Integer userId, String token) throws Exception{
+        try{
+            String requestURL = ratingURL + "/ratings/avgRating/"+userId;
+
+            HttpHeaders header = new HttpHeaders();
+            header.add("Authorization", token);
+
+            HttpEntity request = new HttpEntity(header);
+            ResponseEntity<Float> responseEntity = restTemplate.exchange(requestURL, HttpMethod.GET,
+                    request, Float.class);
+            return responseEntity.getBody();
+        }catch(Exception e){
+            e.printStackTrace();
+            throw e;
+        }
+    }
     public PaginatedEntity<Rating> getAllPaginated(String token, Integer page, Integer limit, Integer ratingUserId, Boolean all) throws Exception {
         String requestURL = ratingURL + "/ratings" + "?page={page}&limit={limit}&ratingUserId={ratingUserId}&all={all}";
         Map<String, Object> queryParams = new HashMap<>();
@@ -57,7 +73,6 @@ public class RatingService {
             HttpHeaders header = new HttpHeaders();
             header.add("Authorization", token);
 
-            HttpEntity request = new HttpEntity(header);
             HttpEntity<com.rideshare.userinfo.model.Rating> entity
                     = new HttpEntity<com.rideshare.userinfo.model.Rating>(rating,header);
 

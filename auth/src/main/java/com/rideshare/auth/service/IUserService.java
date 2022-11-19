@@ -11,4 +11,5 @@ public interface IUserService {
     User getUserByEmail(String email) throws DataAccessException;
     User createUser(User user) throws DataAccessException;
     List<String> getRoles(Integer id) throws DataAccessException;
+    User updateRoles(Integer id, List<String> roles) throws DataAccessException;
 }

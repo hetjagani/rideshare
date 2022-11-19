@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: rideshare-auth
+  namespace: rideshare
+  labels:
+    app: auth
+    tier: app
+spec:
+  selector:
+    matchLabels:
+      app: auth
+      tier: app
+  template:
+    metadata:
+      labels:
+        app: auth
+        tier: app
+    spec:
+      containers:
+        - image: hetpatel572/rideshare-be_auth
+          name: auth
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: auth
+          resources:
+            requests:
+              memory: "265Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth
+  namespace: rideshare
+  labels:
+    app: auth
+    tier: app
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  type: LoadBalancer
+  selector:
+    app: auth
+    tier: app

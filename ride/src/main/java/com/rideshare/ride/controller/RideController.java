@@ -17,6 +17,16 @@ public class RideController {
     @Autowired
     IRideService rideService;
 
+    @GetMapping(path="/noOfRides/{userId}")
+    public ResponseEntity<Integer> getNoOfRidesForUser(@PathVariable Integer userId) throws Exception{
+        try{
+            Integer noOfRides = rideService.getNoOfRides(userId);
+            return ResponseEntity.ok(noOfRides);
+        }catch(Exception e){
+            e.printStackTrace();
+            throw e;
+        }
+    }
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<Ride> getRideById(@PathVariable Integer id) throws Exception {

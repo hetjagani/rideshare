@@ -39,8 +39,8 @@ public class RideServiceFacade {
                                                              Boolean all) {
 
         // all = true only when user is Admin
-        String requestURL = rideUrl + "/rides" + "?all=" + all + (all != true ? "&userId=" +userId : "&page="+page
-                                +"&limit="+limit);
+        String requestURL = rideUrl + "/rides" + "?all=" + all + (all != true ? "&userId=" +userId : "&page="+(page != null ? page : "")
+                                +"&limit="+(limit != null ? limit : ""));
 
         HttpHeaders header = new HttpHeaders();
         header.add("Authorization", token);
@@ -51,6 +51,22 @@ public class RideServiceFacade {
             ResponseEntity<PaginatedEntity<Ride>> response = restTemplate.exchange(requestURL, HttpMethod.GET, request, new ParameterizedTypeReference<PaginatedEntity<Ride>>() {});
             return response.getBody();
         } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public Integer getNoOfRides(String token, Integer userId) throws Exception {
+        try{
+            String requestURL = rideUrl + "/rides/noOfRides/"+userId;
+
+            HttpHeaders header = new HttpHeaders();
+            header.add("Authorization", token);
+
+            HttpEntity request = new HttpEntity(header);
+            ResponseEntity<Integer> response = restTemplate.exchange(requestURL, HttpMethod.GET, request, Integer.class);
+            return response.getBody();
+        }catch(Exception e){
             e.printStackTrace();
             throw e;
         }

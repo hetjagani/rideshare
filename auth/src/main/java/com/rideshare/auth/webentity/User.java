@@ -7,15 +7,13 @@ public class User {
     private String email;
     private String password;
     private String phoneNo;
-    private List<String> roles;
 
     public User() {}
 
-    public User(String email, String password, String phoneNo, List<String> roles) {
+    public User(String email, String password, String phoneNo) {
         this.email = email;
         this.password = password;
         this.phoneNo = phoneNo;
-        this.roles = roles;
     }
 
     public String getEmail() {
@@ -40,13 +38,5 @@ public class User {
 
     public void setPhoneNo(String phoneNo) {
         this.phoneNo = phoneNo;
-    }
-
-    public List<String> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(List<String> roles) {
-        this.roles = roles;
     }
 }

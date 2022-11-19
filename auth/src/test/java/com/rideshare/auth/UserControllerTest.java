@@ -57,7 +57,7 @@ public class UserControllerTest {
         Mockito.when(rideShareUserDetailsService.loadUserByUsername(user.getEmail())).thenReturn(new UserPrincipal(String.valueOf(user.getId()), user.getEmail(), user.getPassword(), user.getVerified(), authorities));
 
         // request body
-        User bodyUser = new User("test@mail.com","Password@123", "1234567890", Arrays.asList("DRIVER", "RIDER"));
+        User bodyUser = new User("test@mail.com","Password@123", "1234567890");
 
         // building request
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/users/signup")

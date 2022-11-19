@@ -13,4 +13,5 @@ public interface IRideService {
     com.rideshare.ride.webentity.Ride create(Ride ride) throws Exception;
     com.rideshare.ride.webentity.Ride updateCapacity(Integer rideId, Integer capacity) throws Exception;
     boolean delete(Integer id) throws Exception;
+    Integer getNoOfRides(Integer userId) throws Exception;
 }
