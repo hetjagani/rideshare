@@ -7,7 +7,6 @@ import { Icon } from "@ui-kitten/components";
 import { HOME_SCREEN, PAYMENT_SCREEN, HOME_NAVIGATOR, PROFILE_SCREEN, USER_INFO_SCREEN } from "./AppRoutes";
 import Profile from "../screens/Profile";
 import { UserInfo } from "../screens/UserInfo";
-const { Navigator, Screen } = createStackNavigator();
 
 
 const Tab = createBottomTabNavigator();
@@ -33,7 +32,7 @@ const HomeNavigator = () => {
       <Stack.Screen
         name={HOME_SCREEN}
         component={Home}
-        options={{ headerShown: true, title:"Home Screen" }}
+        options={{ headerShown: true, title:"Your Feed" }}
       />
       <Stack.Screen
         name={PAYMENT_SCREEN}
