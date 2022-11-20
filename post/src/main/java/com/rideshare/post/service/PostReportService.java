@@ -1,4 +1,4 @@
-package com.rideshare.post.Service;
+package com.rideshare.post.service;
 
 import com.rideshare.post.mapper.PostReportMapper;
 import com.rideshare.post.model.Post;

@@ -118,21 +118,8 @@ public class UserController {
     @GetMapping(path = "/{userID}")
     public ResponseEntity<UserInfo> getUserInfoById(@PathVariable Integer userID, @RequestHeader HttpHeaders headers) throws Exception {
         try {
-            String token = headers.get("Authorization").get(0);
-
             UserInfo userInfo = userInfoService.getById(userID);
 
-            List<Ride> rides = rideService.getAllPaginated(token, null, null, String.valueOf(userID), true).getNodes();
-            userInfo.setRides(rides.size());
-
-            List<Rating> ratings = ratingService.getAllPaginated(token, null, null, userID, true).getNodes();
-            Float total = 0F;
-            for(Rating r : ratings) {
-                total += r.getRating();
-            }
-            if (ratings.size() != 0)
-                userInfo.setRating(total/ratings.size());
-            else userInfo.setRating(0F);
             return ResponseEntity.ok(userInfo);
         }catch (Exception e) {
             e.printStackTrace();

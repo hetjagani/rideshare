@@ -1,18 +1,19 @@
 package com.rideshare.post.controller;
 
-import com.rideshare.post.Service.PostService;
+import com.rideshare.post.service.PostService;
 import com.rideshare.post.model.Post;
 import com.rideshare.post.security.UserPrincipal;
 import com.rideshare.post.webentity.DeleteSuccess;
 import com.rideshare.post.webentity.PaginatedEntity;
 import com.rideshare.post.webentity.PostEntity;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.rideshare.post.webentity.PostImage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/posts")
@@ -44,11 +45,62 @@ public class PostController {
             throw e;
         }
     }
+
+    @PutMapping("/{id}/like")
+    public ResponseEntity<Post> likePost(@RequestHeader HttpHeaders headers, @PathVariable Integer id) throws Exception {
+        try {
+            String token = headers.get("Authorization").get(0);
+            Post post = postService.getPostById(id, token);
+
+            PostEntity postEntity = new PostEntity();
+            postEntity.setUserId(post.getUserId());
+            postEntity.setNoOfLikes(post.getNoOfLikes() + 1);
+            postEntity.setTitle(post.getTitle());
+            postEntity.setType(post.getType());
+            postEntity.setDescription(post.getDescription());
+            postEntity.setImageUrls(post.getImageList().stream().map(PostImage::getUrl).collect(Collectors.toList()));
+            postEntity.setRefId(post.getRefId());
+
+            Post updatedPost = postService.update(postEntity, id, token);
+
+            return ResponseEntity.ok(updatedPost);
+        }catch(Exception e){
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    @PutMapping("/{id}/dislike")
+    public ResponseEntity<Post> unlikePost(@RequestHeader HttpHeaders headers, @PathVariable Integer id) throws Exception {
+        try {
+            String token = headers.get("Authorization").get(0);
+            Post post = postService.getPostById(id, token);
+
+            PostEntity postEntity = new PostEntity();
+            postEntity.setUserId(post.getUserId());
+            postEntity.setNoOfLikes(post.getNoOfLikes() - 1);
+            postEntity.setTitle(post.getTitle());
+            postEntity.setType(post.getType());
+            postEntity.setDescription(post.getDescription());
+            postEntity.setImageUrls(post.getImageList().stream().map((img) -> img.getUrl()).collect(Collectors.toList()));
+            postEntity.setRefId(post.getRefId());
+
+            Post updatedPost = postService.update(postEntity, id, token);
+
+            return ResponseEntity.ok(updatedPost);
+        }catch(Exception e){
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
     @PostMapping
     public ResponseEntity<Post> createPost(@RequestHeader HttpHeaders headers, @RequestBody PostEntity postData, @AuthenticationPrincipal UserPrincipal userDetails) throws Exception{
         try{
             String token = headers.get("Authorization").get(0);
             postData.setUserId(Integer.parseInt(userDetails.getId()));
+
+            // TODO: check if the ride/rating exist based on refId and post type
             Post post = postService.create(postData, token);
             return ResponseEntity.ok(post);
         }catch(Exception e){
@@ -74,7 +126,7 @@ public class PostController {
     public ResponseEntity<DeleteSuccess> deletePlace(@RequestHeader HttpHeaders headers, @AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Integer postId) throws Exception {
         try {
             Integer userId = Integer.parseInt(userPrincipal.getId());
-            String token = headers.get("Authorizarion").get(0);
+            String token = headers.get("Authorization").get(0);
             if(postService.delete(postId, userId, token)) {
                 return ResponseEntity.ok(new DeleteSuccess(true));
             }

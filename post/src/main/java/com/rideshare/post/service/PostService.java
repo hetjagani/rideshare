@@ -1,15 +1,13 @@
-package com.rideshare.post.Service;
+package com.rideshare.post.service;
 
-import com.rideshare.post.controller.PostController;
 import com.rideshare.post.mapper.PostImageMapper;
 import com.rideshare.post.mapper.PostMapper;
 import com.rideshare.post.model.Post;
 import com.rideshare.post.model.PostRating;
 import com.rideshare.post.model.PostRide;
+import com.rideshare.post.model.PostType;
 import com.rideshare.post.util.Pagination;
 import com.rideshare.post.webentity.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -49,8 +47,10 @@ public class PostService {
                 getAllPostsQuery += " WHERE user_id=" + userId;
             }
 
+            getAllPostsQuery += " ORDER BY created_at DESC";
+
             if(limit != null && page != null){
-                getAllPostsQuery += " LIMIT " + limit + "OFFSET " + offset;
+                getAllPostsQuery += " LIMIT " + limit + " OFFSET " + offset;
             }
             List<Integer> postIds = jdbcTemplate.queryForList(getAllPostsQuery, Integer.class);
             List<Post> posts = new ArrayList<>();
@@ -76,7 +76,7 @@ public class PostService {
             post.setImageList(postImages);
 
             // Adding ride information if Post is for a RIDE
-            if(post.getType().compareTo("RIDE") == 0){
+            if(PostType.RIDE.equals(post.getType())) {
                 PostRide ridePost = new PostRide(post);
                 String requestURL = rideUrl + "/rides/" + post.getRefId();
 
@@ -89,7 +89,7 @@ public class PostService {
                 Ride rideInfo = response.getBody();
                 ridePost.setRide(rideInfo);
                 return ridePost;
-            } else if(post.getType().compareTo("RATING") == 0){ // Adding RATING information if Post is for a RATING
+            } else if(PostType.RATING.equals(post.getType())) { // Adding RATING information if Post is for a RATING
                 PostRating ratingPost = new PostRating(post);
                 String requestURL = ratingUrl + "/ratings/" + post.getRefId();
 
@@ -113,7 +113,7 @@ public class PostService {
     public Post create(PostEntity post, String token) throws Exception{
         try{
             String createPostQuery = "INSERT INTO \"post\".\"post\" (user_id, title, description, created_at, updated_at, type, ref_id, no_of_likes) VALUES (?,?,?,?,?,?,?,?) RETURNING id";
-            Integer createdPostId = jdbcTemplate.queryForObject(createPostQuery, Integer.class, post.getUserId(), post.getTitle(), post.getDescription(), Timestamp.from(Instant.now()), Timestamp.from(Instant.now()), post.getType(), post.getRefId(), post.getNoOfLikes());
+            Integer createdPostId = jdbcTemplate.queryForObject(createPostQuery, Integer.class, post.getUserId(), post.getTitle(), post.getDescription(), Timestamp.from(Instant.now()), Timestamp.from(Instant.now()), post.getType(), post.getRefId(), 0);
 
             if(!post.getImageUrls().isEmpty()){
                 for(String s: post.getImageUrls()){

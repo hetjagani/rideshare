@@ -1,7 +1,6 @@
 package com.rideshare.post.controller;
 
-import com.rideshare.post.Service.PostReportService;
-import com.rideshare.post.model.Post;
+import com.rideshare.post.service.PostReportService;
 import com.rideshare.post.model.PostReport;
 import com.rideshare.post.security.UserPrincipal;
 import com.rideshare.post.webentity.DeleteSuccess;

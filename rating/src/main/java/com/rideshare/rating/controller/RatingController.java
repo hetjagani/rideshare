@@ -36,7 +36,7 @@ public class RatingController {
         throws Exception{
         String token = headers.get("Authorization").get(0);
         try {
-            PaginatedEntity<com.rideshare.rating.webentity.Rating> ratings = ratingService.getAllRatings(token, page, limit, userId, ratingUserId, all);
+            PaginatedEntity<com.rideshare.rating.webentity.Rating> ratings = ratingService.getAllRatings(token, page, limit, userId, ratingUserId, all != null && all);
             return ResponseEntity.ok(ratings);
         }catch(Exception e){
             e.printStackTrace();
