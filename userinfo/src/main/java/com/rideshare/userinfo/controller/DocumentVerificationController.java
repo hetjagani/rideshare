@@ -71,7 +71,7 @@ public class DocumentVerificationController {
                                                    @RequestHeader HttpHeaders headers) throws Exception {
         try {
             Integer userId = Integer.parseInt(userDetails.getId());
-
+            String token = headers.get("Authorization").get(0);
             // post license data to ID Analyzer service
             IdAnalyzerRequest idAnalyzerRequest = new IdAnalyzerRequest();
             idAnalyzerRequest.setFile_base64(request.getFileBase64());
@@ -84,7 +84,7 @@ public class DocumentVerificationController {
             IdAnalyzerResponse idAnalyzerResponse = idAnalyzerService.verifyLicense(idAnalyzerRequest);
 
             // check response against the user data
-            UserInfo loggedInUser = userInfoService.getById(userId);
+            UserInfo loggedInUser = userInfoService.getById(token, userId);
             String loggedInUserName = loggedInUser.getFirstName().replaceAll("\\s", "").toLowerCase();
             String verificationFirstName = idAnalyzerResponse.getResult().getFirstName().replaceAll("\\s", "").toLowerCase();
             String verificationUserName = idAnalyzerResponse.getResult().getFullName().replaceAll("\\s", "").toLowerCase();
@@ -121,7 +121,6 @@ public class DocumentVerificationController {
             License createdLicense = licenseService.create(license);
 
             // Add DRIVER to roles of user
-            String token = headers.get("Authorization").get(0);
             Set<String> userRoles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
             userRoles.add("DRIVER");
             authService.updateRoles(new ArrayList<String>(userRoles), token);

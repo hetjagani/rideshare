@@ -80,26 +80,44 @@ public class UserInfoService implements IUserInfoService {
     }
 
     @Override
-    public UserInfo getById(Integer id) throws Exception {
-        String sql = "SELECT * FROM \"userinfo\".\"userinfo\" WHERE id = ?;";
+    public UserInfo getById(String token, Integer id) throws Exception {
+        String sql = "SELECT * FROM \"userinfo\".\"userinfo\" WHERE id = " + id;
 
-        return jdbcTemplate.queryForObject(sql, new UserInfoMapper(), id);
+        UserInfo userInfo = jdbcTemplate.queryForObject(sql, new UserInfoMapper());
+        String requestURL = authURL + "/auth/users";
+        HttpHeaders header = new HttpHeaders();
+        header.add("Authorization", token);
+
+        HttpEntity request = new HttpEntity(header);
+
+        ResponseEntity<User[]> responseEntity = restTemplate.exchange(requestURL, HttpMethod.GET, request, User[].class);
+        List<User> userList = Arrays.asList(responseEntity.getBody());
+        for(User u: userList){
+            if(u.getId() == id) {
+                userInfo.setEmail(u.getEmail());
+                userInfo.setPhoneNo(u.getPhoneNo());
+                userInfo.setRoles(u.getRoles());
+                break;
+            }
+        }
+
+        return userInfo;
     }
 
     @Override
-    public UserInfo create(UserInfo object) throws Exception {
+    public UserInfo create(String token, UserInfo object) throws Exception {
         // create user info object in the database and return the original object with all info
         String createSQL = "INSERT INTO \"userinfo\".\"userinfo\"(id, first_name, last_name, profile_image, created_at) VALUES(?,?,?,?,?) RETURNING id";
         Integer createdId = jdbcTemplate.queryForObject(createSQL, Integer.class, object.getId(), object.getFirstName(), object.getLastName(), object.getProfileImage(), Date.from(Instant.now()));
-        return getById(createdId);
+        return getById(token, createdId);
     }
 
     @Override
-    public UserInfo update(UserInfo object) throws Exception {
+    public UserInfo update(String token, UserInfo object) throws Exception {
         // update user info object in the database and return the original object with all info
         String updateSQL = "UPDATE \"userinfo\".\"userinfo\" SET first_name=?, last_name=?, profile_image=? WHERE id=?";
         jdbcTemplate.update(updateSQL, object.getFirstName(), object.getLastName(), object.getProfileImage(), object.getId());
-        return getById(object.getId());
+        return getById(token, object.getId());
     }
 
     @Override

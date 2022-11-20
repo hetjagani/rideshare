@@ -17,4 +17,14 @@ public class RideService {
         PaginatedEntity<Ride> rides = rideServiceFacade.getAllRides(token, page, limit, Integer.parseInt(userId), all);
         return rides;
     }
+
+    public Integer getNoOfRides(Integer userId, String token) throws Exception{
+        try{
+            Integer noOfRides = rideServiceFacade.getNoOfRides(token, userId);
+            return noOfRides;
+        }catch(Exception e){
+            e.printStackTrace();
+            throw e;
+        }
+    }
 }

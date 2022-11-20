@@ -59,6 +59,8 @@ public class RideService implements IRideService {
 
     private final String insertRideTagQuery = "INSERT INTO ride.ride_tags(ride_id, tag_id) VALUES(?,?);";
 
+    private final String getNoOfRidesQuery = "SELECT COUNT(*) FROM ride.ride WHERE user_id = ?";
+
     @Override
     public PaginatedEntity<Ride> getPaginated(Integer page, Integer limit) throws Exception {
         Integer offset = Pagination.getOffset(page, limit);
@@ -180,5 +182,11 @@ public class RideService implements IRideService {
     public boolean delete(Integer id) throws Exception {
         Integer rowsAffected = jdbcTemplate.update(deleteQuery, RideStatus.DELETED, id);
         return rowsAffected != 0;
+    }
+
+    @Override
+    public Integer getNoOfRides(Integer userId) throws Exception {
+        Integer noOfRides = jdbcTemplate.queryForObject(getNoOfRidesQuery, Integer.class, userId);
+        return noOfRides;
     }
 }
