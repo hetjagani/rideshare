@@ -1,13 +1,22 @@
-import React from "react";
-import Home from "../screens/Home";
-import Payment from "../screens/Payment";
-import { createStackNavigator } from "@react-navigation/stack";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Icon } from "@ui-kitten/components";
-import { HOME_SCREEN, PAYMENT_SCREEN, HOME_NAVIGATOR, PROFILE_SCREEN, USER_INFO_SCREEN } from "./AppRoutes";
-import Profile from "../screens/Profile";
-import { UserInfo } from "../screens/UserInfo";
-
+import React from 'react';
+import Home from '../screens/Home';
+import Payment from '../screens/Payment';
+import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Icon } from '@ui-kitten/components';
+import {
+  HOME_SCREEN,
+  PAYMENT_SCREEN,
+  HOME_NAVIGATOR,
+  PROFILE_SCREEN,
+  USER_INFO_SCREEN,
+  RIDE_POST_DETAILS,
+  MY_POSTS_SCREEN,
+  PROFILE_NAVIGATOR,
+} from './AppRoutes';
+import Profile from '../screens/Profile';
+import { UserInfo } from '../screens/UserInfo';
+import MyPosts from '../screens/MyPosts';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -48,6 +57,23 @@ const HomeNavigator = () => {
   );
 };
 
+const ProfileNavigator = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name={PROFILE_SCREEN}
+        component={Profile}
+        options={{ headerShown: true, title: 'Profile Info' }}
+      />
+      <Stack.Screen
+        name={MY_POSTS_SCREEN}
+        component={MyPosts}
+        options={{ headerShown: true, title: 'Your Posts' }}
+      />
+    </Stack.Navigator>
+  );
+};
+
 export const AppStack = () => {
   return (
     <Tab.Navigator>
@@ -60,13 +86,13 @@ export const AppStack = () => {
           title: "Home"
         }}
       />
-      <Tab.Screen 
-        name={PROFILE_SCREEN}
-        component={Profile}
+      <Tab.Screen
+        name={PROFILE_NAVIGATOR}
+        component={ProfileNavigator}
         options={{
-          headerShown: true,
-          title: "Profile",
-          tabBarIcon: tabIcon("person")
+          headerShown: false,
+          title: 'Profile',
+          tabBarIcon: tabIcon('person'),
         }}
       />
     </Tab.Navigator>

@@ -67,7 +67,7 @@ const CardFooter = ({ id, style, likes, liked, likedPost, dislikedPost }) => {
   );
 };
 
-const PostCard = ({ post, updateLike }) => {
+const PostCard = ({ post, updateLike, navigation, shortView }) => {
   const [liked, setLiked] = useState(false);
 
   const cardStyle = StyleSheet.create({
@@ -173,14 +173,17 @@ const PostCard = ({ post, updateLike }) => {
       style={cardStyle.marginCard}
       header={<CardHeader text={post.title} postType={post.type} />}
       footer={
-        <CardFooter
-          style={cardStyle.footerLayout}
-          id={post.id}
-          liked={liked}
-          likes={post.noOfLikes}
-          likedPost={likedPost}
-          dislikedPost={dislikedPost}
-        />
+        !shortView && (
+          <CardFooter
+            id={post.id}
+            liked={liked}
+            likes={post.noOfLikes}
+            likedPost={likedPost}
+            dislikedPost={dislikedPost}
+            post={post}
+            navigation={navigation}
+          />
+        )
       }
     >
       <View style={cardStyle.cardContent}>
