@@ -113,7 +113,8 @@ public class UserController {
     @GetMapping(path = "/{userID}")
     public ResponseEntity<UserInfo> getUserInfoById(@PathVariable Integer userID, @RequestHeader HttpHeaders headers) throws Exception {
         try {
-            UserInfo userInfo = userInfoService.getById(userID);
+            String token = headers.get("Authentication").get(0);
+            UserInfo userInfo = userInfoService.getById(token, userID);
 
             return ResponseEntity.ok(userInfo);
         }catch (Exception e) {
