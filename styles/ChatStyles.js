@@ -8,6 +8,10 @@ export const ChatStyles = StyleSheet.create({
         alignItems: "center",
         backgroundColor: "#ffffff",
     },
+    posttime: {
+        fontSize: 12,
+        color: "#666",
+    },
     card: {
         width: "100%",
     },
@@ -42,7 +46,6 @@ export const ChatStyles = StyleSheet.create({
     username: {
         fontSize: 14,
         fontWeight: "bold",
-        fontFamily: "Lato-Regular"
     },
     messagetext: {
         fontSize: 14,

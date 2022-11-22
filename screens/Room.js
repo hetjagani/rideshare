@@ -7,7 +7,6 @@ import {
   InteractionManager,
 } from "react-native";
 import userRoomsInfo from "../services/userRoomsInfo";
-import LoadingView from "./loadingView";
 import { set } from "react-hook-form";
 
 import { FlatList } from "react-native-gesture-handler";
@@ -58,8 +57,11 @@ const Messages = [
 ];
 
 const Room = ({ navigation }) => {
+  const [rooms, setRooms] = useState([]);
+  
   const getRooms = async () => {
     const res = await userRoomsInfo();
+    console.log(res.data);
     if (res?.response?.status == 401) {
       Toast.show({
         type: "error",
@@ -75,7 +77,7 @@ const Room = ({ navigation }) => {
       });
       return;
     }
-    return res?.response?.data?.nodes;
+    setRooms(res?.data?.nodes);
   };
 
   useEffect(() => {
@@ -84,14 +86,14 @@ const Room = ({ navigation }) => {
 
   return (
     <View style={ChatStyles.container}>
-      {getRooms?.length <= 0 && (
+      {rooms?.length <= 0 && (
         <View>
           <Text>No Chats exist</Text>
         </View>
       )}
-      {getRooms?.length > 0 && (
+      {rooms?.length > 0 && (
         <FlatList
-          data={getRooms}
+          data={rooms}
           keyExtractor={(item) => item.roomId}
           renderItem={({ item }) => (
             <TouchableOpacity
@@ -107,14 +109,15 @@ const Room = ({ navigation }) => {
                 <View style={ChatStyles.userimgwrapper}>
                   <Image
                     style={ChatStyles.userimg}
-                    source={item.profileImage}
+                    source={{uri:item.profileImage}}
                   />
                 </View>
                 <View style={ChatStyles.textsection}>
                   <View style={ChatStyles.userinfotext}>
                     <Text style={ChatStyles.username}>{item.name}</Text>
+                    <Text style={ChatStyles.posttime}>{item.createdAt == 0 ? "": new Date(item.createdAt).toLocaleString('en-US')}</Text>
                   </View>
-                  {/* <Text style={ChatStyles.messagetext}>{item.messageText}</Text> */}
+                  <Text style={ChatStyles.messagetext}>{item.last}</Text>
                 </View>
               </View>
             </TouchableOpacity>

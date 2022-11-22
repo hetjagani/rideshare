@@ -25,8 +25,6 @@ import {
   MY_POSTS_SCREEN,
   PROFILE_NAVIGATOR,
 } from './AppRoutes';
-import Profile from '../screens/Profile';
-import { UserInfo } from '../screens/UserInfo';
 import MyPosts from '../screens/MyPosts';
 
 const Tab = createBottomTabNavigator();
