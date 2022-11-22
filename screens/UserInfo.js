@@ -14,6 +14,7 @@ import updateUserDetails from '../services/updateUserDetails';
 import * as ImagePicker from 'expo-image-picker';
 import { RNS3 } from 'react-native-aws3';
 import uuid from 'react-native-uuid';
+import { AWS_ACCESS_KEY, AWS_BUCKET, AWS_REGION, AWS_SECRET_KEY } from '../Config';
 
 export const UserInfo = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -22,7 +23,7 @@ export const UserInfo = ({ navigation }) => {
   const [contactNo, setContactNo] = useState('');
   const [id, setId] = useState(0);
   const [profileImage, setProfileImage] = useState('');
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -130,10 +131,10 @@ export const UserInfo = ({ navigation }) => {
   const uploadImageOnS3 = async (image) => {
     const options = {
       keyPrefix: '',
-      bucket: 'rideshare-sjsu',
-      region: 'us-east-1',
-      accessKey: 'AKIA5OTORPR7HUJE5CBD',
-      secretKey: '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',
+      bucket: AWS_BUCKET,
+      region: AWS_REGION,
+      accessKey: AWS_ACCESS_KEY,
+      secretKey: AWS_SECRET_KEY,
       successActionStatus: 201,
     };
     const file = {

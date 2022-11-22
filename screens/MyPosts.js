@@ -1,22 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, RefreshControl } from 'react-native';
+import { RefreshControl, ScrollView } from 'react-native';
 import PostCard from '../components/PostCard';
-import fetchPosts from '../services/fetchPosts';
-import Toast from 'react-native-toast-message';
+import getAuthData from '../contexts/getAuthData';
+import fetchUserPosts from '../services/fetchUserPosts';
 
-function Home({ navigation }) {
+const MyPosts = ({ navigation }) => {
   const [postList, setPostList] = useState([]);
-  const [refreshing, setRefreshing] = React.useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [page, setPage] = useState(0);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     fetchPostsApi();
   }, []);
 
-  const [page, setPage] = useState(0);
-
   const fetchPostsApi = () => {
-    fetchPosts({ page, limit: 10 })
+    getAuthData()
+      .then((authData) => {
+        return fetchUserPosts({ page, limit: 10, userId: authData.userId });
+      })
       .then((resp) => {
         setPostList(resp?.nodes);
         setRefreshing(false);
@@ -28,17 +30,6 @@ function Home({ navigation }) {
           text2: err,
         });
       });
-  };
-
-  const updateLike = (id, likes) => {
-    const newList = postList.map((post) => {
-      if (post.id == id) {
-        post.noOfLikes = likes;
-      }
-      return post;
-    });
-
-    setPostList(newList);
   };
 
   useEffect(() => {
@@ -53,10 +44,15 @@ function Home({ navigation }) {
     >
       {postList &&
         postList.map((post) => (
-          <PostCard post={post} key={post?.id} updateLike={updateLike} />
+          <PostCard
+            post={post}
+            key={post?.id}
+            navigation={navigation}
+            shortView={true}
+          />
         ))}
     </ScrollView>
   );
-}
+};
 
-export default Home;
+export default MyPosts;

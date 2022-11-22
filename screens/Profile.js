@@ -1,19 +1,18 @@
 import { Layout, Text } from '@ui-kitten/components';
 import React, { useEffect, useState } from 'react';
 import { View, Image } from 'react-native';
-import { ProfileMenuItems } from './ProfileMenuItems';
+import { ProfileMenuItems } from '../components/ProfileMenuItems';
 import { fetchUserDetails } from '../services/fetchUserDetails';
-import LoadingView from './loadingView';
-import { set } from 'react-hook-form';
+import LoadingView from '../components/loadingView';
+import { USER_INFO_SCREEN } from '../routes/AppRoutes';
 
 const Profile = ({ navigation }) => {
   const [name, setName] = useState('Temp Name');
-  const [image, setImage] = useState({});
+  const [image, setImage] = useState('');
   const [loading, setLoading] = useState(false);
   const [rides, setRides] = useState(0);
   const [ratings, setRatings] = useState(0.0);
   const [months, setMonths] = useState(0.0);
-  
 
   const getUserDetails = async () => {
     const res = await fetchUserDetails();
@@ -34,7 +33,7 @@ const Profile = ({ navigation }) => {
     }
 
     if (res?.response?.status == 404) {
-      navigation.navigate('USER_INFO_SCREEN');
+      navigation.navigate(USER_INFO_SCREEN);
     }
 
     const userName = res?.data?.firstName + ' ' + res?.data?.lastName;
