@@ -4,11 +4,22 @@ import Payment from "../screens/Payment";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Icon } from "@ui-kitten/components";
-import { HOME_SCREEN, PAYMENT_SCREEN, HOME_NAVIGATOR, PROFILE_SCREEN, USER_INFO_SCREEN } from "./AppRoutes";
+import {
+  HOME_SCREEN,
+  PAYMENT_SCREEN,
+  HOME_NAVIGATOR,
+  PROFILE_SCREEN,
+  USER_INFO_SCREEN,
+  ROOM_SCREEN,
+  MESSAGE_SCREEN,
+  ROOM_NAVIGATOR,
+} from "./AppRoutes";
 import Profile from "../screens/Profile";
 import { UserInfo } from "../screens/UserInfo";
-const { Navigator, Screen } = createStackNavigator();
+import Room from "../screens/Room";
+import Message from "../screens/Message";
 
+const { Navigator, Screen } = createStackNavigator();
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -33,21 +44,36 @@ const HomeNavigator = () => {
       <Stack.Screen
         name={HOME_SCREEN}
         component={Home}
-        options={{ headerShown: true, title:"Home Screen" }}
+        options={{ headerShown: true, title: "Home Screen" }}
       />
       <Stack.Screen
         name={PAYMENT_SCREEN}
         component={Payment}
-        options={{ headerShown: true, title:"Payment Screen" }}
+        options={{ headerShown: true, title: "Payment Screen" }}
       />
-      <Stack.Screen 
+      <Stack.Screen
         name={USER_INFO_SCREEN}
         component={UserInfo}
-        options={{ headerShown: true, title:"User Info Screen" }}
+        options={{ headerShown: true, title: "User Info Screen" }}
       />
     </Stack.Navigator>
   );
 };
+
+const RoomNavigator = ({ navigation }) => (
+  <Stack.Navigator>
+    <Stack.Screen
+      name={ROOM_SCREEN}
+      component={Room}
+      options={{ headerShown: false, title: "Room Screen" }}
+    />
+    <Stack.Screen
+      name={MESSAGE_SCREEN}
+      component={Message}
+      // options={{ headerShown: true, title: "Message Screen" }}
+    />
+  </Stack.Navigator>
+);
 
 export const AppStack = () => {
   return (
@@ -58,16 +84,25 @@ export const AppStack = () => {
         options={{
           headerShown: false,
           tabBarIcon: tabIcon("home"),
-          title: "Home"
+          title: "Home",
         }}
       />
-      <Tab.Screen 
+      <Tab.Screen
         name={PROFILE_SCREEN}
         component={Profile}
         options={{
           headerShown: true,
           title: "Profile",
-          tabBarIcon: tabIcon("person")
+          tabBarIcon: tabIcon("person"),
+        }}
+      />
+      <Tab.Screen
+        name={ROOM_NAVIGATOR}
+        component={RoomNavigator}
+        options={{
+          headerShown: true,
+          title: "Chats",
+          tabBarIcon: tabIcon("message-circle"),
         }}
       />
     </Tab.Navigator>
