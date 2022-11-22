@@ -14,7 +14,12 @@ import updateUserDetails from '../services/updateUserDetails';
 import * as ImagePicker from 'expo-image-picker';
 import { RNS3 } from 'react-native-aws3';
 import uuid from 'react-native-uuid';
-import { AWS_ACCESS_KEY, AWS_BUCKET, AWS_REGION, AWS_SECRET_KEY } from '../Config';
+import {
+  AWS_ACCESS_KEY,
+  AWS_BUCKET,
+  AWS_REGION,
+  AWS_SECRET_KEY,
+} from '../Config';
 
 export const UserInfo = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -109,6 +114,7 @@ export const UserInfo = ({ navigation }) => {
       type: 'success',
       text1: 'Updated User Details',
     });
+    navigation.goBack();
   };
 
   const pickImage = async () => {
@@ -240,7 +246,7 @@ export const UserInfo = ({ navigation }) => {
             marginTop: '10%',
           }}
         >
-         <Image
+          <Image
             onLoadStart={() => setLoading(true)}
             onLoadEnd={() => setLoading(false)}
             source={{ uri: image }}

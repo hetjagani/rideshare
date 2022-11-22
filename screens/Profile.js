@@ -14,34 +14,35 @@ const Profile = ({ navigation }) => {
   const [ratings, setRatings] = useState(0.0);
   const [months, setMonths] = useState(0.0);
 
-  const getUserDetails = async () => {
-    const res = await fetchUserDetails();
-    if (res?.response?.status == 401) {
-      Toast.show({
-        type: 'error',
-        text1: 'Unauthorised',
-      });
-      return;
-    }
+  const getUserDetails = () => {
+    fetchUserDetails().then((res) => {
+      if (res?.response?.status == 401) {
+        Toast.show({
+          type: 'error',
+          text1: 'Unauthorised',
+        });
+        return;
+      }
 
-    if (res?.response?.status == 500) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error Fetching Details',
-      });
-      return;
-    }
+      if (res?.response?.status == 500) {
+        Toast.show({
+          type: 'error',
+          text1: 'Error Fetching Details',
+        });
+        return;
+      }
 
-    if (res?.response?.status == 404) {
-      navigation.navigate(USER_INFO_SCREEN);
-    }
+      if (res?.response?.status == 404) {
+        navigation.navigate(USER_INFO_SCREEN);
+      }
 
-    const userName = res?.data?.firstName + ' ' + res?.data?.lastName;
-    setName(userName);
-    setImage(res?.data?.profileImage);
-    setRatings(res?.data?.rating);
-    setRides(res?.data?.rides);
-    setMonths(res?.data?.months);
+      const userName = res?.data?.firstName + ' ' + res?.data?.lastName;
+      setName(userName);
+      setImage(res?.data?.profileImage);
+      setRatings(res?.data?.rating);
+      setRides(res?.data?.rides);
+      setMonths(res?.data?.months);
+    });
   };
 
   useEffect(() => {

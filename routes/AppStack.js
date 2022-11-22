@@ -10,19 +10,20 @@ import {
   HOME_NAVIGATOR,
   PROFILE_SCREEN,
   USER_INFO_SCREEN,
-  RIDE_POST_DETAILS,
   MY_POSTS_SCREEN,
   PROFILE_NAVIGATOR,
+  MY_RIDES_SCREEN,
 } from './AppRoutes';
 import Profile from '../screens/Profile';
 import { UserInfo } from '../screens/UserInfo';
 import MyPosts from '../screens/MyPosts';
+import MyRides from '../screens/MyRides';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-const unfocusedColor = "#aaaaaa";
-const focusedColor = "#000000";
+const unfocusedColor = '#aaaaaa';
+const focusedColor = '#000000';
 
 const tabIcon = (name) => {
   return ({ focused }) => (
@@ -41,17 +42,12 @@ const HomeNavigator = () => {
       <Stack.Screen
         name={HOME_SCREEN}
         component={Home}
-        options={{ headerShown: true, title:"Your Feed" }}
+        options={{ headerShown: true, title: 'Your Feed' }}
       />
       <Stack.Screen
         name={PAYMENT_SCREEN}
         component={Payment}
-        options={{ headerShown: true, title:"Payment Screen" }}
-      />
-      <Stack.Screen 
-        name={USER_INFO_SCREEN}
-        component={UserInfo}
-        options={{ headerShown: true, title:"User Info Screen" }}
+        options={{ headerShown: true, title: 'Payment Screen' }}
       />
     </Stack.Navigator>
   );
@@ -70,6 +66,16 @@ const ProfileNavigator = () => {
         component={MyPosts}
         options={{ headerShown: true, title: 'Your Posts' }}
       />
+      <Stack.Screen
+        name={MY_RIDES_SCREEN}
+        component={MyRides}
+        options={{ headerShown: true, title: 'Your Rides' }}
+      />
+      <Stack.Screen
+        name={USER_INFO_SCREEN}
+        component={UserInfo}
+        options={{ headerShown: true, title: 'Account Info' }}
+      />
     </Stack.Navigator>
   );
 };
@@ -82,8 +88,8 @@ export const AppStack = () => {
         component={HomeNavigator}
         options={{
           headerShown: false,
-          tabBarIcon: tabIcon("home"),
-          title: "Home"
+          tabBarIcon: tabIcon('home'),
+          title: 'Home',
         }}
       />
       <Tab.Screen
