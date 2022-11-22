@@ -12,6 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,8 +53,11 @@ public class RideService implements IRideService {
             "FROM ride.ride, ride.address as start_add, ride.address as end_add\n" +
             "WHERE (ride.start_address = start_add.id) AND (ride.end_address = end_add.id) AND ride.id = ?;";
 
-    private final String insertRideQuery = "INSERT INTO ride.ride(post_id, user_id, price_per_person, no_passengers, capacity, status, start_address, end_address)\n" +
-            "VALUES (?,?,?,?,?,?,?,?) RETURNING id;";
+    private final String insertRideQuery = "INSERT INTO ride.ride(post_id, user_id, created_at, price_per_person, no_passengers, capacity, status, start_address, end_address)\n" +
+            "VALUES (?,?,?,?,?,?,?,?,?) RETURNING id;";
+
+    private final String startRideQuery = "UPDATE ride.ride SET status='ACTIVE', started_at=? WHERE id = ? AND user_id = ?;";
+    private final String stopRideQuery = "UPDATE ride.ride SET status='COMPLETED', ended_at=? WHERE id = ? AND user_id = ?;";
 
     private final String updateCapacityQuery = "UPDATE ride.ride SET capacity = ? WHERE id = ?";
 
@@ -83,6 +89,8 @@ public class RideService implements IRideService {
         List<Ride> rideList = ridesWithAddress.stream().map((Ride r) -> {
             List<Tag> tagList = rideTagsMap.get(r.getId());
             r.setTags(tagList);
+            if(r.getEndedAt() != null && r.getStartedAt() != null)
+                r.setDuration(Duration.between(r.getStartedAt().toInstant(), r.getEndedAt().toInstant()));
             return r;
         }).collect(Collectors.toList());
 
@@ -111,6 +119,8 @@ public class RideService implements IRideService {
         List<Ride> rideList = ridesWithAddress.stream().map((Ride r) -> {
             List<Tag> tagList = rideTagsMap.get(r.getId());
             r.setTags(tagList);
+            if(r.getEndedAt() != null && r.getStartedAt() != null)
+                r.setDuration(Duration.between(r.getStartedAt().toInstant(), r.getEndedAt().toInstant()));
             return r;
         }).collect(Collectors.toList());
 
@@ -138,6 +148,8 @@ public class RideService implements IRideService {
         List<Ride> rideList = ridesWithAddress.stream().map((Ride r) -> {
             List<Tag> tagList = rideTagsMap.get(r.getId());
             r.setTags(tagList);
+            if(r.getEndedAt() != null && r.getStartedAt() != null)
+                r.setDuration(Duration.between(r.getStartedAt().toInstant(), r.getEndedAt().toInstant()));
             return r;
         }).collect(Collectors.toList());
 
@@ -153,13 +165,15 @@ public class RideService implements IRideService {
 
         List<Tag> tagList = rideTags.stream().map((RideTag rt) -> rt.getTag()).collect(Collectors.toList());
         rideWithAddress.setTags(tagList);
+        if(rideWithAddress.getEndedAt() != null && rideWithAddress.getStartedAt() != null)
+            rideWithAddress.setDuration(Duration.between(rideWithAddress.getStartedAt().toInstant(), rideWithAddress.getEndedAt().toInstant()));
 
         return rideWithAddress;
     }
 
     @Override
     public Ride create(com.rideshare.ride.model.Ride ride) throws Exception {
-        Integer id = jdbcTemplate.queryForObject(insertRideQuery, Integer.class, ride.getPostId(), ride.getUserId(), ride.getPricePerPerson(), ride.getNoPassengers(), ride.getNoPassengers(), RideStatus.CREATED, ride.getStartAddress(), ride.getEndAddress());
+        Integer id = jdbcTemplate.queryForObject(insertRideQuery, Integer.class, ride.getPostId(), ride.getUserId(), Timestamp.from(Instant.now()), ride.getPricePerPerson(), ride.getNoPassengers(), ride.getNoPassengers(), RideStatus.CREATED, ride.getStartAddress(), ride.getEndAddress());
 
         if (ride.getTagIds() != null) {
             ride.getTagIds().stream().forEach((Integer tagId) -> {
@@ -176,6 +190,39 @@ public class RideService implements IRideService {
         jdbcTemplate.update(updateCapacityQuery, capacity, rideId);
         Ride updatedRide = getById(rideId);
         return updatedRide;
+    }
+
+    @Override
+    public Ride startRide(Integer rideId, Integer userId) throws Exception {
+        Ride ride = getById(rideId);
+        if(ride.getUserId() != userId) {
+            throw new Exception("Cannot start other user's ride");
+        }
+        if(RideStatus.ACTIVE.equals(ride.getStatus())) {
+            throw new Exception("Ride already started");
+        }
+        if(RideStatus.COMPLETED.equals(ride.getStatus())) {
+            throw new Exception("Ride already completed");
+        }
+
+        jdbcTemplate.update(startRideQuery, Timestamp.from(Instant.now()), rideId, userId);
+
+        return getById(rideId);
+    }
+
+    @Override
+    public Ride stopRide(Integer rideId, Integer userId) throws Exception {
+        Ride ride = getById(rideId);
+        if(ride.getUserId() != userId) {
+            throw new Exception("Cannot start other user's ride");
+        }
+        if(RideStatus.COMPLETED.equals(ride.getStatus())) {
+            throw new Exception("Ride already completed");
+        }
+
+        jdbcTemplate.update(stopRideQuery, Timestamp.from(Instant.now()), rideId, userId);
+
+        return getById(rideId);
     }
 
     @Override

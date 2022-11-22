@@ -4,10 +4,12 @@ import com.rideshare.ride.model.Address;
 import com.rideshare.ride.model.Tag;
 import lombok.Data;
 
+import java.sql.Timestamp;
+import java.time.Duration;
 import java.util.List;
 
 @Data
-public class Ride {
+public class Ride implements Comparable<Ride> {
     private Integer id;
     private Integer postId;
     private Integer userId;
@@ -18,4 +20,13 @@ public class Ride {
     private List<Tag> tags;
     private Address startAddress;
     private Address endAddress;
+    private Timestamp createdAt;
+    private Timestamp startedAt;
+    private Timestamp endedAt;
+    private Duration duration;
+
+    @Override
+    public int compareTo(Ride o) {
+        return o.getCreatedAt().compareTo(this.createdAt);
+    }
 }

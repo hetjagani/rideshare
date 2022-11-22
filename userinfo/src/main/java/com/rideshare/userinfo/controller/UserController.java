@@ -116,6 +116,12 @@ public class UserController {
             String token = headers.get("Authentication").get(0);
             UserInfo userInfo = userInfoService.getById(token, userID);
 
+            Float avgRating = ratingService.getAvgRating(userID, token);
+            userInfo.setRating(avgRating);
+
+            Integer noOfRides = rideService.getNoOfRides(userID, token);
+            userInfo.setRides(noOfRides);
+
             return ResponseEntity.ok(userInfo);
         }catch (Exception e) {
             e.printStackTrace();

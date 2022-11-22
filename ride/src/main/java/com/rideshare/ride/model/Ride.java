@@ -2,6 +2,7 @@ package com.rideshare.ride.model;
 
 import lombok.Data;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Data
@@ -16,4 +17,7 @@ public class Ride {
     private List<Integer> tagIds;
     private Integer startAddress;
     private Integer endAddress;
+    private Timestamp createdAt;
+    private Timestamp startedAt;
+    private Timestamp endedAt;
 }

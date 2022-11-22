@@ -1,14 +1,21 @@
 package com.rideshare.ride.controller;
 
+import com.rideshare.ride.model.RequestStatus;
+import com.rideshare.ride.model.User;
 import com.rideshare.ride.security.UserPrincipal;
+import com.rideshare.ride.service.IRequestService;
 import com.rideshare.ride.service.IRideService;
-import com.rideshare.ride.webentity.DeleteSuccess;
-import com.rideshare.ride.webentity.PaginatedEntity;
-import com.rideshare.ride.webentity.Ride;
+import com.rideshare.ride.webentity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/rides")
@@ -16,6 +23,9 @@ public class RideController {
 
     @Autowired
     IRideService rideService;
+
+    @Autowired
+    IRequestService requestService;
 
     @GetMapping(path="/noOfRides/{userId}")
     public ResponseEntity<Integer> getNoOfRidesForUser(@PathVariable Integer userId) throws Exception{
@@ -80,6 +90,79 @@ public class RideController {
             e.printStackTrace();
             throw e;
         }
+    }
+
+    @GetMapping(path = "/my")
+    public ResponseEntity<PaginatedEntity<MyRide>> getAllUserRides(@AuthenticationPrincipal UserPrincipal user, @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer limit) throws Exception {
+       try {
+           Integer userId = Integer.parseInt(user.getId());
+
+           // get all rides of user
+           List<MyRide> userRides = rideService.getAll().stream().filter(r -> Objects.equals(r.getUserId(), userId)).map((Ride r) -> {
+               return toMyRide(r, false);
+           }).collect(Collectors.toList());
+
+           // get all completed requests of user
+           List<MyRide> userRequestedRides = requestService.getAll().stream()
+                   .filter(r -> Objects.equals(r.getUserId(), userId) && RequestStatus.COMPLETED.equals(r.getStatus()))
+                   .map((Request r) -> toMyRide(r.getRide(), true)).collect(Collectors.toList());
+
+            for(MyRide r: userRequestedRides) {
+                if (r != null) {
+                    userRides.add(r);
+                }
+            }
+
+           Collections.sort(userRides);
+
+            return ResponseEntity.ok(new PaginatedEntity<>(userRides, 0, 0));
+       } catch (Exception e) {
+           e.printStackTrace();
+           throw e;
+       }
+    }
+
+    @PutMapping(path = "/{id}/start")
+    public ResponseEntity<Ride> startRide(@PathVariable Integer id, @AuthenticationPrincipal UserPrincipal user) throws Exception {
+        try {
+            Integer userId = Integer.parseInt(user.getId());
+            Ride startedRide = rideService.startRide(id, userId);
+            return ResponseEntity.ok(startedRide);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    @PutMapping(path = "/{id}/stop")
+    public ResponseEntity<Ride> stopRide(@PathVariable Integer id, @AuthenticationPrincipal UserPrincipal user) throws Exception {
+        try {
+            Integer userId = Integer.parseInt(user.getId());
+            Ride startedRide = rideService.stopRide(id, userId);
+            return ResponseEntity.ok(startedRide);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    private MyRide toMyRide(Ride r, Boolean isPassenger) {
+        MyRide myRide = new MyRide();
+        myRide.setId(r.getId());
+        myRide.setPostId(r.getPostId());
+        myRide.setUserId(r.getUserId());
+        myRide.setPricePerPerson(r.getPricePerPerson());
+        myRide.setNoPassengers(r.getNoPassengers());
+        myRide.setCapacity(r.getCapacity());
+        myRide.setStatus(r.getStatus());
+        myRide.setTags(r.getTags());
+        myRide.setStartAddress(r.getStartAddress());
+        myRide.setEndAddress(r.getEndAddress());
+        myRide.setCreatedAt(r.getCreatedAt());
+        myRide.setIsPassenger(isPassenger);
+        myRide.setStartedAt(r.getStartedAt());
+        myRide.setEndedAt(r.getEndedAt());
+        return myRide;
     }
 
 }
