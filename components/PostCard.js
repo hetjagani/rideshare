@@ -4,26 +4,10 @@ import { Dimensions, Image, StyleSheet, View } from 'react-native';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { likePost, dislikePost } from '../services/postLike';
 import Toast from 'react-native-toast-message';
+import Pill from '../components/Pill';
 
 const StarIcon = (props) => <Icon {...props} name="star" />;
 const StarOutlineIcon = (props) => <Icon {...props} name="star-outline" />;
-
-const Pill = ({ text, style }) => {
-  return (
-    <Text
-      style={{
-        ...style,
-        borderColor: '#000',
-        borderWidth: 1,
-        borderRadius: 10,
-        padding: 2,
-      }}
-      category="s2"
-    >
-      {text}
-    </Text>
-  );
-};
 
 const CardHeader = ({ text, postType }) => {
   const headerStyles = StyleSheet.create({
@@ -257,7 +241,7 @@ const PostCard = ({ post, updateLike, navigation, shortView }) => {
               </Text>
               <View style={cardStyle.rideTags}>
                 {post.ride?.tags?.map((tag) => (
-                  <Pill text={tag?.name} style={{ margin: 2 }} key={tag?.id} />
+                  <Pill text={tag?.name} key={tag?.id} />
                 ))}
               </View>
             </View>

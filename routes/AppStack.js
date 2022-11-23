@@ -1,9 +1,9 @@
-import React from "react";
-import Home from "../screens/Home";
-import Payment from "../screens/Payment";
-import { createStackNavigator } from "@react-navigation/stack";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Icon } from "@ui-kitten/components";
+import React from 'react';
+import Home from '../screens/Home';
+import Payment from '../screens/Payment';
+import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Icon } from '@ui-kitten/components';
 import {
   HOME_SCREEN,
   PAYMENT_SCREEN,
@@ -19,20 +19,11 @@ import { UserInfo } from "../screens/UserInfo";
 import Room from "../screens/Room";
 import Message from "../screens/Message";
 
-const { Navigator, Screen } = createStackNavigator();
-import {
-  RIDE_POST_DETAILS,
-  MY_POSTS_SCREEN,
-  PROFILE_NAVIGATOR,
-} from "./AppRoutes";
-import MyPosts from "../screens/MyPosts";
-import { useNavigationState } from "@react-navigation/native";
-
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-const unfocusedColor = "#aaaaaa";
-const focusedColor = "#000000";
+const unfocusedColor = '#aaaaaa';
+const focusedColor = '#000000';
 
 const tabIcon = (name) => {
   return ({ focused }) => (
@@ -51,12 +42,34 @@ const HomeNavigator = () => {
       <Stack.Screen
         name={HOME_SCREEN}
         component={Home}
-        options={{ headerShown: true, title: "Your Feed" }}
+        options={{ headerShown: true, title: 'Your Feed' }}
       />
       <Stack.Screen
         name={PAYMENT_SCREEN}
         component={Payment}
-        options={{ headerShown: true, title: "Payment Screen" }}
+        options={{ headerShown: true, title: 'Payment Screen' }}
+      />
+    </Stack.Navigator>
+  );
+};
+
+const ProfileNavigator = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name={PROFILE_SCREEN}
+        component={Profile}
+        options={{ headerShown: true, title: 'Profile Info' }}
+      />
+      <Stack.Screen
+        name={MY_POSTS_SCREEN}
+        component={MyPosts}
+        options={{ headerShown: true, title: 'Your Posts' }}
+      />
+      <Stack.Screen
+        name={MY_RIDES_SCREEN}
+        component={MyRides}
+        options={{ headerShown: true, title: 'Your Rides' }}
       />
       <Stack.Screen
         name={USER_INFO_SCREEN}
@@ -85,22 +98,6 @@ const RoomNavigator = ({navigation }) => (
     />
   </Stack.Navigator>
 );
-const ProfileNavigator = () => {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name={PROFILE_SCREEN}
-        component={Profile}
-        options={{ headerShown: true, title: "Profile Info" }}
-      />
-      <Stack.Screen
-        name={MY_POSTS_SCREEN}
-        component={MyPosts}
-        options={{ headerShown: true, title: "Your Posts" }}
-      />
-    </Stack.Navigator>
-  );
-};
 
 export const AppStack = () => {
   return (
@@ -128,8 +125,8 @@ export const AppStack = () => {
         component={ProfileNavigator}
         options={{
           headerShown: false,
-          title: "Profile",
-          tabBarIcon: tabIcon("person"),
+          title: 'Profile',
+          tabBarIcon: tabIcon('person'),
         }}
       />
     </Tab.Navigator>

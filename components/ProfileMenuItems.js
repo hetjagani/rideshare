@@ -2,7 +2,11 @@ import { Layout, Menu, MenuItem, Icon } from '@ui-kitten/components';
 import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
-import { MY_POSTS_SCREEN, USER_INFO_SCREEN } from '../routes/AppRoutes';
+import {
+  MY_POSTS_SCREEN,
+  MY_RIDES_SCREEN,
+  USER_INFO_SCREEN,
+} from '../routes/AppRoutes';
 
 export const ProfileMenuItems = ({ navigation, props }) => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -40,6 +44,11 @@ export const ProfileMenuItems = ({ navigation, props }) => {
           title="My Posts"
           accessoryRight={ForwardIcon}
           onPress={() => navigation.navigate(MY_POSTS_SCREEN)}
+        />
+        <MenuItem
+          title="My Rides"
+          accessoryRight={ForwardIcon}
+          onPress={() => navigation.navigate(MY_RIDES_SCREEN)}
         />
         <MenuItem title="Sign Out" onPress={signOut} />
       </Menu>
