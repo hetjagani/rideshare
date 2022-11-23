@@ -37,7 +37,7 @@ public class MessageController {
             throw e;
         }
     }
-    @GetMapping(path = "/{roomId}/messages")
+    @GetMapping(path = "/rooms/{roomId}/messages")
     public ResponseEntity<PaginatedEntity<Message>> getPaginated(@AuthenticationPrincipal UserPrincipal userDetails, @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer limit, @PathVariable Integer roomId) throws Exception {
         try {
             PaginatedEntity<Message> roomList = messageService.getAllPaginated(roomId, page, limit);
