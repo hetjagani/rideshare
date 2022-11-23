@@ -12,53 +12,13 @@ import { set } from "react-hook-form";
 import { FlatList } from "react-native-gesture-handler";
 import { MESSAGE_SCREEN } from "../routes/AppRoutes";
 import { ChatStyles } from "../styles/ChatStyles";
-
-const Messages = [
-  {
-    id: "1",
-    userName: "Jenny Doe",
-    userImg: require("../assets/splash.png"),
-    messageTime: "4 mins ago",
-    messageText:
-      "Hey there, this is my test for a post of my social app in React Native.",
-  },
-  {
-    id: "2",
-    userName: "John Doe",
-    userImg: require("../assets/splash.png"),
-    messageTime: "2 hours ago",
-    messageText:
-      "Hey there, this is my test for a post of my social app in React Native.",
-  },
-  {
-    id: "3",
-    userName: "Ken William",
-    userImg: require("../assets/splash.png"),
-    messageTime: "1 hours ago",
-    messageText:
-      "Hey there, this is my test for a post of my social app in React Native.",
-  },
-  {
-    id: "4",
-    userName: "Selina Paul",
-    userImg: require("../assets/splash.png"),
-    messageTime: "1 day ago",
-    messageText:
-      "Hey there, this is my test for a post of my social app in React Native.",
-  },
-  {
-    id: "5",
-    userName: "Christy Alex",
-    userImg: require("../assets/splash.png"),
-    messageTime: "2 days ago",
-    messageText:
-      "Hey there, this is my test for a post of my social app in React Native.",
-  },
-];
+import getAuthData from '../contexts/getAuthData';
 
 const Room = ({ navigation }) => {
   const [rooms, setRooms] = useState([]);
+  const [currentUser, setCurrentUser] = useState();
   
+  console.log(currentUser);
   const getRooms = async () => {
     const res = await userRoomsInfo();
     console.log(res.data);
@@ -82,6 +42,7 @@ const Room = ({ navigation }) => {
 
   useEffect(() => {
     getRooms();
+    getAuthData().then((authData) => {setCurrentUser(authData.userId)});
   }, []);
 
   return (
@@ -100,8 +61,10 @@ const Room = ({ navigation }) => {
               style={ChatStyles.card}
               onPress={() =>
                 navigation.navigate(MESSAGE_SCREEN, {
-                  userName: item.userName,
+                  userName: item.name,
                   roomId: item.roomId,
+                  senderId: currentUser,
+                  receiverId: item.userId,
                 })
               }
             >

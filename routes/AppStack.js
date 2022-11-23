@@ -1,9 +1,9 @@
-import React from 'react';
-import Home from '../screens/Home';
-import Payment from '../screens/Payment';
-import { createStackNavigator } from '@react-navigation/stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Icon } from '@ui-kitten/components';
+import React from "react";
+import Home from "../screens/Home";
+import Payment from "../screens/Payment";
+import { createStackNavigator } from "@react-navigation/stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Icon } from "@ui-kitten/components";
 import {
   HOME_SCREEN,
   PAYMENT_SCREEN,
@@ -24,8 +24,9 @@ import {
   RIDE_POST_DETAILS,
   MY_POSTS_SCREEN,
   PROFILE_NAVIGATOR,
-} from './AppRoutes';
-import MyPosts from '../screens/MyPosts';
+} from "./AppRoutes";
+import MyPosts from "../screens/MyPosts";
+import { useNavigationState } from "@react-navigation/native";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -50,7 +51,7 @@ const HomeNavigator = () => {
       <Stack.Screen
         name={HOME_SCREEN}
         component={Home}
-        options={{ headerShown: true, title:"Your Feed" }}
+        options={{ headerShown: true, title: "Your Feed" }}
       />
       <Stack.Screen
         name={PAYMENT_SCREEN}
@@ -66,17 +67,21 @@ const HomeNavigator = () => {
   );
 };
 
-const RoomNavigator = ({ navigation }) => (
+const RoomNavigator = ({navigation }) => (
   <Stack.Navigator>
     <Stack.Screen
       name={ROOM_SCREEN}
       component={Room}
-      options={{ headerShown: false, title: "Room Screen" }}
+      options={{ headerShown: true, title: "Chats" }}
     />
     <Stack.Screen
       name={MESSAGE_SCREEN}
       component={Message}
-      // options={{ headerShown: true, title: "Message Screen" }}
+      options={({ route }) => ({
+        tabBarVisible: false,
+        title: route.params.userName,
+        headerShown: true
+      })}
     />
   </Stack.Navigator>
 );
@@ -86,12 +91,12 @@ const ProfileNavigator = () => {
       <Stack.Screen
         name={PROFILE_SCREEN}
         component={Profile}
-        options={{ headerShown: true, title: 'Profile Info' }}
+        options={{ headerShown: true, title: "Profile Info" }}
       />
       <Stack.Screen
         name={MY_POSTS_SCREEN}
         component={MyPosts}
-        options={{ headerShown: true, title: 'Your Posts' }}
+        options={{ headerShown: true, title: "Your Posts" }}
       />
     </Stack.Navigator>
   );
@@ -112,19 +117,19 @@ export const AppStack = () => {
       <Tab.Screen
         name={ROOM_NAVIGATOR}
         component={RoomNavigator}
-        options={{
-          headerShown: true,
+        options={({route}) => ({
+          headerShown: false,
           title: "Chats",
           tabBarIcon: tabIcon("message-circle"),
-        }}
+        })}
       />
       <Tab.Screen
         name={PROFILE_NAVIGATOR}
         component={ProfileNavigator}
         options={{
           headerShown: false,
-          title: 'Profile',
-          tabBarIcon: tabIcon('person'),
+          title: "Profile",
+          tabBarIcon: tabIcon("person"),
         }}
       />
     </Tab.Navigator>
