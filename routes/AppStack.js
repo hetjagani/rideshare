@@ -10,14 +10,14 @@ import {
   HOME_NAVIGATOR,
   PROFILE_SCREEN,
   USER_INFO_SCREEN,
-  MY_POSTS_SCREEN,
-  PROFILE_NAVIGATOR,
-  MY_RIDES_SCREEN,
-} from './AppRoutes';
-import Profile from '../screens/Profile';
-import { UserInfo } from '../screens/UserInfo';
-import MyPosts from '../screens/MyPosts';
-import MyRides from '../screens/MyRides';
+  ROOM_SCREEN,
+  MESSAGE_SCREEN,
+  ROOM_NAVIGATOR,
+} from "./AppRoutes";
+import Profile from "../screens/Profile";
+import { UserInfo } from "../screens/UserInfo";
+import Room from "../screens/Room";
+import Message from "../screens/Message";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -74,11 +74,30 @@ const ProfileNavigator = () => {
       <Stack.Screen
         name={USER_INFO_SCREEN}
         component={UserInfo}
-        options={{ headerShown: true, title: 'Account Info' }}
+        options={{ headerShown: true, title: "User Info Screen" }}
       />
     </Stack.Navigator>
   );
 };
+
+const RoomNavigator = ({navigation }) => (
+  <Stack.Navigator>
+    <Stack.Screen
+      name={ROOM_SCREEN}
+      component={Room}
+      options={{ headerShown: true, title: "Chats" }}
+    />
+    <Stack.Screen
+      name={MESSAGE_SCREEN}
+      component={Message}
+      options={({ route }) => ({
+        tabBarVisible: false,
+        title: route.params.userName,
+        headerShown: true
+      })}
+    />
+  </Stack.Navigator>
+);
 
 export const AppStack = () => {
   return (
@@ -88,9 +107,18 @@ export const AppStack = () => {
         component={HomeNavigator}
         options={{
           headerShown: false,
-          tabBarIcon: tabIcon('home'),
-          title: 'Home',
+          tabBarIcon: tabIcon("home"),
+          title: "Home",
         }}
+      />
+      <Tab.Screen
+        name={ROOM_NAVIGATOR}
+        component={RoomNavigator}
+        options={({route}) => ({
+          headerShown: false,
+          title: "Chats",
+          tabBarIcon: tabIcon("message-circle"),
+        })}
       />
       <Tab.Screen
         name={PROFILE_NAVIGATOR}
