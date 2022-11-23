@@ -24,6 +24,7 @@ import Room from '../screens/Room';
 import Message from '../screens/Message';
 import RidePostDetails from '../screens/RidePostDetails';
 import MyPosts from '../screens/MyPosts';
+import MyRides from '../screens/MyRides';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
