@@ -1,4 +1,4 @@
-import { Layout, Text } from '@ui-kitten/components';
+import { Button, Layout, Text } from '@ui-kitten/components';
 import React, { useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
@@ -64,7 +64,7 @@ const RidePostDetails = ({ route }) => {
         <Layout
           style={{
             justifyContent: 'center',
-            backgroundColor: 'white',
+            backgroundColor: 'light gray',
             borderRadius: '90%',
             height: 120,
             width: 120,
@@ -87,7 +87,7 @@ const RidePostDetails = ({ route }) => {
         </Layout>
       </View>
       <View style={{ alignItems: 'center', margin: '5%' }}>
-        <Text category="h6">{post?.ride?.user?.firstName} {post?.ride?.user?.lastName}</Text>
+        <Text>Ride with </Text><Text category="h6"> {post.user?.firstName} {" "} {post.user?.lastName} </Text>
       </View>
       <View style={{ marginTop: -40 }}>
         <MapView style={styles.map} region={initRegion}>
@@ -123,12 +123,18 @@ const RidePostDetails = ({ route }) => {
           <Text style={{ fontWeight: 'bold' }}> Destination:</Text>
           <Text> {destinationAddress} </Text>
         </Layout>
-        <Layout
-          style={{ flexDirection: 'row', justifyContent: 'space-between' }}
-        >
-          <Text style={{ fontWeight: 'bold' }}> Capacity:</Text>
-          <Text> {capacity} </Text>
+        <Layout style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          <Text style={{fontWeight: 'bold'}}> Capacity:</Text>
+          <Text>  {post.ride?.noPassengers - post.ride?.capacity}/
+                {post.ride?.noPassengers}  </Text>
         </Layout>
+        <Layout style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          <Text style={{fontWeight: 'bold'}}> Price Per person:</Text>
+          <Text>  ${post.ride?.pricePerPerson}  </Text>
+        </Layout>
+      </View>
+      <View style={{width: '100%', alignItems: 'center', marginTop: '3%'}}>
+        <Button> Request Ride </Button>
       </View>
     </View>
   );
@@ -137,7 +143,7 @@ const RidePostDetails = ({ route }) => {
 const styles = StyleSheet.create({
   map: {
     width: '100%',
-    height: '50%',
+    height: '55%',
     marginTop: '10%',
   },
 });
