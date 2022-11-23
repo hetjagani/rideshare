@@ -24,6 +24,7 @@ import Room from '../screens/Room';
 import Message from '../screens/Message';
 import RidePostDetails from '../screens/RidePostDetails';
 import MyPosts from '../screens/MyPosts';
+import MyRides from '../screens/MyRides';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -123,8 +124,8 @@ export const AppStack = () => {
         component={HomeNavigator}
         options={{
           headerShown: false,
-          tabBarIcon: tabIcon("home"),
-          title: "Home",
+          tabBarIcon: tabIcon('home'),
+          title: 'Home',
         }}
       />
       <Tab.Screen
@@ -140,7 +141,7 @@ export const AppStack = () => {
         name={PROFILE_NAVIGATOR}
         component={ProfileNavigator}
         options={{
-          headerShown: true,
+          headerShown: false,
           title: 'Profile',
           tabBarIcon: tabIcon('person'),
         }}

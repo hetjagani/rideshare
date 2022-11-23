@@ -27,7 +27,6 @@ export const UserInfo = ({ navigation }) => {
   const [lastName, setLastName] = useState('');
   const [contactNo, setContactNo] = useState('');
   const [id, setId] = useState(0);
-  const [profileImage, setProfileImage] = useState('');
   const [image, setImage] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -79,7 +78,6 @@ export const UserInfo = ({ navigation }) => {
     setLastName(res?.data?.lastName);
     setContactNo(res?.data?.phoneNo);
     setId(res?.data?.id);
-    setProfileImage(res?.data?.profileImage);
     setImage(res?.data?.profileImage);
   };
 
@@ -128,8 +126,7 @@ export const UserInfo = ({ navigation }) => {
     if (result.cancelled) {
       getUserDetails();
     }
-    if (!result.canceled) {
-      setImage(result.uri);
+    if (!result.cancelled) {
       uploadImageOnS3(result);
     }
   };
@@ -160,7 +157,6 @@ export const UserInfo = ({ navigation }) => {
             setIsUploading(false);
             const { postResponse } = res.body;
             setImage(postResponse.location);
-            setProfileImage(postResponse.location);
             resolve({
               src: postResponse.location,
             });
@@ -249,7 +245,9 @@ export const UserInfo = ({ navigation }) => {
           <Image
             onLoadStart={() => setLoading(true)}
             onLoadEnd={() => setLoading(false)}
-            source={{ uri: image }}
+            source={
+              image != '' ? { uri: image } : require('../assets/img_avatar.png')
+            }
             style={{
               borderRadius: '90%',
               height: 180,

@@ -2,7 +2,7 @@ import { Layout, Text } from '@ui-kitten/components';
 import React, { useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-import MapViewDirections from 'react-native-maps-directions';
+import MapViewDirections from 'react-native-maps';
 
 const RidePostDetails = ({ route }) => {
   const { post } = route.params;
@@ -75,7 +75,7 @@ const RidePostDetails = ({ route }) => {
             onLoadStart={() => setLoading(true)}
             onLoadEnd={() => setLoading(false)}
             source={{
-              uri: 'https://rideshare-sjsu.s3.amazonaws.com/c7434b50-dee3-4fa7-b1c0-58074a5f327f',
+              uri: post?.ride?.user?.profileImage,
             }}
             style={{
               borderRadius: '90%',
@@ -87,7 +87,7 @@ const RidePostDetails = ({ route }) => {
         </Layout>
       </View>
       <View style={{ alignItems: 'center', margin: '5%' }}>
-        <Text category="h6"> Akash Rupapara </Text>
+        <Text category="h6">{post?.ride?.user?.firstName} {post?.ride?.user?.lastName}</Text>
       </View>
       <View style={{ marginTop: -40 }}>
         <MapView style={styles.map} region={initRegion}>
@@ -111,19 +111,24 @@ const RidePostDetails = ({ route }) => {
         }}
       >
         <Text category="h6"> Trip Details: </Text>
-        <Layout style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <Text style={{fontWeight: 'bold'}}> Origin: </Text>
+        <Layout
+          style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+        >
+          <Text style={{ fontWeight: 'bold' }}> Origin: </Text>
           <Text> {originAddress} </Text>
         </Layout>
-        <Layout style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <Text style={{fontWeight: 'bold'}}> Destination:</Text>
-          <Text>  {destinationAddress} </Text>
+        <Layout
+          style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+        >
+          <Text style={{ fontWeight: 'bold' }}> Destination:</Text>
+          <Text> {destinationAddress} </Text>
         </Layout>
-        <Layout style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <Text style={{fontWeight: 'bold'}}> Capacity:</Text>
-          <Text>  {capacity}  </Text>
+        <Layout
+          style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+        >
+          <Text style={{ fontWeight: 'bold' }}> Capacity:</Text>
+          <Text> {capacity} </Text>
         </Layout>
-       
       </View>
     </View>
   );
