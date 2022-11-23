@@ -2,6 +2,7 @@ package com.rideshare.chat.model;
 
 import lombok.Data;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.lang.String;
 
@@ -20,7 +21,7 @@ public class Message {
 
     private MessageStatus status;
 
-    private Date createdAt;
+    private Timestamp createdAt;
 
     public Message() {}
 
@@ -33,7 +34,7 @@ public class Message {
         this.status = status;
     }
 
-    public Message(Integer id, Integer roomId, Integer senderId, Integer receiverId, String content, MessageStatus status, Date createdAt) {
+    public Message(Integer id, Integer roomId, Integer senderId, Integer receiverId, String content, MessageStatus status, Timestamp createdAt) {
         this.id = id;
         this.roomId = roomId;
         this.senderId = senderId;
@@ -91,11 +92,11 @@ public class Message {
         this.status = status;
     }
 
-    public Date getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 

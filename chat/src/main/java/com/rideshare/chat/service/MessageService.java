@@ -45,5 +45,12 @@ class MessageService implements IMessageService{
         int affectedRows = jdbcTemplate.update(query, id);
         return affectedRows != 0;
     }
+    @Override
+    public List<Message> getLastMessages() throws Exception {
+        String query = "SELECT DISTINCT ON(room_id) * FROM chat.message ORDER BY room_id DESC, created_at DESC";
+        List<Message> messageList = jdbcTemplate.query(query, new MessageMapper());
+
+        return messageList;
+    }
 
 }

@@ -15,6 +15,6 @@ public class MessageMapper implements RowMapper<Message> {
         }else{
             status = Message.MessageStatus.RECEIVED;
         }
-        return new Message(rs.getInt("id"),rs.getInt("room_id"),rs.getInt("sender_id"),rs.getInt("receiver_id"),rs.getString("content"),status,rs.getTime("created_at"));
+        return new Message(rs.getInt("id"),rs.getInt("room_id"),rs.getInt("sender_id"),rs.getInt("receiver_id"),rs.getString("content"),status,rs.getTimestamp("created_at"));
     }
 }

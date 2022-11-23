@@ -1,6 +1,8 @@
 package com.rideshare.chat.model;
 
 import lombok.Data;
+
+import java.sql.Timestamp;
 import java.util.Date;
 
 import java.lang.String;
@@ -11,11 +13,11 @@ public class Room {
     private Integer initiatedBy;
     private Integer initiatedFor;
 
-    private Date createdAt;
+    private Timestamp createdAt;
 
     public Room() {}
 
-    public Room(Integer id, Integer initiatedBy, Integer initiatedFor, Date createdAt) {
+    public Room(Integer id, Integer initiatedBy, Integer initiatedFor, Timestamp createdAt) {
         this.id = id;
         this.initiatedBy = initiatedBy;
         this.initiatedFor = initiatedFor;
@@ -52,7 +54,7 @@ public class Room {
         this.initiatedFor = initiatedFor;
     }
 
-    public Date getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
