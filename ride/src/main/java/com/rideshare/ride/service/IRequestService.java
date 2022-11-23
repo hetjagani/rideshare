@@ -6,11 +6,11 @@ import com.rideshare.ride.webentity.Request;
 import java.util.List;
 
 public interface IRequestService {
-    PaginatedEntity<Request> getPaginated(Integer userId, Integer page, Integer limit) throws Exception;
-    List<Request> getAll() throws Exception;
-    PaginatedEntity<Request> searchRequests(Integer userId, String stripePaymentId, String status, Integer rideId, Integer page, Integer limit) throws Exception;
-    Request getById(Integer userId, Integer id) throws Exception;
-    Request create(com.rideshare.ride.model.Request request) throws Exception;
-    Request update(com.rideshare.ride.model.Request request) throws Exception;
+    PaginatedEntity<Request> getPaginated(String token, Integer userId, Integer page, Integer limit) throws Exception;
+    List<Request> getAll(String token) throws Exception;
+    PaginatedEntity<Request> searchRequests(String token, Integer userId, String stripePaymentId, String status, Integer rideId, Integer page, Integer limit) throws Exception;
+    Request getById(String token, Integer userId, Integer id) throws Exception;
+    Request create(String token, com.rideshare.ride.model.Request request) throws Exception;
+    Request update(String token, com.rideshare.ride.model.Request request) throws Exception;
     boolean delete(Integer requestId, Integer userId) throws Exception;
 }

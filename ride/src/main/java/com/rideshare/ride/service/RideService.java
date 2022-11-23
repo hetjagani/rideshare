@@ -2,12 +2,12 @@ package com.rideshare.ride.service;
 
 import com.rideshare.ride.mapper.RideTagMapper;
 import com.rideshare.ride.mapper.RideWithAddressMapper;
-import com.rideshare.ride.model.RideStatus;
-import com.rideshare.ride.model.RideTag;
-import com.rideshare.ride.model.Tag;
+import com.rideshare.ride.model.*;
 import com.rideshare.ride.util.Pagination;
 import com.rideshare.ride.webentity.PaginatedEntity;
 import com.rideshare.ride.webentity.Ride;
+import facade.UserInfoFacade;
+import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -26,6 +26,9 @@ public class RideService implements IRideService {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private UserInfoFacade userInfoService;
 
     private final String allRideTags = "SELECT *\n" +
             "FROM ride.tags, ride.ride_tags\n" +
@@ -68,7 +71,7 @@ public class RideService implements IRideService {
     private final String getNoOfRidesQuery = "SELECT COUNT(*) FROM ride.ride WHERE user_id = ?";
 
     @Override
-    public PaginatedEntity<Ride> getPaginated(Integer page, Integer limit) throws Exception {
+    public PaginatedEntity<Ride> getPaginated(String token, Integer page, Integer limit) throws Exception {
         Integer offset = Pagination.getOffset(page, limit);
         List<Ride> ridesWithAddress = jdbcTemplate.query(paginatedRideAddressQuery, new RideWithAddressMapper(), limit, offset);
 
@@ -86,9 +89,12 @@ public class RideService implements IRideService {
             rideTagsMap.put(rt.getRideId(), tags);
         });
 
+        Map<Integer, UserInfo> userInfoMap = userInfoService.getAllUsers(token);
+
         List<Ride> rideList = ridesWithAddress.stream().map((Ride r) -> {
             List<Tag> tagList = rideTagsMap.get(r.getId());
             r.setTags(tagList);
+            r.setUser(userInfoMap.get(r.getUserId()));
             if(r.getEndedAt() != null && r.getStartedAt() != null)
                 r.setDuration(Duration.between(r.getStartedAt().toInstant(), r.getEndedAt().toInstant()));
             return r;
@@ -98,7 +104,7 @@ public class RideService implements IRideService {
     }
 
     @Override
-    public PaginatedEntity<Ride> searchRides(Integer userId, Integer page, Integer limit) throws Exception {
+    public PaginatedEntity<Ride> searchRides(String token, Integer userId, Integer page, Integer limit) throws Exception {
         Integer offset = Pagination.getOffset(page, limit);
         List<Ride> ridesWithAddress = jdbcTemplate.query(getRidesByUserIdQuery, new RideWithAddressMapper(), userId, limit, offset);
 
@@ -116,9 +122,12 @@ public class RideService implements IRideService {
             rideTagsMap.put(rt.getRideId(), tags);
         });
 
+        Map<Integer, UserInfo> userInfoMap = userInfoService.getAllUsers(token);
+
         List<Ride> rideList = ridesWithAddress.stream().map((Ride r) -> {
             List<Tag> tagList = rideTagsMap.get(r.getId());
             r.setTags(tagList);
+            r.setUser(userInfoMap.get(r.getUserId()));
             if(r.getEndedAt() != null && r.getStartedAt() != null)
                 r.setDuration(Duration.between(r.getStartedAt().toInstant(), r.getEndedAt().toInstant()));
             return r;
@@ -128,7 +137,7 @@ public class RideService implements IRideService {
     }
 
     @Override
-    public List<Ride> getAll() throws Exception {
+    public List<Ride> getAll(String token) throws Exception {
         List<Ride> ridesWithAddress = jdbcTemplate.query(allRidesQuery, new RideWithAddressMapper());
 
         List<RideTag> rideTags = jdbcTemplate.query(allRideTags, new RideTagMapper());
@@ -145,9 +154,12 @@ public class RideService implements IRideService {
             rideTagsMap.put(rt.getRideId(), tags);
         });
 
+        Map<Integer, UserInfo> userInfoMap = userInfoService.getAllUsers(token);
+
         List<Ride> rideList = ridesWithAddress.stream().map((Ride r) -> {
             List<Tag> tagList = rideTagsMap.get(r.getId());
             r.setTags(tagList);
+            r.setUser(userInfoMap.get(r.getUserId()));
             if(r.getEndedAt() != null && r.getStartedAt() != null)
                 r.setDuration(Duration.between(r.getStartedAt().toInstant(), r.getEndedAt().toInstant()));
             return r;
@@ -157,14 +169,17 @@ public class RideService implements IRideService {
     }
 
     @Override
-    public Ride getById(Integer id) throws Exception {
+    public Ride getById(String token, Integer id) throws Exception {
         // TODO: get information of user who has created this ride
         Ride rideWithAddress = jdbcTemplate.queryForObject(getByIdQuery, new RideWithAddressMapper(), id);
 
         List<RideTag> rideTags = jdbcTemplate.query(rideTagsWithId, new RideTagMapper(), id);
 
+        Map<Integer, UserInfo> userInfoMap = userInfoService.getAllUsers(token);
+
         List<Tag> tagList = rideTags.stream().map((RideTag rt) -> rt.getTag()).collect(Collectors.toList());
         rideWithAddress.setTags(tagList);
+        rideWithAddress.setUser(userInfoMap.get(rideWithAddress.getUserId()));
         if(rideWithAddress.getEndedAt() != null && rideWithAddress.getStartedAt() != null)
             rideWithAddress.setDuration(Duration.between(rideWithAddress.getStartedAt().toInstant(), rideWithAddress.getEndedAt().toInstant()));
 
@@ -172,7 +187,7 @@ public class RideService implements IRideService {
     }
 
     @Override
-    public Ride create(com.rideshare.ride.model.Ride ride) throws Exception {
+    public Ride create(String token, com.rideshare.ride.model.Ride ride) throws Exception {
         Integer id = jdbcTemplate.queryForObject(insertRideQuery, Integer.class, ride.getPostId(), ride.getUserId(), Timestamp.from(Instant.now()), ride.getPricePerPerson(), ride.getNoPassengers(), ride.getNoPassengers(), RideStatus.CREATED, ride.getStartAddress(), ride.getEndAddress());
 
         if (ride.getTagIds() != null) {
@@ -181,20 +196,20 @@ public class RideService implements IRideService {
             });
         }
 
-        Ride createdRide = getById(id);
+        Ride createdRide = getById(token, id);
         return createdRide;
     }
 
     @Override
-    public Ride updateCapacity(Integer rideId, Integer capacity) throws Exception {
+    public Ride updateCapacity(String token, Integer rideId, Integer capacity) throws Exception {
         jdbcTemplate.update(updateCapacityQuery, capacity, rideId);
-        Ride updatedRide = getById(rideId);
+        Ride updatedRide = getById(token, rideId);
         return updatedRide;
     }
 
     @Override
-    public Ride startRide(Integer rideId, Integer userId) throws Exception {
-        Ride ride = getById(rideId);
+    public Ride startRide(String token, Integer rideId, Integer userId) throws Exception {
+        Ride ride = getById(token, rideId);
         if(ride.getUserId() != userId) {
             throw new Exception("Cannot start other user's ride");
         }
@@ -207,12 +222,12 @@ public class RideService implements IRideService {
 
         jdbcTemplate.update(startRideQuery, Timestamp.from(Instant.now()), rideId, userId);
 
-        return getById(rideId);
+        return getById(token, rideId);
     }
 
     @Override
-    public Ride stopRide(Integer rideId, Integer userId) throws Exception {
-        Ride ride = getById(rideId);
+    public Ride stopRide(String token, Integer rideId, Integer userId) throws Exception {
+        Ride ride = getById(token, rideId);
         if(ride.getUserId() != userId) {
             throw new Exception("Cannot start other user's ride");
         }
@@ -222,7 +237,7 @@ public class RideService implements IRideService {
 
         jdbcTemplate.update(stopRideQuery, Timestamp.from(Instant.now()), rideId, userId);
 
-        return getById(rideId);
+        return getById(token, rideId);
     }
 
     @Override

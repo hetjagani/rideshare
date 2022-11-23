@@ -1,5 +1,6 @@
 package com.rideshare.userinfo.controller;
 
+import com.rideshare.userinfo.model.User;
 import com.rideshare.userinfo.model.UserInfo;
 import com.rideshare.userinfo.security.UserPrincipal;
 import com.rideshare.userinfo.service.IUserInfoService;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
@@ -40,11 +42,16 @@ public class UserController {
     private final Logger logger = LogManager.getLogger(UserController.class);
 
     @GetMapping
-    public ResponseEntity<PaginatedEntity<UserInfo>> getAllUsers(@RequestHeader HttpHeaders headers, @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer limit) throws Exception {
+    public ResponseEntity<PaginatedEntity<UserInfo>> getAllUsers(@RequestHeader HttpHeaders headers, @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer limit, @RequestParam(required = false) Boolean all) throws Exception {
         try {
             String token = headers.get("Authorization").get(0);
 
-            PaginatedEntity<UserInfo> userInfoList = userInfoService.getAllPaginated(token, page, limit);
+            PaginatedEntity<UserInfo> userInfoList;
+            if(Objects.equals(all, true)) {
+                userInfoList = userInfoService.getAll(token);
+            } else {
+                userInfoList = userInfoService.getAllPaginated(token, page, limit);
+            }
 
             return ResponseEntity.ok(userInfoList);
         } catch (Exception e) {

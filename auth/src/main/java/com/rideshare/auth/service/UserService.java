@@ -18,7 +18,15 @@ public class UserService implements IUserService{
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public List<User> getAllUsers(Integer page, Integer limit) throws DataAccessException {
+    public List<User> getAllUsers() throws DataAccessException {
+        String sql = "SELECT * FROM \"auth\".\"user\";";
+        List<User> userList = jdbcTemplate.query(sql, new UserMapper());
+
+        return userList;
+    }
+
+    @Override
+    public List<User> getAllUsersPaginated(Integer page, Integer limit) throws DataAccessException {
         int offset = Pagination.getOffset(page, limit);
         String sql = "SELECT * FROM \"auth\".\"user\" LIMIT ? OFFSET ?;";
         List<User> userList = jdbcTemplate.query(sql, new UserMapper(), new Object[]{limit, offset});

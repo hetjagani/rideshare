@@ -47,9 +47,12 @@ public class AuthController {
     private Set<String> validRoles = new HashSet<String>(Arrays.asList("DRIVER", "RIDER", "ADMIN"));
 
     @GetMapping(path = "/users")
-    public ResponseEntity<List<com.rideshare.auth.model.User>> getAllUsers(@RequestParam(required = false) Integer page, @RequestParam(required = false) Integer limit) {
+    public ResponseEntity<List<com.rideshare.auth.model.User>> getAllUsers(@RequestParam(required = false) Integer page, @RequestParam(required = false) Integer limit, @RequestParam(required = false) Boolean all) {
         try {
-            return ResponseEntity.ok(userService.getAllUsers(page, limit));
+            if(Objects.equals(all, true)) {
+                return ResponseEntity.ok(userService.getAllUsers());
+            }
+            return ResponseEntity.ok(userService.getAllUsersPaginated(page, limit));
         } catch (Exception e) {
             e.printStackTrace();
             throw e;

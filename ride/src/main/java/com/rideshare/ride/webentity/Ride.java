@@ -2,6 +2,7 @@ package com.rideshare.ride.webentity;
 
 import com.rideshare.ride.model.Address;
 import com.rideshare.ride.model.Tag;
+import com.rideshare.ride.model.UserInfo;
 import lombok.Data;
 
 import java.sql.Timestamp;
@@ -24,6 +25,7 @@ public class Ride implements Comparable<Ride> {
     private Timestamp startedAt;
     private Timestamp endedAt;
     private Duration duration;
+    private UserInfo user;
 
     @Override
     public int compareTo(Ride o) {

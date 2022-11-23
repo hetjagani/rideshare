@@ -1,17 +1,16 @@
 package com.rideshare.ride.controller;
 
 import com.rideshare.ride.model.RequestStatus;
-import com.rideshare.ride.model.User;
 import com.rideshare.ride.security.UserPrincipal;
 import com.rideshare.ride.service.IRequestService;
 import com.rideshare.ride.service.IRideService;
 import com.rideshare.ride.webentity.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -39,9 +38,10 @@ public class RideController {
     }
 
     @GetMapping(path = "/{id}")
-    public ResponseEntity<Ride> getRideById(@PathVariable Integer id) throws Exception {
+    public ResponseEntity<Ride> getRideById(@PathVariable Integer id, @RequestHeader HttpHeaders headers) throws Exception {
         try {
-            Ride ride = rideService.getById(id);
+            String token = headers.get("Authorization").get(0);
+            Ride ride = rideService.getById(token, id);
             return ResponseEntity.ok(ride);
         }catch (Exception e) {
             e.printStackTrace();
@@ -50,15 +50,16 @@ public class RideController {
     }
 
     @GetMapping
-    public ResponseEntity<PaginatedEntity<Ride>> getAllRides(@RequestParam(required = false) Integer page, @RequestParam(required = false) Integer limit, @RequestParam(required = false) Integer userId, @RequestParam(required = false) Boolean all) throws Exception {
+    public ResponseEntity<PaginatedEntity<Ride>> getAllRides(@RequestParam(required = false) Integer page, @RequestParam(required = false) Integer limit, @RequestParam(required = false) Integer userId, @RequestParam(required = false) Boolean all, @RequestHeader HttpHeaders headers) throws Exception {
         PaginatedEntity<Ride> rides;
         try {
+            String token = headers.get("Authorization").get(0);
             if(userId != null && userId != 0) {
-                rides = rideService.searchRides(userId, page, limit);
+                rides = rideService.searchRides(token, userId, page, limit);
             } else if(page == null && limit == null && userId == null && all != null && all) {
-                rides = new PaginatedEntity<>(rideService.getAll(), 0, 0);
+                rides = new PaginatedEntity<>(rideService.getAll(token), 0, 0);
             } else {
-                rides = rideService.getPaginated(page, limit);
+                rides = rideService.getPaginated(token, page, limit);
             }
         }catch (Exception e) {
             e.printStackTrace();
@@ -69,11 +70,12 @@ public class RideController {
     }
 
     @PostMapping
-    public ResponseEntity<Ride> createRide(@RequestBody com.rideshare.ride.model.Ride ride, @AuthenticationPrincipal UserPrincipal user) throws Exception {
+    public ResponseEntity<Ride> createRide(@RequestBody com.rideshare.ride.model.Ride ride, @AuthenticationPrincipal UserPrincipal user, @RequestHeader HttpHeaders headers) throws Exception {
         Integer userId = Integer.parseInt(user.getId());
         try {
+            String token = headers.get("Authorization").get(0);
             ride.setUserId(userId);
-            Ride createdRide = rideService.create(ride);
+            Ride createdRide = rideService.create(token, ride);
             return ResponseEntity.ok(createdRide);
         }catch (Exception e) {
             e.printStackTrace();
@@ -93,17 +95,18 @@ public class RideController {
     }
 
     @GetMapping(path = "/my")
-    public ResponseEntity<PaginatedEntity<MyRide>> getAllUserRides(@AuthenticationPrincipal UserPrincipal user, @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer limit) throws Exception {
+    public ResponseEntity<PaginatedEntity<MyRide>> getAllUserRides(@AuthenticationPrincipal UserPrincipal user, @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer limit, @RequestHeader HttpHeaders headers) throws Exception {
        try {
+           String token = headers.get("Authorization").get(0);
            Integer userId = Integer.parseInt(user.getId());
 
            // get all rides of user
-           List<MyRide> userRides = rideService.getAll().stream().filter(r -> Objects.equals(r.getUserId(), userId)).map((Ride r) -> {
+           List<MyRide> userRides = rideService.getAll(token).stream().filter(r -> Objects.equals(r.getUserId(), userId)).map((Ride r) -> {
                return toMyRide(r, false);
            }).collect(Collectors.toList());
 
            // get all completed requests of user
-           List<MyRide> userRequestedRides = requestService.getAll().stream()
+           List<MyRide> userRequestedRides = requestService.getAll(token).stream()
                    .filter(r -> Objects.equals(r.getUserId(), userId) && RequestStatus.COMPLETED.equals(r.getStatus()))
                    .map((Request r) -> toMyRide(r.getRide(), true)).collect(Collectors.toList());
 
@@ -123,10 +126,11 @@ public class RideController {
     }
 
     @PutMapping(path = "/{id}/start")
-    public ResponseEntity<Ride> startRide(@PathVariable Integer id, @AuthenticationPrincipal UserPrincipal user) throws Exception {
+    public ResponseEntity<Ride> startRide(@PathVariable Integer id, @AuthenticationPrincipal UserPrincipal user, @RequestHeader HttpHeaders headers) throws Exception {
         try {
+            String token = headers.get("Authorization").get(0);
             Integer userId = Integer.parseInt(user.getId());
-            Ride startedRide = rideService.startRide(id, userId);
+            Ride startedRide = rideService.startRide(token, id, userId);
             return ResponseEntity.ok(startedRide);
         } catch (Exception e) {
             e.printStackTrace();
@@ -135,10 +139,11 @@ public class RideController {
     }
 
     @PutMapping(path = "/{id}/stop")
-    public ResponseEntity<Ride> stopRide(@PathVariable Integer id, @AuthenticationPrincipal UserPrincipal user) throws Exception {
+    public ResponseEntity<Ride> stopRide(@PathVariable Integer id, @AuthenticationPrincipal UserPrincipal user, @RequestHeader HttpHeaders headers) throws Exception {
         try {
+            String token = headers.get("Authorization").get(0);
             Integer userId = Integer.parseInt(user.getId());
-            Ride startedRide = rideService.stopRide(id, userId);
+            Ride startedRide = rideService.stopRide(token, id, userId);
             return ResponseEntity.ok(startedRide);
         } catch (Exception e) {
             e.printStackTrace();

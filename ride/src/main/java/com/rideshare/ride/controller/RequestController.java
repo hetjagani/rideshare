@@ -12,6 +12,7 @@ import com.rideshare.ride.webentity.Request;
 import com.rideshare.ride.webentity.Ride;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -30,13 +31,14 @@ public class RequestController {
     private IRideService rideService;
 
     @GetMapping
-    public ResponseEntity<PaginatedEntity<Request>> getPaginatedRequests(@AuthenticationPrincipal UserPrincipal user,  @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer limit, @RequestParam(required = false) String stripePaymentId, @RequestParam(required = false) String status, @RequestParam(required = false) Integer rideId) throws Exception {
+    public ResponseEntity<PaginatedEntity<Request>> getPaginatedRequests(@AuthenticationPrincipal UserPrincipal user,  @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer limit, @RequestParam(required = false) String stripePaymentId, @RequestParam(required = false) String status, @RequestParam(required = false) Integer rideId, @RequestHeader HttpHeaders headers) throws Exception {
         try {
+            String token = headers.get("Authorization").get(0);
             Integer userId = Integer.parseInt(user.getId());
 
             String rStatus = status != null ? status.toUpperCase() : null;
 
-            PaginatedEntity<Request> requests = requestService.searchRequests(userId, stripePaymentId, rStatus, rideId, page, limit);
+            PaginatedEntity<Request> requests = requestService.searchRequests(token, userId, stripePaymentId, rStatus, rideId, page, limit);
 
             return ResponseEntity.ok(requests);
         } catch (Exception e) {
@@ -46,10 +48,11 @@ public class RequestController {
     }
 
     @GetMapping(path = "/{requestId}")
-    public ResponseEntity<Request> getById(@AuthenticationPrincipal UserPrincipal user, @PathVariable Integer requestId) throws Exception {
+    public ResponseEntity<Request> getById(@AuthenticationPrincipal UserPrincipal user, @PathVariable Integer requestId, @RequestHeader HttpHeaders headers) throws Exception {
         try {
+            String token = headers.get("Authorization").get(0);
             Integer userId = Integer.parseInt(user.getId());
-            Request request = requestService.getById(userId, requestId);
+            Request request = requestService.getById(token, userId, requestId);
             return ResponseEntity.ok(request);
         } catch (Exception e) {
             e.printStackTrace();
@@ -59,11 +62,12 @@ public class RequestController {
 
 
     @PostMapping
-    public ResponseEntity<Request> create(@AuthenticationPrincipal UserPrincipal user, @RequestBody com.rideshare.ride.model.Request request) throws Exception {
+    public ResponseEntity<Request> create(@AuthenticationPrincipal UserPrincipal user, @RequestBody com.rideshare.ride.model.Request request, @RequestHeader HttpHeaders headers) throws Exception {
         try {
+            String token = headers.get("Authorization").get(0);
             Integer userId = Integer.parseInt(user.getId());
 
-            Ride requestedRide = rideService.getById(request.getRideId());
+            Ride requestedRide = rideService.getById(token, request.getRideId());
             if (Objects.equals(requestedRide.getUserId(), userId)) {
                 throw new BadRequestException("user cannot request his own ride");
             }
@@ -71,12 +75,12 @@ public class RequestController {
             request.setUserId(userId);
 
             try {
-                rideService.getById(request.getRideId());
+                rideService.getById(token, request.getRideId());
             } catch (EmptyResultDataAccessException e) {
                 throw new EntityNotFoundException("requested ride not found");
             }
 
-            Request createdRequest = requestService.create(request);
+            Request createdRequest = requestService.create(token, request);
 
             return ResponseEntity.ok(createdRequest);
         } catch (Exception e) {
@@ -87,14 +91,15 @@ public class RequestController {
     }
 
     @PutMapping(path = "/{requestId}")
-    public ResponseEntity<Request> update(@AuthenticationPrincipal UserPrincipal user, @PathVariable Integer requestId, @RequestBody com.rideshare.ride.model.Request request) throws Exception {
+    public ResponseEntity<Request> update(@AuthenticationPrincipal UserPrincipal user, @PathVariable Integer requestId, @RequestBody com.rideshare.ride.model.Request request, @RequestHeader HttpHeaders headers) throws Exception {
 
         try {
+            String token = headers.get("Authorization").get(0);
             Integer userId = Integer.parseInt(user.getId());
             request.setId(requestId);
             request.setUserId(userId);
 
-            Request updatedRequest = requestService.update(request);
+            Request updatedRequest = requestService.update(token, request);
 
             return ResponseEntity.ok(updatedRequest);
         } catch (Exception e) {

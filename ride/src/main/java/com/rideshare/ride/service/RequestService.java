@@ -44,8 +44,8 @@ public class RequestService implements IRequestService {
     private final String searchQueryT = "SELECT * FROM ride.request WHERE ";
 
 
-    private Map<Integer, Ride> getRideIdMap() throws Exception {
-        List<Ride> allRides = rideService.getAll();
+    private Map<Integer, Ride> getRideIdMap(String token) throws Exception {
+        List<Ride> allRides = rideService.getAll(token);
         Map<Integer, Ride> rideIdMap = new HashMap<>();
         allRides.stream().forEach((ride) -> {
             if(!rideIdMap.containsKey(ride.getId())) {
@@ -58,13 +58,13 @@ public class RequestService implements IRequestService {
 
 
     @Override
-    public PaginatedEntity<Request> getPaginated(Integer userId, Integer page, Integer limit) throws Exception {
+    public PaginatedEntity<Request> getPaginated(String token, Integer userId, Integer page, Integer limit) throws Exception {
 
         Integer offset = Pagination.getOffset(page, limit);
 
         List<Request> userRequests = jdbcTemplate.query(userRequestsQuery, new RequestMapper(), userId, limit, offset);
 
-        Map<Integer, Ride> rideIdMap = getRideIdMap();
+        Map<Integer, Ride> rideIdMap = getRideIdMap(token);
 
         List<Request> requestsWithRide = userRequests.stream().map((request -> {
             Ride ride = rideIdMap.get(request.getRideId());
@@ -76,9 +76,9 @@ public class RequestService implements IRequestService {
     }
 
     @Override
-    public List<Request> getAll() throws Exception {
+    public List<Request> getAll(String token) throws Exception {
         List<Request> userRequests = jdbcTemplate.query(allRequestsQuery, new RequestMapper());
-        Map<Integer, Ride> rideIdMap = getRideIdMap();
+        Map<Integer, Ride> rideIdMap = getRideIdMap(token);
 
         List<Request> requestsWithRide = userRequests.stream().map((request -> {
             Ride ride = rideIdMap.get(request.getRideId());
@@ -90,7 +90,7 @@ public class RequestService implements IRequestService {
     }
 
     @Override
-    public PaginatedEntity<Request> searchRequests(Integer userId, String stripePaymentId, String status, Integer rideId, Integer page, Integer limit) throws Exception {
+    public PaginatedEntity<Request> searchRequests(String token, Integer userId, String stripePaymentId, String status, Integer rideId, Integer page, Integer limit) throws Exception {
 
         StringBuilder sb = new StringBuilder(searchQueryT);
 
@@ -119,7 +119,7 @@ public class RequestService implements IRequestService {
 
         List<Request> userRequests = jdbcTemplate.query(searchQuery, new RequestMapper(), limit, offset);
 
-        Map<Integer, Ride> rideIdMap = getRideIdMap();
+        Map<Integer, Ride> rideIdMap = getRideIdMap(token);
 
         List<Request> requestsWithRide = userRequests.stream().map((request -> {
             Ride ride = rideIdMap.get(request.getRideId());
@@ -131,24 +131,24 @@ public class RequestService implements IRequestService {
     }
 
     @Override
-    public Request getById(Integer userId, Integer id) throws Exception {
+    public Request getById(String token, Integer userId, Integer id) throws Exception {
         Request userRequest = jdbcTemplate.queryForObject(userRequestByIdQuery, new RequestMapper(), userId, id);
-        Ride ride = rideService.getById(userRequest.getRideId());
+        Ride ride = rideService.getById(token, userRequest.getRideId());
         userRequest.setRide(ride);
         return userRequest;
     }
 
     @Override
-    public Request create(com.rideshare.ride.model.Request request) throws Exception {
+    public Request create(String token, com.rideshare.ride.model.Request request) throws Exception {
         Integer id = jdbcTemplate.queryForObject(insertQuery, Integer.class, request.getUserId(), request.getRideId(), request.getNotes(), RequestStatus.CREATED, Timestamp.from(Instant.now()));
 
-        Request createdRequest = getById(request.getUserId(), id);
+        Request createdRequest = getById(token, request.getUserId(), id);
         return createdRequest;
     }
 
     @Override
-    public Request update(com.rideshare.ride.model.Request request) throws Exception {
-        Request existingRequest = getById(request.getUserId(), request.getId());
+    public Request update(String token, com.rideshare.ride.model.Request request) throws Exception {
+        Request existingRequest = getById(token, request.getUserId(), request.getId());
 
         String stripePaymentId = request.getStripePaymentId() != null ? request.getStripePaymentId() : existingRequest.getStripePaymentId();
         String receiptUrl = request.getReceiptUrl() != null ? request.getReceiptUrl() : existingRequest.getReceiptUrl();
@@ -156,7 +156,7 @@ public class RequestService implements IRequestService {
 
         jdbcTemplate.update(updateQuery, stripePaymentId, receiptUrl, status, request.getId());
 
-        Request updatedRequest = getById(request.getUserId(), request.getId());
+        Request updatedRequest = getById(token, request.getUserId(), request.getId());
 
         return updatedRequest;
     }

@@ -40,6 +40,45 @@ public class UserInfoService implements IUserInfoService {
     private String authURL;
 
     @Override
+    public PaginatedEntity<UserInfo> getAll(String token) throws Exception {
+        // get list of users from auth service with pagination params
+        String requestURL = authURL + "/auth/users" + "?all={all}";
+        Map<String, Object> queryParams = new HashMap<>();
+        queryParams.put("all", true);
+
+        HttpHeaders header = new HttpHeaders();
+        header.add("Authorization", token);
+
+        HttpEntity request = new HttpEntity(header);
+
+        ResponseEntity<User[]> responseEntity = restTemplate.exchange(requestURL, HttpMethod.GET, request, User[].class, queryParams);
+        List<User> userList = Arrays.asList(responseEntity.getBody());
+        List<Integer> userIds = userList.stream().map((u) -> u.getId()).collect(Collectors.toList());
+
+        Map<Integer, User> userMap = new HashMap<Integer, User>();
+        userList.forEach((u) -> {
+            userMap.put(u.getId(), u);
+        });
+
+        // fetch userinfo of all those user ids
+        String inParams = String.join(",", userIds.stream().map(id -> "?").collect(Collectors.toList()));
+
+        String userInfoSQL = String.format("SELECT * FROM \"userinfo\".\"userinfo\" WHERE id IN (%s);", inParams);
+
+        List<UserInfo> userInfoList = jdbcTemplate.query(userInfoSQL, new UserInfoMapper(), userIds.toArray());
+
+        List<UserInfo> result = userInfoList.stream().map((u) -> {
+            u.setEmail(userMap.get(u.getId()).getEmail());
+            u.setPhoneNo(userMap.get(u.getId()).getPhoneNo());
+            u.setRoles(userMap.get(u.getId()).getRoles());
+            u.setVerified(userMap.get(u.getId()).getVerified());
+            return u;
+        }).collect(Collectors.toList());
+
+        return new PaginatedEntity<UserInfo>(result, 0, 0);
+    }
+
+    @Override
     public PaginatedEntity<UserInfo> getAllPaginated(String token, Integer page, Integer limit) throws Exception {
         // get list of users from auth service with pagination params
         String requestURL = authURL + "/auth/users" + "?page={page}&limit={limit}";
