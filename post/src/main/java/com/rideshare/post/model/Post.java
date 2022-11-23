@@ -18,10 +18,11 @@ public class Post {
     private Integer refId;
     private Integer noOfLikes;
     private List<PostImage> imageList;
+    private UserInfo user;
 
     public Post(){}
 
-    public Post(Integer userId, String title, String description, Timestamp createdAt, Timestamp updatedAt, String type, Integer refId, Integer noOfLikes, List<PostImage> imageList) {
+    public Post(Integer userId, String title, String description, Timestamp createdAt, Timestamp updatedAt, String type, Integer refId, Integer noOfLikes, List<PostImage> imageList, UserInfo user) {
         this.userId = userId;
         this.title = title;
         this.description = description;
@@ -31,9 +32,10 @@ public class Post {
         this.refId = refId;
         this.noOfLikes = noOfLikes;
         this.imageList = imageList;
+        this.user = user;
     }
 
-    public Post(Integer id, Integer userId, String title, String description, Timestamp createdAt, Timestamp updatedAt, String type, Integer refId, Integer noOfLikes, List<PostImage> imageList) {
+    public Post(Integer id, Integer userId, String title, String description, Timestamp createdAt, Timestamp updatedAt, String type, Integer refId, Integer noOfLikes, List<PostImage> imageList, UserInfo user) {
         this.id = id;
         this.userId = userId;
         this.title = title;
@@ -44,5 +46,6 @@ public class Post {
         this.refId = refId;
         this.noOfLikes = noOfLikes;
         this.imageList = imageList;
+        this.user = user;
     }
 }

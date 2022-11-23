@@ -1,5 +1,7 @@
 package com.rideshare.post.controller;
 
+import com.rideshare.post.facade.UserInfoFacade;
+import com.rideshare.post.model.UserInfo;
 import com.rideshare.post.service.PostService;
 import com.rideshare.post.model.Post;
 import com.rideshare.post.security.UserPrincipal;
@@ -13,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -21,6 +24,9 @@ public class PostController {
 
     @Autowired
     private PostService postService;
+
+    @Autowired
+    private UserInfoFacade userInfoFacade;
 
     @GetMapping
     public ResponseEntity<PaginatedEntity<Post>> getPosts(@RequestHeader HttpHeaders headers,
@@ -39,7 +45,11 @@ public class PostController {
     @GetMapping("/{id}")
     public ResponseEntity<Post> getPostById(@RequestHeader HttpHeaders headers, @PathVariable Integer id) throws Exception {
         try {
-            return ResponseEntity.ok(postService.getPostById(id, headers.get("Authorization").get(0)));
+            String token = headers.get("Authorization").get(0);
+
+            Map<Integer, UserInfo> userInfoMap = userInfoFacade.getAllUsers(token);
+
+            return ResponseEntity.ok(postService.getPostById(id, token, userInfoMap));
         }catch(Exception e){
             e.printStackTrace();
             throw e;
@@ -50,7 +60,10 @@ public class PostController {
     public ResponseEntity<Post> likePost(@RequestHeader HttpHeaders headers, @PathVariable Integer id) throws Exception {
         try {
             String token = headers.get("Authorization").get(0);
-            Post post = postService.getPostById(id, token);
+
+            Map<Integer, UserInfo> userInfoMap = userInfoFacade.getAllUsers(token);
+
+            Post post = postService.getPostById(id, token, userInfoMap);
 
             PostEntity postEntity = new PostEntity();
             postEntity.setUserId(post.getUserId());
@@ -74,7 +87,9 @@ public class PostController {
     public ResponseEntity<Post> unlikePost(@RequestHeader HttpHeaders headers, @PathVariable Integer id) throws Exception {
         try {
             String token = headers.get("Authorization").get(0);
-            Post post = postService.getPostById(id, token);
+            Map<Integer, UserInfo> userInfoMap = userInfoFacade.getAllUsers(token);
+
+            Post post = postService.getPostById(id, token, userInfoMap);
 
             PostEntity postEntity = new PostEntity();
             postEntity.setUserId(post.getUserId());

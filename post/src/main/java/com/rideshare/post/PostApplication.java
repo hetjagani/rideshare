@@ -1,5 +1,6 @@
 package com.rideshare.post;
 
+import com.rideshare.post.facade.UserInfoFacade;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
@@ -17,6 +18,11 @@ public class PostApplication {
 	@Bean
 	public RestTemplate restTemplate() {
 		return new RestTemplate();
+	}
+
+	@Bean
+	public UserInfoFacade userInfoFacade() {
+		return new UserInfoFacade();
 	}
 
 	public static void main(String[] args) {

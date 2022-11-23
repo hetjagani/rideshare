@@ -2,6 +2,7 @@ package com.rideshare.post.webentity;
 
 import com.rideshare.post.model.Address;
 import com.rideshare.post.model.Tag;
+import com.rideshare.post.model.UserInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -20,6 +21,7 @@ public class Ride {
     private List<Tag> tags;
     private Address startAddress;
     private Address endAddress;
+    private UserInfo user;
 
     public Ride(){}
 }

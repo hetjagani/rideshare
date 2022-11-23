@@ -1,8 +1,10 @@
 package com.rideshare.post.service;
 
+import com.rideshare.post.facade.UserInfoFacade;
 import com.rideshare.post.mapper.PostReportMapper;
 import com.rideshare.post.model.Post;
 import com.rideshare.post.model.PostReport;
+import com.rideshare.post.model.UserInfo;
 import com.rideshare.post.util.Pagination;
 import com.rideshare.post.webentity.PaginatedEntity;
 import com.rideshare.post.webentity.PostReportDetails;
@@ -20,6 +22,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class PostReportService {
@@ -31,6 +34,9 @@ public class PostReportService {
 
     @Autowired
     private PostService postService;
+
+    @Autowired
+    private UserInfoFacade userInfoFacade;
 
     @Value("${app.userinfo.url}")
     private String userInfoUrl;
@@ -65,7 +71,10 @@ public class PostReportService {
         try{
             String getReportQuery = "SELECT * FROM \"post\".\"reported_post\" WHERE id=" + id;
             PostReport postReport = jdbcTemplate.queryForObject(getReportQuery, new PostReportMapper());
-            Post post =  postService.getPostById(postReport.getPostId(), token);
+
+            Map<Integer, UserInfo> userInfoMap = userInfoFacade.getAllUsers(token);
+
+            Post post =  postService.getPostById(postReport.getPostId(), token, userInfoMap);
 
             String requestURL = userInfoUrl + "/users/" + postReport.getUserId();
 

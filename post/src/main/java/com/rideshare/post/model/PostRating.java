@@ -16,16 +16,16 @@ public class PostRating extends Post{
     }
 
     public PostRating(Post post){
-        super(post.getId(), post.getUserId(), post.getTitle(), post.getDescription(), post.getCreatedAt(), post.getUpdatedAt(), post.getType(), post.getRefId(), post.getNoOfLikes(), post.getImageList());
+        super(post.getId(), post.getUserId(), post.getTitle(), post.getDescription(), post.getCreatedAt(), post.getUpdatedAt(), post.getType(), post.getRefId(), post.getNoOfLikes(), post.getImageList(), post.getUser());
     }
 
-    public PostRating(Integer userId, String title, String description, Timestamp createdAt, Timestamp updatedAt, String type, Integer rideId, Integer noOfLikes, List<PostImage> imageList, Rating rating) {
-        super(userId, title, description, createdAt, updatedAt, type, rideId, noOfLikes, imageList);
+    public PostRating(Integer userId, String title, String description, Timestamp createdAt, Timestamp updatedAt, String type, Integer rideId, Integer noOfLikes, List<PostImage> imageList, Rating rating, UserInfo user) {
+        super(userId, title, description, createdAt, updatedAt, type, rideId, noOfLikes, imageList, user);
         this.rating = rating;
     }
 
-    public PostRating(Integer id, Integer userId, String title, String description, Timestamp createdAt, Timestamp updatedAt, String type, Integer rideId, Integer noOfLikes, List<PostImage> imageList, Rating rating) {
-        super(id, userId, title, description, createdAt, updatedAt, type, rideId, noOfLikes, imageList);
+    public PostRating(Integer id, Integer userId, String title, String description, Timestamp createdAt, Timestamp updatedAt, String type, Integer rideId, Integer noOfLikes, List<PostImage> imageList, Rating rating, UserInfo user) {
+        super(id, userId, title, description, createdAt, updatedAt, type, rideId, noOfLikes, imageList, user);
         this.rating = rating;
     }
 }

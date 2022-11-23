@@ -17,16 +17,16 @@ public class PostRide extends Post{
     }
 
     public PostRide(Post post) {
-        super(post.getId(), post.getUserId(), post.getTitle(), post.getDescription(), post.getCreatedAt(), post.getUpdatedAt(), post.getType(), post.getRefId(), post.getNoOfLikes(), post.getImageList());
+        super(post.getId(), post.getUserId(), post.getTitle(), post.getDescription(), post.getCreatedAt(), post.getUpdatedAt(), post.getType(), post.getRefId(), post.getNoOfLikes(), post.getImageList(), post.getUser());
     }
 
-    public PostRide(Integer userId, String title, String description, Timestamp createdAt, Timestamp updatedAt, String type, Integer rideId, Integer noOfLikes, List<PostImage> imageList, Ride ride) {
-        super(userId, title, description, createdAt, updatedAt, type, rideId, noOfLikes, imageList);
+    public PostRide(Integer userId, String title, String description, Timestamp createdAt, Timestamp updatedAt, String type, Integer rideId, Integer noOfLikes, List<PostImage> imageList, Ride ride, UserInfo user) {
+        super(userId, title, description, createdAt, updatedAt, type, rideId, noOfLikes, imageList, user);
         this.ride = ride;
     }
 
-    public PostRide(Integer id, Integer userId, String title, String description, Timestamp createdAt, Timestamp updatedAt, String type, Integer rideId, Integer noOfLikes, List<PostImage> imageList, Ride ride) {
-        super(id, userId, title, description, createdAt, updatedAt, type, rideId, noOfLikes, imageList);
+    public PostRide(Integer id, Integer userId, String title, String description, Timestamp createdAt, Timestamp updatedAt, String type, Integer rideId, Integer noOfLikes, List<PostImage> imageList, Ride ride, UserInfo user) {
+        super(id, userId, title, description, createdAt, updatedAt, type, rideId, noOfLikes, imageList, user);
         this.ride = ride;
     }
 }

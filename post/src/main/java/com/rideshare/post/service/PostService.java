@@ -1,13 +1,13 @@
 package com.rideshare.post.service;
 
+import com.rideshare.post.facade.UserInfoFacade;
 import com.rideshare.post.mapper.PostImageMapper;
 import com.rideshare.post.mapper.PostMapper;
-import com.rideshare.post.model.Post;
-import com.rideshare.post.model.PostRating;
-import com.rideshare.post.model.PostRide;
-import com.rideshare.post.model.PostType;
+import com.rideshare.post.model.*;
 import com.rideshare.post.util.Pagination;
 import com.rideshare.post.webentity.*;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -20,14 +20,19 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
+@Slf4j
 public class PostService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private UserInfoFacade userInfoFacade;
 
     @Value("${app.ride.url}")
     private String rideUrl;
@@ -55,8 +60,11 @@ public class PostService {
             List<Integer> postIds = jdbcTemplate.queryForList(getAllPostsQuery, Integer.class);
             List<Post> posts = new ArrayList<>();
 
+            Map<Integer, UserInfo> userInfoMap = userInfoFacade.getAllUsers(token);
+            log.info(userInfoMap.toString());
+
             for (Integer n : postIds) {
-                posts.add(getPostById(n, token));
+                posts.add(getPostById(n, token, userInfoMap));
             }
 
             return new PaginatedEntity<>(posts, page, limit);
@@ -66,7 +74,7 @@ public class PostService {
         }
     }
 
-    public Post getPostById(Integer id, String token) throws Exception{
+    public Post getPostById(Integer id, String token, Map<Integer, UserInfo> userInfoMap) throws Exception{
         try{
             String getPostQuery = "SELECT * FROM \"post\".\"post\" WHERE id = " + id;
             Post post =  jdbcTemplate.queryForObject(getPostQuery, new PostMapper());
@@ -74,6 +82,8 @@ public class PostService {
             String getPostImagesQuery = "SELECT * FROM \"post\".\"image\" WHERE post_id = " + id;
             List<PostImage> postImages = jdbcTemplate.query(getPostImagesQuery, new PostImageMapper());
             post.setImageList(postImages);
+
+            post.setUser(userInfoMap.get(post.getUserId()));
 
             // Adding ride information if Post is for a RIDE
             if(PostType.RIDE.equals(post.getType())) {
@@ -122,7 +132,9 @@ public class PostService {
                 }
             }
 
-            Post retrievedPost = getPostById(createdPostId, token);
+            Map<Integer, UserInfo> userInfoMap = userInfoFacade.getAllUsers(token);
+
+            Post retrievedPost = getPostById(createdPostId, token, userInfoMap);
             return retrievedPost;
         }catch(Exception e){
             e.printStackTrace();
@@ -132,7 +144,9 @@ public class PostService {
 
     public Post update(PostEntity post, Integer id, String token) throws Exception{
         try{
-            Post fetchedPost = getPostById(id, token);
+            Map<Integer, UserInfo> userInfoMap = userInfoFacade.getAllUsers(token);
+
+            Post fetchedPost = getPostById(id, token, userInfoMap);
             if(fetchedPost.getUserId() != post.getUserId()){
                 throw new Exception("Cannot update post from different user");
             }
@@ -149,7 +163,8 @@ public class PostService {
                 }
             }
 
-            Post retrievedPost = getPostById(id, token);
+
+            Post retrievedPost = getPostById(id, token, userInfoMap);
             return retrievedPost;
         }catch(Exception e){
             e.printStackTrace();
@@ -159,7 +174,8 @@ public class PostService {
 
     public Boolean delete(Integer id, Integer userId, String token) throws Exception{
         try{
-            Post fetchedPost = getPostById(id, token);
+            Map<Integer, UserInfo> userInfoMap = userInfoFacade.getAllUsers(token);
+            Post fetchedPost = getPostById(id, token, userInfoMap);
             if(fetchedPost.getUserId() != userId){
                 throw new Exception("Cannot delete post of different user");
             }
