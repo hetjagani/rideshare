@@ -10,11 +10,20 @@ import {
   HOME_NAVIGATOR,
   PROFILE_SCREEN,
   USER_INFO_SCREEN,
+  ROOM_SCREEN,
+  MESSAGE_SCREEN,
+  ROOM_NAVIGATOR,
+  MY_POSTS_SCREEN,
+  MY_RIDES_SCREEN,
   RIDE_POST_DETAILS,
+  PROFILE_NAVIGATOR,
 } from './AppRoutes';
 import Profile from '../screens/Profile';
 import { UserInfo } from '../screens/UserInfo';
+import Room from '../screens/Room';
+import Message from '../screens/Message';
 import RidePostDetails from '../screens/RidePostDetails';
+import MyPosts from '../screens/MyPosts';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -60,6 +69,52 @@ const HomeNavigator = () => {
   );
 };
 
+const ProfileNavigator = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name={PROFILE_SCREEN}
+        component={Profile}
+        options={{ headerShown: true, title: 'Profile Info' }}
+      />
+      <Stack.Screen
+        name={MY_POSTS_SCREEN}
+        component={MyPosts}
+        options={{ headerShown: true, title: 'Your Posts' }}
+      />
+      <Stack.Screen
+        name={MY_RIDES_SCREEN}
+        component={MyRides}
+        options={{ headerShown: true, title: 'Your Rides' }}
+      />
+      <Stack.Screen
+        name={USER_INFO_SCREEN}
+        component={UserInfo}
+        options={{ headerShown: true, title: 'User Info Screen' }}
+      />
+    </Stack.Navigator>
+  );
+};
+
+const RoomNavigator = ({ navigation }) => (
+  <Stack.Navigator>
+    <Stack.Screen
+      name={ROOM_SCREEN}
+      component={Room}
+      options={{ headerShown: true, title: 'Chats' }}
+    />
+    <Stack.Screen
+      name={MESSAGE_SCREEN}
+      component={Message}
+      options={({ route }) => ({
+        tabBarVisible: false,
+        title: route.params.userName,
+        headerShown: true,
+      })}
+    />
+  </Stack.Navigator>
+);
+
 export const AppStack = () => {
   return (
     <Tab.Navigator>
@@ -73,8 +128,17 @@ export const AppStack = () => {
         }}
       />
       <Tab.Screen
-        name={PROFILE_SCREEN}
-        component={Profile}
+        name={ROOM_NAVIGATOR}
+        component={RoomNavigator}
+        options={({ route }) => ({
+          headerShown: false,
+          title: 'Chats',
+          tabBarIcon: tabIcon('message-circle'),
+        })}
+      />
+      <Tab.Screen
+        name={PROFILE_NAVIGATOR}
+        component={ProfileNavigator}
         options={{
           headerShown: true,
           title: 'Profile',
