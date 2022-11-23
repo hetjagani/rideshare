@@ -123,8 +123,8 @@ export const AppStack = () => {
         component={HomeNavigator}
         options={{
           headerShown: false,
-          tabBarIcon: tabIcon('home'),
-          title: 'Home',
+          tabBarIcon: tabIcon("home"),
+          title: "Home",
         }}
       />
       <Tab.Screen
