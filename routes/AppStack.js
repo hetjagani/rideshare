@@ -10,14 +10,11 @@ import {
   HOME_NAVIGATOR,
   PROFILE_SCREEN,
   USER_INFO_SCREEN,
-  MY_POSTS_SCREEN,
-  PROFILE_NAVIGATOR,
-  MY_RIDES_SCREEN,
+  RIDE_POST_DETAILS,
 } from './AppRoutes';
 import Profile from '../screens/Profile';
 import { UserInfo } from '../screens/UserInfo';
-import MyPosts from '../screens/MyPosts';
-import MyRides from '../screens/MyRides';
+import RidePostDetails from '../screens/RidePostDetails';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -49,32 +46,15 @@ const HomeNavigator = () => {
         component={Payment}
         options={{ headerShown: true, title: 'Payment Screen' }}
       />
-    </Stack.Navigator>
-  );
-};
-
-const ProfileNavigator = () => {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name={PROFILE_SCREEN}
-        component={Profile}
-        options={{ headerShown: true, title: 'Profile Info' }}
-      />
-      <Stack.Screen
-        name={MY_POSTS_SCREEN}
-        component={MyPosts}
-        options={{ headerShown: true, title: 'Your Posts' }}
-      />
-      <Stack.Screen
-        name={MY_RIDES_SCREEN}
-        component={MyRides}
-        options={{ headerShown: true, title: 'Your Rides' }}
-      />
       <Stack.Screen
         name={USER_INFO_SCREEN}
         component={UserInfo}
-        options={{ headerShown: true, title: 'Account Info' }}
+        options={{ headerShown: true, title: 'User Info Screen' }}
+      />
+      <Stack.Screen
+        name={RIDE_POST_DETAILS}
+        component={RidePostDetails}
+        options={{ headerShown: true, title: 'Ride Details' }}
       />
     </Stack.Navigator>
   );
@@ -93,10 +73,10 @@ export const AppStack = () => {
         }}
       />
       <Tab.Screen
-        name={PROFILE_NAVIGATOR}
-        component={ProfileNavigator}
+        name={PROFILE_SCREEN}
+        component={Profile}
         options={{
-          headerShown: false,
+          headerShown: true,
           title: 'Profile',
           tabBarIcon: tabIcon('person'),
         }}
