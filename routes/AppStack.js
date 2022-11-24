@@ -13,11 +13,18 @@ import {
   ROOM_SCREEN,
   MESSAGE_SCREEN,
   ROOM_NAVIGATOR,
-} from "./AppRoutes";
-import Profile from "../screens/Profile";
-import { UserInfo } from "../screens/UserInfo";
-import Room from "../screens/Room";
-import Message from "../screens/Message";
+  MY_POSTS_SCREEN,
+  MY_RIDES_SCREEN,
+  RIDE_POST_DETAILS,
+  PROFILE_NAVIGATOR,
+} from './AppRoutes';
+import Profile from '../screens/Profile';
+import { UserInfo } from '../screens/UserInfo';
+import Room from '../screens/Room';
+import Message from '../screens/Message';
+import RidePostDetails from '../screens/RidePostDetails';
+import MyPosts from '../screens/MyPosts';
+import MyRides from '../screens/MyRides';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -49,6 +56,16 @@ const HomeNavigator = () => {
         component={Payment}
         options={{ headerShown: true, title: 'Payment Screen' }}
       />
+      <Stack.Screen
+        name={USER_INFO_SCREEN}
+        component={UserInfo}
+        options={{ headerShown: true, title: 'User Info Screen' }}
+      />
+      <Stack.Screen
+        name={RIDE_POST_DETAILS}
+        component={RidePostDetails}
+        options={{ headerShown: true, title: 'Ride Details' }}
+      />
     </Stack.Navigator>
   );
 };
@@ -74,18 +91,18 @@ const ProfileNavigator = () => {
       <Stack.Screen
         name={USER_INFO_SCREEN}
         component={UserInfo}
-        options={{ headerShown: true, title: "User Info Screen" }}
+        options={{ headerShown: true, title: 'User Info Screen' }}
       />
     </Stack.Navigator>
   );
 };
 
-const RoomNavigator = ({navigation }) => (
+const RoomNavigator = ({ navigation }) => (
   <Stack.Navigator>
     <Stack.Screen
       name={ROOM_SCREEN}
       component={Room}
-      options={{ headerShown: true, title: "Chats" }}
+      options={{ headerShown: true, title: 'Chats' }}
     />
     <Stack.Screen
       name={MESSAGE_SCREEN}
@@ -93,7 +110,7 @@ const RoomNavigator = ({navigation }) => (
       options={({ route }) => ({
         tabBarVisible: false,
         title: route.params.userName,
-        headerShown: true
+        headerShown: true,
       })}
     />
   </Stack.Navigator>
@@ -107,17 +124,17 @@ export const AppStack = () => {
         component={HomeNavigator}
         options={{
           headerShown: false,
-          tabBarIcon: tabIcon("home"),
-          title: "Home",
+          tabBarIcon: tabIcon('home'),
+          title: 'Home',
         }}
       />
       <Tab.Screen
         name={ROOM_NAVIGATOR}
         component={RoomNavigator}
-        options={({route}) => ({
+        options={({ route }) => ({
           headerShown: false,
-          title: "Chats",
-          tabBarIcon: tabIcon("message-circle"),
+          title: 'Chats',
+          tabBarIcon: tabIcon('message-circle'),
         })}
       />
       <Tab.Screen

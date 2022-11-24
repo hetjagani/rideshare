@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import MapViewDirections from 'react-native-maps';
+import MAPS_API_KEY from '../Config';
 
 const RidePostDetails = ({ route }) => {
   const { post } = route.params;
@@ -102,7 +103,7 @@ const RidePostDetails = ({ route }) => {
           <MapViewDirections
             origin={startLocation}
             destination={endLocation}
-            apikey={'AIzaSyCwW5sS2iPAJt64l1f-sVJEU_yQZrySKYI'}
+            apikey={MAPS_API_KEY}
             strokeWidth={3}
             strokeColor="hotpink"
           />
@@ -121,7 +122,10 @@ const RidePostDetails = ({ route }) => {
           style={{ flexDirection: 'row', justifyContent: 'space-between' }}
         >
           <Text style={{ fontWeight: 'bold' }}> Ride Time: </Text>
-          <Text> {rideDate} {rideTime} </Text>
+          <Text>
+            {' '}
+            {rideDate} {rideTime}{' '}
+          </Text>
         </Layout>
         <Layout
           style={{ flexDirection: 'row', justifyContent: 'space-between' }}

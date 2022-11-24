@@ -50,15 +50,15 @@ const Profile = ({ navigation }) => {
   }, []);
 
   return (
-    <View style={{ height: "100%", backgroundColor: "white" }}>
+    <View style={{ height: '100%', backgroundColor: 'white' }}>
       <Layout
-        style={{ height: "40%", alignItems: "center", paddingTop: "10%" }}
+        style={{ height: '40%', alignItems: 'center', paddingTop: '10%' }}
       >
         <Layout
           style={{
-            justifyContent: "center",
-            backgroundColor: "white",
-            borderRadius: "90%",
+            justifyContent: 'center',
+            backgroundColor: 'white',
+            borderRadius: '90%',
             height: 180,
             width: 180,
           }}
@@ -66,37 +66,39 @@ const Profile = ({ navigation }) => {
           <Image
             onLoadStart={() => setLoading(true)}
             onLoadEnd={() => setLoading(false)}
-            source={{ uri: image }}
+            source={
+              image != '' ? { uri: image } : require('../assets/img_avatar.png')
+            }
             style={{
-              borderRadius: "90%",
+              borderRadius: '90%',
               height: 180,
               width: 180,
             }}
           />
           {loading && <LoadingView />}
         </Layout>
-        <Layout style={{ marginTop: "3%" }}>
-          <Text style={{ fontWeight: "bold", fontSize: "20px" }}>{name}</Text>
+        <Layout style={{ marginTop: '3%' }}>
+          <Text style={{ fontWeight: 'bold', fontSize: '20px' }}>{name}</Text>
         </Layout>
         <View
           style={{
-            marginTop: "2%",
-            flexDirection: "row",
-            alignItems: "center",
-            width: "80%",
+            marginTop: '2%',
+            flexDirection: 'row',
+            alignItems: 'center',
+            width: '80%',
           }}
         >
-          <View style={{ flex: 1, height: 1, backgroundColor: "black" }} />
+          <View style={{ flex: 1, height: 1, backgroundColor: 'black' }} />
         </View>
         <Layout
           style={{
-            flexDirection: "row",
-            marginTop: "2%",
-            justifyContent: "space-around",
-            width: "80%",
+            flexDirection: 'row',
+            marginTop: '2%',
+            justifyContent: 'space-around',
+            width: '80%',
           }}
         >
-          <Layout style={{ flexDirection: "column", alignItems: "center" }}>
+          <Layout style={{ flexDirection: 'column', alignItems: 'center' }}>
             <Layout>
               <Text>{rides ?? 0}</Text>
             </Layout>
@@ -104,7 +106,7 @@ const Profile = ({ navigation }) => {
               <Text>Rides</Text>
             </Layout>
           </Layout>
-          <Layout style={{ flexDirection: "column", alignItems: "center" }}>
+          <Layout style={{ flexDirection: 'column', alignItems: 'center' }}>
             <Layout>
               <Text>{ratings ?? 0.0}</Text>
             </Layout>
@@ -112,7 +114,7 @@ const Profile = ({ navigation }) => {
               <Text>Ratings</Text>
             </Layout>
           </Layout>
-          <Layout style={{ flexDirection: "column", alignItems: "center" }}>
+          <Layout style={{ flexDirection: 'column', alignItems: 'center' }}>
             <Layout>
               <Text>{months ?? 0}</Text>
             </Layout>
@@ -122,9 +124,9 @@ const Profile = ({ navigation }) => {
           </Layout>
         </Layout>
       </Layout>
-      <Layout style={{ height: "50%", marginTop: "15%" }}>
-        <Layout style={{ marginTop: "5%", alignItems: "center" }}>
-          <Text style={{ fontWeight: "bold" }}>Account Settings</Text>
+      <Layout style={{ height: '50%', marginTop: '15%' }}>
+        <Layout style={{ marginTop: '5%', alignItems: 'center' }}>
+          <Text style={{ fontWeight: 'bold' }}>Account Settings</Text>
         </Layout>
         <Layout>
           <ProfileMenuItems navigation={navigation} />

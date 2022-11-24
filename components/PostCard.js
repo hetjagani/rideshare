@@ -5,9 +5,12 @@ import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { likePost, dislikePost } from '../services/postLike';
 import Toast from 'react-native-toast-message';
 import Pill from '../components/Pill';
+import { useNavigation } from '@react-navigation/native';
+import { RIDE_POST_DETAILS } from '../routes/AppRoutes';
 
 const StarIcon = (props) => <Icon {...props} name="star" />;
 const StarOutlineIcon = (props) => <Icon {...props} name="star-outline" />;
+const InfoIcon = (props) => <Icon {...props} name="info-outline" />;
 
 const CardHeader = ({ text, postType }) => {
   const headerStyles = StyleSheet.create({
@@ -31,7 +34,28 @@ const CardHeader = ({ text, postType }) => {
   );
 };
 
-const CardFooter = ({ id, style, likes, liked, likedPost, dislikedPost }) => {
+const CardFooter = ({
+  id,
+  style,
+  likes,
+  liked,
+  likedPost,
+  dislikedPost,
+  post,
+  navigation,
+}) => {
+  const footerStyle = StyleSheet.create({
+    buttonStyle: {
+      width: '40%',
+      margin: 10,
+    },
+    footerLayout: {
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-around',
+    },
+  });
   const toggleLike = () => {
     if (liked) {
       dislikedPost(id);
@@ -39,11 +63,24 @@ const CardFooter = ({ id, style, likes, liked, likedPost, dislikedPost }) => {
       likedPost(id);
     }
   };
+
+  const seeDetails = () => {
+    navigation.navigate(RIDE_POST_DETAILS, { post });
+  };
+
   return (
-    <View style={style}>
+    <View style={footerStyle.footerLayout}>
+      <Button
+        accessoryLeft={InfoIcon}
+        style={footerStyle.buttonStyle}
+        onPress={seeDetails}
+      >
+        See Details
+      </Button>
       <Button
         accessoryLeft={liked ? StarIcon : StarOutlineIcon}
         onPress={toggleLike}
+        style={footerStyle.buttonStyle}
       >
         {likes} Likes
       </Button>
@@ -51,7 +88,7 @@ const CardFooter = ({ id, style, likes, liked, likedPost, dislikedPost }) => {
   );
 };
 
-const PostCard = ({ post, updateLike, navigation, shortView }) => {
+const PostCard = ({ post, updateLike, navigation }) => {
   const [liked, setLiked] = useState(false);
 
   const cardStyle = StyleSheet.create({
@@ -71,10 +108,6 @@ const PostCard = ({ post, updateLike, navigation, shortView }) => {
     },
     cardContent: {
       display: 'flex',
-    },
-    footerLayout: {
-      display: 'flex',
-      alignItems: 'center',
     },
     description: {
       marginVertical: 5,
@@ -157,17 +190,15 @@ const PostCard = ({ post, updateLike, navigation, shortView }) => {
       style={cardStyle.marginCard}
       header={<CardHeader text={post.title} postType={post.type} />}
       footer={
-        !shortView && (
-          <CardFooter
-            id={post.id}
-            liked={liked}
-            likes={post.noOfLikes}
-            likedPost={likedPost}
-            dislikedPost={dislikedPost}
-            post={post}
-            navigation={navigation}
-          />
-        )
+        <CardFooter
+          id={post.id}
+          liked={liked}
+          likes={post.noOfLikes}
+          likedPost={likedPost}
+          dislikedPost={dislikedPost}
+          post={post}
+          navigation={navigation}
+        />
       }
     >
       <View style={cardStyle.cardContent}>
