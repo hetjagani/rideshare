@@ -6,7 +6,7 @@ import {
   MY_POSTS_SCREEN,
   MY_RIDES_SCREEN,
   USER_INFO_SCREEN,
-  MY_RATINGS_SCREEN,
+  MY_RATINGS_NAVIGATOR,
 } from '../routes/AppRoutes';
 
 export const ProfileMenuItems = ({ navigation, props }) => {
@@ -54,7 +54,7 @@ export const ProfileMenuItems = ({ navigation, props }) => {
         <MenuItem
           title='My Ratings'
           accessoryRight={ForwardIcon}
-          onPress={() => navigation.navigate(MY_RATINGS_SCREEN)}
+          onPress={() => navigation.navigate(MY_RATINGS_NAVIGATOR)}
         />
         <MenuItem title='Sign Out' onPress={signOut} />
       </Menu>

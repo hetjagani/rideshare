@@ -20,7 +20,6 @@ const Room = ({ navigation }) => {
   const [currentUser, setCurrentUser] = useState();
   const isFocused = useIsFocused();
 
-  console.log(currentUser);
   const getRooms = async () => {
     const res = await userRoomsInfo();
     console.log(res.data);

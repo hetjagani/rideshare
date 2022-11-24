@@ -17,7 +17,9 @@ import {
   MY_RIDES_SCREEN,
   RIDE_POST_DETAILS,
   PROFILE_NAVIGATOR,
-  MY_RATINGS_SCREEN,
+  MY_RATINGS_NAVIGATOR,
+  MY_RATINGS_BY_YOU_SCREEN,
+  MY_RATINGS_FOR_YOU_SCREEN,
 } from './AppRoutes';
 import Profile from '../screens/Profile';
 import { UserInfo } from '../screens/UserInfo';
@@ -27,13 +29,12 @@ import RidePostDetails from '../screens/RidePostDetails';
 import MyPosts from '../screens/MyPosts';
 import MyRides from '../screens/MyRides';
 import { RatingsByYou, RatingsForYou, TopTabBar } from '../screens/MyRatings';
-import { NavigationContainer } from '@react-navigation/native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-const { Navigator, Screen } = createMaterialTopTabNavigator();
+const MyRatingsTabs = createMaterialTopTabNavigator();
 
 const unfocusedColor = '#aaaaaa';
 const focusedColor = '#000000';
@@ -50,10 +51,16 @@ const tabIcon = (name) => {
 };
 
 const MyRatingsNavigator = () => (
-  <Navigator tabBar={(props) => <TopTabBar {...props} />}>
-    <Screen name='RATINGS_BY_YOU' component={RatingsByYou} />
-    <Screen name='RATINGS_FOR_YOU' component={RatingsForYou} />
-  </Navigator>
+  <MyRatingsTabs.Navigator tabBar={(props) => <TopTabBar {...props} />}>
+    <MyRatingsTabs.Screen
+      name={MY_RATINGS_BY_YOU_SCREEN}
+      component={RatingsByYou}
+    />
+    <MyRatingsTabs.Screen
+      name={MY_RATINGS_FOR_YOU_SCREEN}
+      component={RatingsForYou}
+    />
+  </MyRatingsTabs.Navigator>
 );
 const HomeNavigator = () => {
   return (
@@ -106,7 +113,7 @@ const ProfileNavigator = () => {
         options={{ headerShown: true, title: 'User Info Screen' }}
       />
       <Stack.Screen
-        name={MY_RATINGS_SCREEN}
+        name={MY_RATINGS_NAVIGATOR}
         component={MyRatingsNavigator}
         options={{ headerShown: true, title: 'Your Ratings' }}
       />
