@@ -17,6 +17,7 @@ import {
   MY_RIDES_SCREEN,
   RIDE_POST_DETAILS,
   PROFILE_NAVIGATOR,
+  MY_RATINGS_NAVIGATOR,
 } from './AppRoutes';
 import Profile from '../screens/Profile';
 import { UserInfo } from '../screens/UserInfo';
@@ -25,6 +26,7 @@ import Message from '../screens/Message';
 import RidePostDetails from '../screens/RidePostDetails';
 import MyPosts from '../screens/MyPosts';
 import MyRides from '../screens/MyRides';
+import MyRatings from '../screens/MyRatings';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -92,6 +94,11 @@ const ProfileNavigator = () => {
         name={USER_INFO_SCREEN}
         component={UserInfo}
         options={{ headerShown: true, title: 'User Info Screen' }}
+      />
+      <Stack.Screen
+        name={MY_RATINGS_NAVIGATOR}
+        component={MyRatings}
+        options={{ headerShown: true, title: 'Your Ratings' }}
       />
     </Stack.Navigator>
   );
