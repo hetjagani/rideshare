@@ -1,5 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { ScrollView, RefreshControl } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+  ScrollView,
+  RefreshControl,
+  FlatList,
+  ActivityIndicator,
+  View,
+} from 'react-native';
 import PostCard from '../components/PostCard';
 import fetchPosts from '../services/fetchPosts';
 import Toast from 'react-native-toast-message';
@@ -12,24 +18,26 @@ import {
 
 function Home({ navigation }) {
   const [postList, setPostList] = useState([]);
-  const [refreshing, setRefreshing] = React.useState(false);
-
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    fetchPostsApi();
-  }, []);
-
+  const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(0);
+
+  const onRefresh = useCallback(() => {
+    setPostList([]);
+    setRefreshing(true);
+    setPage(0);
+  }, []);
 
   const AddIcon = (props) => <Icon name="plus-outline" {...props} />;
 
   const topNavigation = () => <TopNavigationAction icon={AddIcon} />;
 
   const fetchPostsApi = () => {
-    fetchPosts({ page, limit: 10 })
+    fetchPosts({ page, limit: 2 })
       .then((resp) => {
-        setPostList(resp?.nodes);
-        setRefreshing(false);
+        if (resp?.nodes.length > 0) {
+          setPostList([...postList, ...resp?.nodes]);
+          setRefreshing(false);
+        }
       })
       .catch((err) => {
         Toast.show({
@@ -53,30 +61,57 @@ function Home({ navigation }) {
 
   useEffect(() => {
     fetchPostsApi();
-  }, []);
+  }, [page]);
+
+  const renderItem = ({ item: post }) => {
+    return (
+      <PostCard
+        post={post}
+        key={post?.id}
+        updateLike={updateLike}
+        navigation={navigation}
+      />
+    );
+  };
+
+  const renderLoader = () => {
+    return (
+      <View>
+        <ActivityIndicator
+          size="large"
+          color="#aaa"
+          style={{ marginVertical: 16, alignItems: 'center' }}
+        />
+      </View>
+    );
+  };
+
+  const loadMoreItems = () => {
+    setPage(page + 1);
+  };
 
   return (
-    <Layout level='1' style={{marginTop: 50, marginBottom: 50}}>
+    <Layout level="1" style={{ marginTop: 50, marginBottom: 50 }}>
       <TopNavigation
         title={'Your Feed'}
         alignment="center"
         accessoryRight={topNavigation}
       />
-      <ScrollView
+      <FlatList
+        data={postList}
+        renderItem={renderItem}
+        keyExtractor={(item) => item?.id}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          <RefreshControl
+            tintColor={'#aaa'}
+            onRefresh={onRefresh}
+            refreshing={refreshing}
+          />
         }
-      >
-        {postList &&
-          postList.map((post) => (
-            <PostCard
-              post={post}
-              key={post?.id}
-              updateLike={updateLike}
-              navigation={navigation}
-            />
-          ))}
-      </ScrollView>
+        ListFooterComponent={renderLoader}
+        onEndReached={loadMoreItems}
+        onEndReachedThreshold={0.8}
+      />
     </Layout>
   );
 }

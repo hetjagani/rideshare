@@ -5,6 +5,7 @@ import { GiftedChat, Bubble, Send } from "react-native-gifted-chat";
 import getMessages from "../services/getMessages";
 import { BACKEND_URL } from "../Config";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Toast  from "react-native-toast-message";
 
 var stompClient = null;
 
