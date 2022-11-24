@@ -6,6 +6,7 @@ import {
   MY_POSTS_SCREEN,
   MY_RIDES_SCREEN,
   USER_INFO_SCREEN,
+  MY_RATINGS_SCREEN,
 } from '../routes/AppRoutes';
 
 export const ProfileMenuItems = ({ navigation, props }) => {
@@ -26,31 +27,36 @@ export const ProfileMenuItems = ({ navigation, props }) => {
     },
   });
 
-  const ForwardIcon = (props) => <Icon {...props} name="arrow-ios-forward" />;
+  const ForwardIcon = (props) => <Icon {...props} name='arrow-ios-forward' />;
   return (
-    <Layout style={styles.container} level="1">
+    <Layout style={styles.container} level='1'>
       <Menu
         style={styles.menu}
         selectedIndex={selectedIndex}
         onSelect={(index) => setSelectedIndex(index)}
       >
         <MenuItem
-          title="Account Info"
+          title='Account Info'
           accessoryRight={ForwardIcon}
           onPress={() => navigation.navigate(USER_INFO_SCREEN)}
         />
-        <MenuItem title="Update Role" accessoryRight={ForwardIcon} />
+        <MenuItem title='Update Role' accessoryRight={ForwardIcon} />
         <MenuItem
-          title="My Posts"
+          title='My Posts'
           accessoryRight={ForwardIcon}
           onPress={() => navigation.navigate(MY_POSTS_SCREEN)}
         />
         <MenuItem
-          title="My Rides"
+          title='My Rides'
           accessoryRight={ForwardIcon}
           onPress={() => navigation.navigate(MY_RIDES_SCREEN)}
         />
-        <MenuItem title="Sign Out" onPress={signOut} />
+        <MenuItem
+          title='My Ratings'
+          accessoryRight={ForwardIcon}
+          onPress={() => navigation.navigate(MY_RATINGS_SCREEN)}
+        />
+        <MenuItem title='Sign Out' onPress={signOut} />
       </Menu>
     </Layout>
   );

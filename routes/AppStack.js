@@ -17,6 +17,7 @@ import {
   MY_RIDES_SCREEN,
   RIDE_POST_DETAILS,
   PROFILE_NAVIGATOR,
+  MY_RATINGS_SCREEN,
 } from './AppRoutes';
 import Profile from '../screens/Profile';
 import { UserInfo } from '../screens/UserInfo';
@@ -25,9 +26,14 @@ import Message from '../screens/Message';
 import RidePostDetails from '../screens/RidePostDetails';
 import MyPosts from '../screens/MyPosts';
 import MyRides from '../screens/MyRides';
+import { RatingsByYou, RatingsForYou, TopTabBar } from '../screens/MyRatings';
+import { NavigationContainer } from '@react-navigation/native';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
+
+const { Navigator, Screen } = createMaterialTopTabNavigator();
 
 const unfocusedColor = '#aaaaaa';
 const focusedColor = '#000000';
@@ -43,6 +49,12 @@ const tabIcon = (name) => {
   );
 };
 
+const MyRatingsNavigator = () => (
+  <Navigator tabBar={(props) => <TopTabBar {...props} />}>
+    <Screen name='RATINGS_BY_YOU' component={RatingsByYou} />
+    <Screen name='RATINGS_FOR_YOU' component={RatingsForYou} />
+  </Navigator>
+);
 const HomeNavigator = () => {
   return (
     <Stack.Navigator>
@@ -92,6 +104,11 @@ const ProfileNavigator = () => {
         name={USER_INFO_SCREEN}
         component={UserInfo}
         options={{ headerShown: true, title: 'User Info Screen' }}
+      />
+      <Stack.Screen
+        name={MY_RATINGS_SCREEN}
+        component={MyRatingsNavigator}
+        options={{ headerShown: true, title: 'Your Ratings' }}
       />
     </Stack.Navigator>
   );
