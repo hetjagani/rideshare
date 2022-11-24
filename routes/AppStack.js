@@ -51,7 +51,7 @@ const HomeNavigator = () => {
       <Stack.Screen
         name={HOME_SCREEN}
         component={Home}
-        options={{ headerShown: true, title: 'Your Feed' }}
+        options={{ headerShown: false, title: 'Your Feed' }}
       />
       <Stack.Screen
         name={PAYMENT_SCREEN}
