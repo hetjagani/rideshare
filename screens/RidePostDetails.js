@@ -1,17 +1,29 @@
-import { Button, Layout, Text } from '@ui-kitten/components';
+import {
+  Button,
+  Layout,
+  Text,
+  Modal,
+  Card,
+  Input,
+} from '@ui-kitten/components';
 import React, { useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 import { MAPS_API_KEY } from '../Config';
+import { requestRide } from '../services/requestRide';
+import Toast from 'react-native-toast-message';
+import { PAYMENT_SCREEN } from '../routes/AppRoutes';
 
-const RidePostDetails = ({ route }) => {
+const RidePostDetails = ({ navigation, route }) => {
   const { post } = route.params;
   const startAddressLatitude = post?.ride?.startAddress?.latitude;
   const startAddressLongitude = post?.ride?.startAddress?.longitude;
   const endAddressLatitude = post?.ride?.endAddress?.latitude;
   const endAddressLongitude = post?.ride?.endAddress?.longitude;
   const [loading, setLoading] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [notes, setNotes] = useState('');
 
   const originAddress =
     post?.ride?.startAddress?.street +
@@ -54,6 +66,32 @@ const RidePostDetails = ({ route }) => {
     longitude: (startLocation.longitude + endLocation.longitude) / 2,
     latitudeDelta: Math.abs(oLat - dLat) + 0.3,
     longitudeDelta: Math.abs(oLng - dLng) + 0.3,
+  };
+
+  const openModal = () => {
+    setNotes('');
+    setVisible(true);
+  };
+
+  const createRideRequest = () => {
+    const data = {
+      rideId: post?.ride?.id,
+      notes: notes,
+    };
+
+    requestRide(data).then((res) => {
+      if (res?.response && res?.response.status != 200) {
+        Toast.show({
+          type: 'error',
+          text1: 'Error Requesting Ride',
+          text2: res?.response?.data?.message,
+        });
+        return;
+      }
+      setVisible(false);
+
+      navigation.navigate(PAYMENT_SCREEN, res?.data);
+    });
   };
 
   return (
@@ -152,8 +190,36 @@ const RidePostDetails = ({ route }) => {
         </Layout>
       </View>
       <View style={{ width: '100%', alignItems: 'center', marginTop: '3%' }}>
-        <Button> Request Ride </Button>
+        <Button onPress={() => openModal()}> Request Ride </Button>
       </View>
+
+      {/* Ride Request Modal */}
+      <Modal
+        visible={visible}
+        backdropStyle={styles.backdrop}
+        onBackdropPress={() => setVisible(false)}
+        style={styles.detailsModal}
+      >
+        <Card style={styles.detailsCard}>
+          <Text category="s1" style={{ margin: 5 }}>
+            Add Notes:
+          </Text>
+          <Input
+            placeholder="Enter notes for ride"
+            value={notes}
+            onChangeText={(nextValue) => setNotes(nextValue)}
+            style={{ margin: 5 }}
+          />
+          <Button
+            onPress={() => createRideRequest()}
+            status="success"
+            style={{ margin: 5 }}
+          >
+            {' '}
+            Confirm Requesting Ride{' '}
+          </Button>
+        </Card>
+      </Modal>
     </View>
   );
 };
@@ -163,6 +229,20 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '50%',
     marginTop: '10%',
+  },
+  backdrop: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  detailsModal: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+  },
+  detailsCard: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    width: '80%',
   },
 });
 

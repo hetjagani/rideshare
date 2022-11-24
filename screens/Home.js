@@ -9,6 +9,12 @@ import {
 import PostCard from '../components/PostCard';
 import fetchPosts from '../services/fetchPosts';
 import Toast from 'react-native-toast-message';
+import {
+  Icon,
+  Layout,
+  TopNavigation,
+  TopNavigationAction,
+} from '@ui-kitten/components';
 
 function Home({ navigation }) {
   const [postList, setPostList] = useState([]);
@@ -20,6 +26,12 @@ function Home({ navigation }) {
     setRefreshing(true);
     setPage(0);
   }, []);
+
+  const [page, setPage] = useState(0);
+
+  const AddIcon = (props) => <Icon name="plus-outline" {...props} />;
+
+  const topNavigation = () => <TopNavigationAction icon={AddIcon} />;
 
   const fetchPostsApi = () => {
     fetchPosts({ page, limit: 2 })
@@ -81,7 +93,13 @@ function Home({ navigation }) {
   };
 
   return (
-    <FlatList
+    <Layout level='1' style={{marginTop: 50, marginBottom: 50}}>
+      <TopNavigation
+        title={'Your Feed'}
+        alignment="center"
+        accessoryRight={topNavigation}
+      />
+     <FlatList
       data={postList}
       renderItem={renderItem}
       keyExtractor={(item) => item?.id}
@@ -96,6 +114,7 @@ function Home({ navigation }) {
       onEndReached={loadMoreItems}
       onEndReachedThreshold={0.8}
     />
+    </Layout>
   );
 }
 
