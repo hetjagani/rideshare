@@ -2,8 +2,8 @@ import { Button, Layout, Text } from '@ui-kitten/components';
 import React, { useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-import MapViewDirections from 'react-native-maps';
-import MAPS_API_KEY from '../Config';
+import MapViewDirections from 'react-native-maps-directions';
+import { MAPS_API_KEY } from '../Config';
 
 const RidePostDetails = ({ route }) => {
   const { post } = route.params;
@@ -12,7 +12,7 @@ const RidePostDetails = ({ route }) => {
   const endAddressLatitude = post?.ride?.endAddress?.latitude;
   const endAddressLongitude = post?.ride?.endAddress?.longitude;
   const [loading, setLoading] = useState(false);
-  var mapView = null;
+
   const originAddress =
     post?.ride?.startAddress?.street +
     ', ' +
@@ -21,6 +21,7 @@ const RidePostDetails = ({ route }) => {
     post?.ride?.startAddress?.state +
     ', ' +
     post?.ride?.startAddress?.zipcode;
+
   const destinationAddress =
     post?.ride?.endAddress?.street +
     ', ' +
@@ -29,19 +30,13 @@ const RidePostDetails = ({ route }) => {
     post?.ride?.endAddress?.state +
     ', ' +
     post?.ride?.endAddress?.zipcode;
-  const capacity = post?.ride?.capacity;
+
   const rideDate = new Date(post?.ride?.rideTime).toDateString();
   const rideTime = new Date(post?.ride?.rideTime).toLocaleTimeString();
 
   const startLocation = {
     latitude: startAddressLatitude,
     longitude: startAddressLongitude,
-  };
-
-  const initialRegion = {
-    ...startLocation,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421,
   };
 
   const endLocation = {
@@ -71,7 +66,7 @@ const RidePostDetails = ({ route }) => {
             borderRadius: '90%',
             height: 120,
             width: 120,
-            marginTop: '10%',
+            marginTop: '5%',
           }}
         >
           <Image
@@ -112,7 +107,7 @@ const RidePostDetails = ({ route }) => {
       <View
         style={{
           marginTop: -120,
-          height: 100,
+          height: 140,
           flexDirection: 'column',
           justifyContent: 'space-around',
         }}
@@ -166,7 +161,7 @@ const RidePostDetails = ({ route }) => {
 const styles = StyleSheet.create({
   map: {
     width: '100%',
-    height: '55%',
+    height: '50%',
     marginTop: '10%',
   },
 });
