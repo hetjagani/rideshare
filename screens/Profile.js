@@ -66,7 +66,9 @@ const Profile = ({ navigation }) => {
           <Image
             onLoadStart={() => setLoading(true)}
             onLoadEnd={() => setLoading(false)}
-            source={{ uri: image }}
+            source={
+              image != '' ? { uri: image } : require('../assets/img_avatar.png')
+            }
             style={{
               borderRadius: '90%',
               height: 180,
