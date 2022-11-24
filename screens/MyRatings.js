@@ -3,8 +3,6 @@ import React from 'react';
 import { useState } from 'react';
 import RatingsByYou from './RatingsByYou';
 import RatingsForYou from './RatingsForYou';
-import { useEffect } from 'react';
-import getAuthData from '../contexts/getAuthData';
 
 const MyRatings = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
