@@ -120,7 +120,7 @@ public class UserController {
     @GetMapping(path = "/{userID}")
     public ResponseEntity<UserInfo> getUserInfoById(@PathVariable Integer userID, @RequestHeader HttpHeaders headers) throws Exception {
         try {
-            String token = headers.get("Authentication").get(0);
+            String token = headers.get("Authorization").get(0);
             UserInfo userInfo = userInfoService.getById(token, userID);
 
             Float avgRating = ratingService.getAvgRating(userID, token);
