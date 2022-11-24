@@ -8,6 +8,7 @@ import com.rideshare.ride.webentity.PaginatedEntity;
 import com.rideshare.ride.webentity.Ride;
 import facade.UserInfoFacade;
 import io.swagger.models.auth.In;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class RideService implements IRideService {
 
     @Autowired
@@ -56,8 +58,8 @@ public class RideService implements IRideService {
             "FROM ride.ride, ride.address as start_add, ride.address as end_add\n" +
             "WHERE (ride.start_address = start_add.id) AND (ride.end_address = end_add.id) AND ride.id = ?;";
 
-    private final String insertRideQuery = "INSERT INTO ride.ride(post_id, user_id, created_at, price_per_person, no_passengers, capacity, status, start_address, end_address)\n" +
-            "VALUES (?,?,?,?,?,?,?,?,?) RETURNING id;";
+    private final String insertRideQuery = "INSERT INTO ride.ride(post_id, user_id, created_at, price_per_person, no_passengers, capacity, status, ride_time, start_address, end_address)\n" +
+            "VALUES (?,?,?,?,?,?,?,?,?,?) RETURNING id;";
 
     private final String startRideQuery = "UPDATE ride.ride SET status='ACTIVE', started_at=? WHERE id = ? AND user_id = ?;";
     private final String stopRideQuery = "UPDATE ride.ride SET status='COMPLETED', ended_at=? WHERE id = ? AND user_id = ?;";
@@ -188,14 +190,13 @@ public class RideService implements IRideService {
 
     @Override
     public Ride create(String token, com.rideshare.ride.model.Ride ride) throws Exception {
-        Integer id = jdbcTemplate.queryForObject(insertRideQuery, Integer.class, ride.getPostId(), ride.getUserId(), Timestamp.from(Instant.now()), ride.getPricePerPerson(), ride.getNoPassengers(), ride.getNoPassengers(), RideStatus.CREATED, ride.getStartAddress(), ride.getEndAddress());
+        Integer id = jdbcTemplate.queryForObject(insertRideQuery, Integer.class, ride.getPostId(), ride.getUserId(), Timestamp.from(Instant.now()), ride.getPricePerPerson(), ride.getNoPassengers(), ride.getNoPassengers(), RideStatus.CREATED, new Timestamp(ride.getRideTime()), ride.getStartAddress(), ride.getEndAddress());
 
         if (ride.getTagIds() != null) {
             ride.getTagIds().stream().forEach((Integer tagId) -> {
                 jdbcTemplate.update(insertRideTagQuery, id, tagId);
             });
         }
-
         Ride createdRide = getById(token, id);
         return createdRide;
     }

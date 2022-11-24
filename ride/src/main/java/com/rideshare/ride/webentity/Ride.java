@@ -24,6 +24,7 @@ public class Ride implements Comparable<Ride> {
     private Timestamp createdAt;
     private Timestamp startedAt;
     private Timestamp endedAt;
+    private Timestamp rideTime;
     private Duration duration;
     private UserInfo user;
 

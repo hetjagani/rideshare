@@ -20,4 +20,5 @@ public class Ride {
     private Timestamp createdAt;
     private Timestamp startedAt;
     private Timestamp endedAt;
+    private Long rideTime;
 }

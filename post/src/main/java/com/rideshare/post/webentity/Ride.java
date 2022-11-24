@@ -6,6 +6,8 @@ import com.rideshare.post.model.UserInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.sql.Timestamp;
+import java.time.Duration;
 import java.util.List;
 
 @Data
@@ -21,6 +23,11 @@ public class Ride {
     private List<Tag> tags;
     private Address startAddress;
     private Address endAddress;
+    private Timestamp createdAt;
+    private Timestamp startedAt;
+    private Timestamp endedAt;
+    private Timestamp rideTime;
+    private Duration duration;
     private UserInfo user;
 
     public Ride(){}

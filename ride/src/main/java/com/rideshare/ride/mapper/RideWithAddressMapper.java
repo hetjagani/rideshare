@@ -12,9 +12,9 @@ import java.sql.Timestamp;
 public class RideWithAddressMapper implements RowMapper<Ride> {
     @Override
     public Ride mapRow(ResultSet rs, int rowNum) throws SQLException {
-        Address startAddress = new Address(rs.getInt(13), rs.getString(14), rs.getString(15), rs.getString(16), rs.getString(17), rs.getString(18), rs.getString(19), rs.getFloat(20), rs.getFloat(21));
+        Address startAddress = new Address(rs.getInt(14), rs.getString(15), rs.getString(16), rs.getString(17), rs.getString(18), rs.getString(19), rs.getString(20), rs.getFloat(21), rs.getFloat(22));
 
-        Address endAddress = new Address(rs.getInt(22), rs.getString(23), rs.getString(24), rs.getString(25), rs.getString(26), rs.getString(27), rs.getString(28), rs.getFloat(29), rs.getFloat(30));
+        Address endAddress = new Address(rs.getInt(23), rs.getString(24), rs.getString(25), rs.getString(26), rs.getString(27), rs.getString(28), rs.getString(29), rs.getFloat(30), rs.getFloat(31));
 
         Ride ride = new Ride();
         ride.setId(rs.getInt(1));
@@ -29,6 +29,7 @@ public class RideWithAddressMapper implements RowMapper<Ride> {
         ride.setCreatedAt(rs.getTimestamp("created_at"));
         ride.setStartedAt(rs.getTimestamp("started_at"));
         ride.setEndedAt(rs.getTimestamp("ended_at"));
+        ride.setRideTime(rs.getTimestamp("ride_time"));
         return ride;
     }
 }
