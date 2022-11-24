@@ -221,6 +221,10 @@ public class RideService implements IRideService {
             throw new Exception("Ride already completed");
         }
 
+        if(ride.getRideTime().after(Timestamp.from(Instant.now()))) {
+            throw new Exception("Cannot start ride before the ride time");
+        }
+
         jdbcTemplate.update(startRideQuery, Timestamp.from(Instant.now()), rideId, userId);
 
         return getById(token, rideId);
@@ -234,6 +238,10 @@ public class RideService implements IRideService {
         }
         if(RideStatus.COMPLETED.equals(ride.getStatus())) {
             throw new Exception("Ride already completed");
+        }
+
+        if(ride.getRideTime().after(Timestamp.from(Instant.now()))) {
+            throw new Exception("Cannot stop ride before the ride time");
         }
 
         jdbcTemplate.update(stopRideQuery, Timestamp.from(Instant.now()), rideId, userId);
