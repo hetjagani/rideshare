@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import {
   MY_POSTS_SCREEN,
-  MY_RIDES_SCREEN,
+  MY_RIDES_NAVIGATOR,
   USER_INFO_SCREEN,
 } from '../routes/AppRoutes';
 
@@ -48,7 +48,7 @@ export const ProfileMenuItems = ({ navigation, props }) => {
         <MenuItem
           title="My Rides"
           accessoryRight={ForwardIcon}
-          onPress={() => navigation.navigate(MY_RIDES_SCREEN)}
+          onPress={() => navigation.navigate(MY_RIDES_NAVIGATOR)}
         />
         <MenuItem title="Sign Out" onPress={signOut} />
       </Menu>
