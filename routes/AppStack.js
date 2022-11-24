@@ -14,9 +14,12 @@ import {
   MESSAGE_SCREEN,
   ROOM_NAVIGATOR,
   MY_POSTS_SCREEN,
-  MY_RIDES_SCREEN,
   RIDE_POST_DETAILS,
   PROFILE_NAVIGATOR,
+  MY_RIDES_NAVIGATOR,
+  MY_RIDES_BY_YOU_SCREEN,
+  MY_RIDES_FOR_YOU_SCREEN,
+  MY_RATINGS_NAVIGATOR,
 } from './AppRoutes';
 import Profile from '../screens/Profile';
 import { UserInfo } from '../screens/UserInfo';
@@ -24,7 +27,11 @@ import Room from '../screens/Room';
 import Message from '../screens/Message';
 import RidePostDetails from '../screens/RidePostDetails';
 import MyPosts from '../screens/MyPosts';
-import MyRides from '../screens/MyRides';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { RidesByYou, RidesForYou, TopTabBar } from '../screens/MyRides';
+import MyRatings from '../screens/MyRatings';
+
+const MyRidesTabs = createMaterialTopTabNavigator();
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -43,13 +50,26 @@ const tabIcon = (name) => {
   );
 };
 
+const MyRidesNavigator = () => (
+  <MyRidesTabs.Navigator tabBar={(props) => <TopTabBar {...props} />}>
+    <MyRidesTabs.Screen
+      name={MY_RIDES_BY_YOU_SCREEN}
+      component={RidesByYou}
+    />
+    <MyRidesTabs.Screen
+      name={MY_RIDES_FOR_YOU_SCREEN}
+      component={RidesForYou}
+    />
+  </MyRidesTabs.Navigator>
+);
+
 const HomeNavigator = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
         name={HOME_SCREEN}
         component={Home}
-        options={{ headerShown: true, title: 'Your Feed' }}
+        options={{ headerShown: false, title: 'Your Feed' }}
       />
       <Stack.Screen
         name={PAYMENT_SCREEN}
@@ -65,6 +85,11 @@ const HomeNavigator = () => {
         name={RIDE_POST_DETAILS}
         component={RidePostDetails}
         options={{ headerShown: true, title: 'Ride Details' }}
+      />
+       <Stack.Screen
+        name={MY_RIDES_NAVIGATOR}
+        component={MyRidesNavigator}
+        options={{ headerShown: true, title: 'My Rides' }}
       />
     </Stack.Navigator>
   );
@@ -84,14 +109,14 @@ const ProfileNavigator = () => {
         options={{ headerShown: true, title: 'Your Posts' }}
       />
       <Stack.Screen
-        name={MY_RIDES_SCREEN}
-        component={MyRides}
-        options={{ headerShown: true, title: 'Your Rides' }}
-      />
-      <Stack.Screen
         name={USER_INFO_SCREEN}
         component={UserInfo}
         options={{ headerShown: true, title: 'User Info Screen' }}
+      />
+      <Stack.Screen
+        name={MY_RATINGS_NAVIGATOR}
+        component={MyRatings}
+        options={{ headerShown: true, title: 'Your Ratings' }}
       />
     </Stack.Navigator>
   );
