@@ -3,7 +3,7 @@ import axiosInstance from '../axiosInstance';
 const fetchRatingsForYou = async (userId) =>
   axiosInstance('/ratings', {
     method: 'GET',
-    params: { userId },
+    params: { userId: userId },
   })
     .then((response) => response)
     .catch((err) => err);
