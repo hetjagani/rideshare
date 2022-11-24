@@ -5,6 +5,7 @@ import { ProfileMenuItems } from '../components/ProfileMenuItems';
 import { fetchUserDetails } from '../services/fetchUserDetails';
 import LoadingView from '../components/loadingView';
 import { USER_INFO_SCREEN } from '../routes/AppRoutes';
+import { useIsFocused } from '@react-navigation/native';
 
 const Profile = ({ navigation }) => {
   const [name, setName] = useState('Temp Name');
@@ -13,6 +14,7 @@ const Profile = ({ navigation }) => {
   const [rides, setRides] = useState(0);
   const [ratings, setRatings] = useState(0.0);
   const [months, setMonths] = useState(0.0);
+  const isFocused = useIsFocused();
 
   const getUserDetails = () => {
     fetchUserDetails().then((res) => {
@@ -47,7 +49,7 @@ const Profile = ({ navigation }) => {
 
   useEffect(() => {
     getUserDetails();
-  }, []);
+  }, [isFocused]);
 
   return (
     <View style={{ height: '100%', backgroundColor: 'white' }}>

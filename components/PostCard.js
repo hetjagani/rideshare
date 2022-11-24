@@ -7,10 +7,11 @@ import Toast from 'react-native-toast-message';
 import Pill from '../components/Pill';
 import { useNavigation } from '@react-navigation/native';
 import { RIDE_POST_DETAILS } from '../routes/AppRoutes';
+import { Rating } from 'react-native-ratings';
 
-const StarIcon = (props) => <Icon {...props} name="star" />;
-const StarOutlineIcon = (props) => <Icon {...props} name="star-outline" />;
-const InfoIcon = (props) => <Icon {...props} name="info-outline" />;
+const StarIcon = (props) => <Icon {...props} name='star' />;
+const StarOutlineIcon = (props) => <Icon {...props} name='star-outline' />;
+const InfoIcon = (props) => <Icon {...props} name='info-outline' />;
 
 const CardHeader = ({ text, postType }) => {
   const headerStyles = StyleSheet.create({
@@ -27,7 +28,7 @@ const CardHeader = ({ text, postType }) => {
   });
   return (
     <View style={headerStyles.layout}>
-      <Text style={headerStyles.title} category="s1">
+      <Text style={headerStyles.title} category='s1'>
         {postType == 'RIDE' ? '🚗' : postType == 'RATING' ? '⭐' : '📜'} {text}
       </Text>
     </View>
@@ -43,6 +44,7 @@ const CardFooter = ({
   dislikedPost,
   post,
   navigation,
+  type,
 }) => {
   const footerStyle = StyleSheet.create({
     buttonStyle: {
@@ -70,13 +72,15 @@ const CardFooter = ({
 
   return (
     <View style={footerStyle.footerLayout}>
-      <Button
-        accessoryLeft={InfoIcon}
-        style={footerStyle.buttonStyle}
-        onPress={seeDetails}
-      >
-        See Details
-      </Button>
+      {type == 'RIDE' && (
+        <Button
+          accessoryLeft={InfoIcon}
+          style={footerStyle.buttonStyle}
+          onPress={seeDetails}
+        >
+          See Details
+        </Button>
+      )}
       <Button
         accessoryLeft={liked ? StarIcon : StarOutlineIcon}
         onPress={toggleLike}
@@ -198,6 +202,7 @@ const PostCard = ({ post, updateLike, navigation }) => {
           dislikedPost={dislikedPost}
           post={post}
           navigation={navigation}
+          type={post?.type}
         />
       }
     >
@@ -211,7 +216,7 @@ const PostCard = ({ post, updateLike, navigation }) => {
             }}
           >
             <Carousel
-              layout="default"
+              layout='default'
               ref={isCarousel}
               data={post.imageList}
               renderItem={renderImageItem}
@@ -245,7 +250,7 @@ const PostCard = ({ post, updateLike, navigation }) => {
         <Divider />
         {/* Description */}
         <View style={cardStyle.description}>
-          <Text category="s1">{post.description}</Text>
+          <Text category='s1'>{post.description}</Text>
         </View>
 
         {post.type == 'RIDE' && (
@@ -256,25 +261,64 @@ const PostCard = ({ post, updateLike, navigation }) => {
             <View style={cardStyle.ride}>
               {/* <Text category="s1">Ride:</Text> */}
               <Text>
-                <Text category="s1">From:</Text>{' '}
+                <Text category='s1'>From:</Text>{' '}
                 {post.ride?.startAddress?.street}
               </Text>
               <Text>
-                <Text category="s1">To:</Text> {post.ride?.endAddress?.street}
+                <Text category='s1'>To:</Text> {post.ride?.endAddress?.street}
               </Text>
               <Text>
-                <Text category="s1">Price:</Text> ${post.ride?.pricePerPerson}
+                <Text category='s1'>Price:</Text> ${post.ride?.pricePerPerson}
               </Text>
               <Text>
-                <Text category="s1">Capacity:</Text>{' '}
+                <Text category='s1'>Capacity:</Text>{' '}
                 {post.ride?.noPassengers - post.ride?.capacity}/
                 {post.ride?.noPassengers}
               </Text>
               <View style={cardStyle.rideTags}>
                 {post.ride?.tags?.map((tag) => (
-                  <Pill text={tag?.name} key={tag?.id} />
+                  <Pill type={'NORMAL'} text={tag?.name} key={tag?.id} />
                 ))}
               </View>
+            </View>
+          </View>
+        )}
+
+        {post.type == 'RATING' && (
+          <View>
+            <Divider />
+
+            <View style={{ alignItems: 'left', marginTop: 6 }}>
+              <Text category='s1'>{`${post?.rating?.user?.firstName} ${post?.rating?.user?.lastName} was given ratings by ${post?.rating?.ratingUser?.firstName} ${post?.rating?.ratingUser?.lastName}.`}</Text>
+            </View>
+            <View
+              style={{
+                ...cardStyle.rideTags,
+                justifyContent: 'center',
+                marginTop: 10,
+              }}
+            >
+              {post?.rating?.liked?.map((l, index) => (
+                <Pill type='LIKED' text={l} key={index} />
+              ))}
+            </View>
+            <View style={{ ...cardStyle.rideTags, justifyContent: 'center' }}>
+              {post?.rating?.disliked?.map((l, index) => (
+                <Pill type='DISLIKED' text={l} key={index} />
+              ))}
+            </View>
+            {/* <Divider /> */}
+            <View style={{ alignItems: 'center' }}>
+              <Rating
+                readonly
+                showReadOnlyText={false}
+                type='custom'
+                showRating
+                ratingTextColor={'#000000'}
+                fractions={1}
+                ratingCount={5}
+                startingValue={post?.rating?.rating}
+              />
             </View>
           </View>
         )}
