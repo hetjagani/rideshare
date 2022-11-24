@@ -53,7 +53,12 @@ function Home({ navigation }) {
     >
       {postList &&
         postList.map((post) => (
-          <PostCard post={post} key={post?.id} updateLike={updateLike} />
+          <PostCard
+            post={post}
+            key={post?.id}
+            updateLike={updateLike}
+            navigation={navigation}
+          />
         ))}
     </ScrollView>
   );
