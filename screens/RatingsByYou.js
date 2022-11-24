@@ -3,6 +3,7 @@ import { TabBar, Tab, Layout, Text, Card, List } from '@ui-kitten/components';
 import { Rating } from 'react-native-ratings';
 import fetchRatingsByYou from '../services/fetchRatingsByYou';
 import { StyleSheet, View } from 'react-native';
+import getAuthData from '../contexts/getAuthData';
 
 const styles = StyleSheet.create({
   container: {
@@ -42,12 +43,20 @@ const RatingsByYou = (props) => {
   };
 
   useEffect(() => {
-    getRatingsByYou(ratingUser);
+    getAuthData((res) => {
+      return res;
+    })
+      .then((user) => {
+        getRatingsByYou(user.userId);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }, []);
 
   const renderHeaderBy = (headerProps, info) => (
     <View {...headerProps}>
-      <Text category='h6'>
+      <Text category="h6">
         {info?.item?.user?.firstName + ' ' + info?.item?.user?.lastName}
       </Text>
     </View>
@@ -56,7 +65,7 @@ const RatingsByYou = (props) => {
   const renderItemBy = (info) => (
     <Card
       style={styles.item}
-      status='primary'
+      status="primary"
       header={(headerProps) => renderHeaderBy(headerProps, info)}
     >
       <View>
@@ -66,7 +75,7 @@ const RatingsByYou = (props) => {
         <Rating
           readonly
           showReadOnlyText={false}
-          type='custom'
+          type="custom"
           showRating
           ratingTextColor={'#000000'}
           fractions={1}

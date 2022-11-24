@@ -11,11 +11,6 @@ const MyRatings = () => {
   const shouldLoadComponent = (index) => index === selectedIndex;
   const [user, setUser] = useState();
 
-  useEffect(() => {
-    getAuthData().then((authData) => {
-      setUser(authData.userId);
-    });
-  }, []);
 
   return (
     <TabView
