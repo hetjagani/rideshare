@@ -27,8 +27,6 @@ function Home({ navigation }) {
     setPage(0);
   }, []);
 
-  const [page, setPage] = useState(0);
-
   const AddIcon = (props) => <Icon name="plus-outline" {...props} />;
 
   const topNavigation = () => <TopNavigationAction icon={AddIcon} />;
@@ -93,27 +91,27 @@ function Home({ navigation }) {
   };
 
   return (
-    <Layout level='1' style={{marginTop: 50, marginBottom: 50}}>
+    <Layout level="1" style={{ marginTop: 50, marginBottom: 50 }}>
       <TopNavigation
         title={'Your Feed'}
         alignment="center"
         accessoryRight={topNavigation}
       />
-     <FlatList
-      data={postList}
-      renderItem={renderItem}
-      keyExtractor={(item) => item?.id}
-      refreshControl={
-        <RefreshControl
-          tintColor={'#aaa'}
-          onRefresh={onRefresh}
-          refreshing={refreshing}
-        />
-      }
-      ListFooterComponent={renderLoader}
-      onEndReached={loadMoreItems}
-      onEndReachedThreshold={0.8}
-    />
+      <FlatList
+        data={postList}
+        renderItem={renderItem}
+        keyExtractor={(item) => item?.id}
+        refreshControl={
+          <RefreshControl
+            tintColor={'#aaa'}
+            onRefresh={onRefresh}
+            refreshing={refreshing}
+          />
+        }
+        ListFooterComponent={renderLoader}
+        onEndReached={loadMoreItems}
+        onEndReachedThreshold={0.8}
+      />
     </Layout>
   );
 }
