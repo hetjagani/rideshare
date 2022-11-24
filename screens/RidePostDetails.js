@@ -2,7 +2,8 @@ import { Button, Layout, Text } from '@ui-kitten/components';
 import React, { useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-import MapViewDirections from 'react-native-maps';
+import MapViewDirections from 'react-native-maps-directions';
+import { MAPS_API_KEY } from '../Config';
 
 const RidePostDetails = ({ route }) => {
   const { post } = route.params;
@@ -11,7 +12,7 @@ const RidePostDetails = ({ route }) => {
   const endAddressLatitude = post?.ride?.endAddress?.latitude;
   const endAddressLongitude = post?.ride?.endAddress?.longitude;
   const [loading, setLoading] = useState(false);
-  var mapView = null;
+
   const originAddress =
     post?.ride?.startAddress?.street +
     ', ' +
@@ -20,6 +21,7 @@ const RidePostDetails = ({ route }) => {
     post?.ride?.startAddress?.state +
     ', ' +
     post?.ride?.startAddress?.zipcode;
+
   const destinationAddress =
     post?.ride?.endAddress?.street +
     ', ' +
@@ -28,17 +30,13 @@ const RidePostDetails = ({ route }) => {
     post?.ride?.endAddress?.state +
     ', ' +
     post?.ride?.endAddress?.zipcode;
-  const capacity = post?.ride?.capacity;
+
+  const rideDate = new Date(post?.ride?.rideTime).toDateString();
+  const rideTime = new Date(post?.ride?.rideTime).toLocaleTimeString();
 
   const startLocation = {
     latitude: startAddressLatitude,
     longitude: startAddressLongitude,
-  };
-
-  const initialRegion = {
-    ...startLocation,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421,
   };
 
   const endLocation = {
@@ -68,7 +66,7 @@ const RidePostDetails = ({ route }) => {
             borderRadius: '90%',
             height: 120,
             width: 120,
-            marginTop: '10%',
+            marginTop: '5%',
           }}
         >
           <Image
@@ -87,7 +85,11 @@ const RidePostDetails = ({ route }) => {
         </Layout>
       </View>
       <View style={{ alignItems: 'center', margin: '5%' }}>
-        <Text>Ride with </Text><Text category="h6"> {post.user?.firstName} {" "} {post.user?.lastName} </Text>
+        <Text>Ride with </Text>
+        <Text category="h6">
+          {' '}
+          {post.user?.firstName} {post.user?.lastName}{' '}
+        </Text>
       </View>
       <View style={{ marginTop: -40 }}>
         <MapView style={styles.map} region={initRegion}>
@@ -96,7 +98,7 @@ const RidePostDetails = ({ route }) => {
           <MapViewDirections
             origin={startLocation}
             destination={endLocation}
-            apikey={'AIzaSyCwW5sS2iPAJt64l1f-sVJEU_yQZrySKYI'}
+            apikey={MAPS_API_KEY}
             strokeWidth={3}
             strokeColor="hotpink"
           />
@@ -105,12 +107,21 @@ const RidePostDetails = ({ route }) => {
       <View
         style={{
           marginTop: -120,
-          height: 100,
+          height: 140,
           flexDirection: 'column',
           justifyContent: 'space-around',
         }}
       >
         <Text category="h6"> Trip Details: </Text>
+        <Layout
+          style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+        >
+          <Text style={{ fontWeight: 'bold' }}> Ride Time: </Text>
+          <Text>
+            {' '}
+            {rideDate} {rideTime}{' '}
+          </Text>
+        </Layout>
         <Layout
           style={{ flexDirection: 'row', justifyContent: 'space-between' }}
         >
@@ -123,17 +134,24 @@ const RidePostDetails = ({ route }) => {
           <Text style={{ fontWeight: 'bold' }}> Destination:</Text>
           <Text> {destinationAddress} </Text>
         </Layout>
-        <Layout style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <Text style={{fontWeight: 'bold'}}> Capacity:</Text>
-          <Text>  {post.ride?.noPassengers - post.ride?.capacity}/
-                {post.ride?.noPassengers}  </Text>
+        <Layout
+          style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+        >
+          <Text style={{ fontWeight: 'bold' }}> Capacity:</Text>
+          <Text>
+            {' '}
+            {post.ride?.noPassengers - post.ride?.capacity}/
+            {post.ride?.noPassengers}{' '}
+          </Text>
         </Layout>
-        <Layout style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <Text style={{fontWeight: 'bold'}}> Price Per person:</Text>
-          <Text>  ${post.ride?.pricePerPerson}  </Text>
+        <Layout
+          style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+        >
+          <Text style={{ fontWeight: 'bold' }}> Price Per person:</Text>
+          <Text> ${post.ride?.pricePerPerson} </Text>
         </Layout>
       </View>
-      <View style={{width: '100%', alignItems: 'center', marginTop: '3%'}}>
+      <View style={{ width: '100%', alignItems: 'center', marginTop: '3%' }}>
         <Button> Request Ride </Button>
       </View>
     </View>
@@ -143,7 +161,7 @@ const RidePostDetails = ({ route }) => {
 const styles = StyleSheet.create({
   map: {
     width: '100%',
-    height: '55%',
+    height: '50%',
     marginTop: '10%',
   },
 });
