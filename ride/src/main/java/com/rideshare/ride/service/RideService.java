@@ -1,5 +1,6 @@
 package com.rideshare.ride.service;
 
+import com.rideshare.ride.mapper.RideIdMapper;
 import com.rideshare.ride.mapper.RideTagMapper;
 import com.rideshare.ride.mapper.RideWithAddressMapper;
 import com.rideshare.ride.model.*;
@@ -71,6 +72,10 @@ public class RideService implements IRideService {
     private final String insertRideTagQuery = "INSERT INTO ride.ride_tags(ride_id, tag_id) VALUES(?,?);";
 
     private final String getNoOfRidesQuery = "SELECT COUNT(*) FROM ride.ride WHERE user_id = ?";
+
+    private final String fetchRideRatingForUser = "SELECT ride.ride_id FROM ride.ride_user_ratings WHERE user_id = ?";
+
+    private final String addRideRatingForUser = "INSERT INTO ride.ride_user_ratings(user_id, ride_id, rating_id) VALUES (?,?,?) RETURNING id";
 
     @Override
     public PaginatedEntity<Ride> getPaginated(String token, Integer page, Integer limit) throws Exception {
@@ -259,5 +264,17 @@ public class RideService implements IRideService {
     public Integer getNoOfRides(Integer userId) throws Exception {
         Integer noOfRides = jdbcTemplate.queryForObject(getNoOfRidesQuery, Integer.class, userId);
         return noOfRides;
+    }
+
+    @Override
+    public List<Integer> checkRideForUserIfRated(Integer userId) throws Exception {
+        List<Integer> ridesRatedList = jdbcTemplate.query(fetchRideRatingForUser, new RideIdMapper(), userId);
+        return ridesRatedList;
+    }
+
+    @Override
+    public Integer createRideRatingForUser(Integer rideId, Integer userId, Integer rId) throws Exception {
+        Integer id = jdbcTemplate.queryForObject(addRideRatingForUser, Integer.class, userId, rideId, rId);
+        return id;
     }
 }

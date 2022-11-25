@@ -15,5 +15,10 @@ public interface IRideService {
     com.rideshare.ride.webentity.Ride startRide(String token, Integer rideId, Integer userId) throws Exception;
     com.rideshare.ride.webentity.Ride stopRide(String token, Integer rideId, Integer userId) throws Exception;
     boolean delete(Integer id) throws Exception;
+
+    List<Integer> checkRideForUserIfRated(Integer id) throws Exception;
+
+    Integer createRideRatingForUser(Integer rideId, Integer userId, Integer rId) throws Exception;
+
     Integer getNoOfRides(Integer userId) throws Exception;
 }
