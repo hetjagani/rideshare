@@ -67,7 +67,6 @@ public class StripeServiceFacade {
                 .build();
 
         RequestOptions ephemeralKeyRequestOptions = new RequestOptions.RequestOptionsBuilder()
-                .setStripeVersionOverride("2022-08-01")
                 .build();
 
         EphemeralKey ephemeralKey = EphemeralKey.create(ephemeralKeyParams, ephemeralKeyRequestOptions);

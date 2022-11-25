@@ -2,14 +2,12 @@ package com.rideshare.ride.controller;
 
 import com.rideshare.ride.exception.BadRequestException;
 import com.rideshare.ride.exception.EntityNotFoundException;
+import com.rideshare.ride.model.RequestStatus;
 import com.rideshare.ride.model.User;
 import com.rideshare.ride.security.UserPrincipal;
 import com.rideshare.ride.service.IRequestService;
 import com.rideshare.ride.service.IRideService;
-import com.rideshare.ride.webentity.DeleteSuccess;
-import com.rideshare.ride.webentity.PaginatedEntity;
-import com.rideshare.ride.webentity.Request;
-import com.rideshare.ride.webentity.Ride;
+import com.rideshare.ride.webentity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
@@ -90,16 +88,20 @@ public class RequestController {
 
     }
 
-    @PutMapping(path = "/{requestId}")
-    public ResponseEntity<Request> update(@AuthenticationPrincipal UserPrincipal user, @PathVariable Integer requestId, @RequestBody com.rideshare.ride.model.Request request, @RequestHeader HttpHeaders headers) throws Exception {
+    @PutMapping(path = "/{requestId}/complete")
+    public ResponseEntity<Request> completeRequest(@PathVariable Integer requestId, @RequestBody CompleteRequest requestData, @RequestHeader HttpHeaders headers) throws Exception {
 
         try {
-            String token = headers.get("Authorization").get(0);
-            Integer userId = Integer.parseInt(user.getId());
-            request.setId(requestId);
-            request.setUserId(userId);
+            Request request = requestService.getById(requestId);
 
-            Request updatedRequest = requestService.update(token, request);
+            request.setId(requestId);
+            request.setStatus(RequestStatus.COMPLETED);
+            request.setStripePaymentId(requestData.getStripePaymentId());
+            request.setReceiptUrl(requestData.getReceiptUrl());
+
+            // TODO: update ride capacity
+
+            Request updatedRequest = requestService.update(request);
 
             return ResponseEntity.ok(updatedRequest);
         } catch (Exception e) {

@@ -31,6 +31,8 @@ public class RequestService implements IRequestService {
 
     private final String userRequestByIdQuery = "SELECT * FROM ride.request WHERE user_id = ? AND id = ?;";
 
+    private final String requestByIdQuery = "SELECT * FROM ride.request WHERE AND id = ?;";
+
     private final String allRequestsQuery = "SELECT * FROM ride.request;";
 
     private final String insertQuery = "INSERT INTO ride.request(user_id, ride_id, notes, status, created_at) VALUES(?,?,?,?,?) RETURNING id;";
@@ -131,6 +133,11 @@ public class RequestService implements IRequestService {
     }
 
     @Override
+    public Request getById(Integer id) {
+        return jdbcTemplate.queryForObject(requestByIdQuery, new RequestMapper(), id);
+    }
+
+    @Override
     public Request getById(String token, Integer userId, Integer id) throws Exception {
         Request userRequest = jdbcTemplate.queryForObject(userRequestByIdQuery, new RequestMapper(), userId, id);
         Ride ride = rideService.getById(token, userRequest.getRideId());
@@ -147,8 +154,8 @@ public class RequestService implements IRequestService {
     }
 
     @Override
-    public Request update(String token, com.rideshare.ride.model.Request request) throws Exception {
-        Request existingRequest = getById(token, request.getUserId(), request.getId());
+    public Request update(Request request) throws Exception {
+        Request existingRequest = getById(request.getId());
 
         String stripePaymentId = request.getStripePaymentId() != null ? request.getStripePaymentId() : existingRequest.getStripePaymentId();
         String receiptUrl = request.getReceiptUrl() != null ? request.getReceiptUrl() : existingRequest.getReceiptUrl();
@@ -156,7 +163,7 @@ public class RequestService implements IRequestService {
 
         jdbcTemplate.update(updateQuery, stripePaymentId, receiptUrl, status, request.getId());
 
-        Request updatedRequest = getById(token, request.getUserId(), request.getId());
+        Request updatedRequest = getById(request.getId());
 
         return updatedRequest;
     }

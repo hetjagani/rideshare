@@ -1,5 +1,6 @@
 package com.rideshare.payment.facade;
 
+import com.rideshare.payment.webentity.CompleteRequest;
 import com.rideshare.payment.webentity.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +21,7 @@ public class RideServiceFacade {
     private RestTemplate restTemplate;
 
     public Request getRequest(Integer requestId, String token) throws Exception {
-        String urlEndpoint = String.format("%s/%s/%s", rideUrl, "/rides/requests", requestId);
+        String urlEndpoint = String.format("%s/%s/%s", rideUrl, "rides/requests", requestId);
 
          HttpHeaders headers = new HttpHeaders();
          headers.add("Authorization", token);
@@ -28,6 +29,17 @@ public class RideServiceFacade {
         HttpEntity request = new HttpEntity(headers);
 
         ResponseEntity<Request> response = restTemplate.exchange(urlEndpoint, HttpMethod.GET, request, Request.class);
+
+        return response.getBody();
+    }
+
+    public Request completeRequest(Integer requestId, CompleteRequest requestData) throws Exception {
+        String urlEndpoint = String.format("%s/%s/%s/complete", rideUrl, "rides/requests", requestId);
+
+
+        HttpEntity request = new HttpEntity(requestData);
+
+        ResponseEntity<Request> response = restTemplate.exchange(urlEndpoint, HttpMethod.PUT, request, Request.class);
 
         return response.getBody();
     }

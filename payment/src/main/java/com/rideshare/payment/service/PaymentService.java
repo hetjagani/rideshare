@@ -18,6 +18,7 @@ public class PaymentService implements IPaymentService {
 
     private final String getAllPaginatedQuery = "SELECT * FROM payment.payment WHERE user_id = ? LIMIT ? OFFSET ?;";
     private final String getByIdQuery = "SELECT * FROM payment.payment WHERE id = ?;";
+    private final String getByStripeIdQuery = "SELECT * FROM payment.payment WHERE stripe_payment_id = ?;";
     private final String createQuery = "INSERT INTO payment.payment(request_id, user_id, stripe_customer_id, stripe_payment_id, status) VALUES(?,?,?,?,?) RETURNING id";
     private final String updateStatusQuery = "UPDATE payment.payment SET status = ? WHERE id = ?";
     private final String deleteQuery = "DELETE FROM payment.payment WHERE id = ?";
@@ -31,6 +32,11 @@ public class PaymentService implements IPaymentService {
     @Override
     public Payment getById(Integer id) throws Exception {
         return jdbcTemplate.queryForObject(getByIdQuery, new PaymentMapper(), id);
+    }
+
+    @Override
+    public Payment getByStripePaymentId(String id) throws Exception {
+        return jdbcTemplate.queryForObject(getByStripeIdQuery, new PaymentMapper(), id);
     }
 
     @Override
