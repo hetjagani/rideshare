@@ -49,6 +49,7 @@
     "react-native-snap-carousel": "^4.0.0-beta.6",
     "react-native-svg": "^12.3.0",
     "react-native-tab-view": "^3.3.0",
+    "react-native-tags": "^2.2.1",
     "react-native-toast-message": "^2.1.5",
     "react-native-uuid": "^2.0.1",
     "react-stomp": "^5.1.0",

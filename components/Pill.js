@@ -4,12 +4,12 @@ import { StyleSheet } from 'react-native';
 const Pill = ({ type, text, style }) => {
   const textStyle = StyleSheet.create({
     normal: {
-      borderColor: 'blue',
+      borderColor: '#3366ff',
       borderWidth: 1,
       borderRadius: 10,
       padding: 3,
       margin: 3,
-      color: 'blue',
+      color: '#3366ff',
       fontSize: '16',
     },
     liked: {

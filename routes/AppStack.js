@@ -52,10 +52,7 @@ const tabIcon = (name) => {
 
 const MyRidesNavigator = () => (
   <MyRidesTabs.Navigator tabBar={(props) => <TopTabBar {...props} />}>
-    <MyRidesTabs.Screen
-      name={MY_RIDES_BY_YOU_SCREEN}
-      component={RidesByYou}
-    />
+    <MyRidesTabs.Screen name={MY_RIDES_BY_YOU_SCREEN} component={RidesByYou} />
     <MyRidesTabs.Screen
       name={MY_RIDES_FOR_YOU_SCREEN}
       component={RidesForYou}
@@ -86,11 +83,6 @@ const HomeNavigator = () => {
         component={RidePostDetails}
         options={{ headerShown: true, title: 'Ride Details' }}
       />
-       <Stack.Screen
-        name={MY_RIDES_NAVIGATOR}
-        component={MyRidesNavigator}
-        options={{ headerShown: true, title: 'My Rides' }}
-      />
     </Stack.Navigator>
   );
 };
@@ -117,6 +109,11 @@ const ProfileNavigator = () => {
         name={MY_RATINGS_NAVIGATOR}
         component={MyRatings}
         options={{ headerShown: true, title: 'Your Ratings' }}
+      />
+      <Stack.Screen
+        name={MY_RIDES_NAVIGATOR}
+        component={MyRidesNavigator}
+        options={{ headerShown: true, title: 'My Rides' }}
       />
     </Stack.Navigator>
   );
