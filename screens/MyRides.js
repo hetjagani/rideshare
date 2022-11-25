@@ -14,6 +14,7 @@ import fetchMyRides from '../services/fetchMyRides';
 import Toast from 'react-native-toast-message';
 import Pill from '../components/Pill';
 import Tags from 'react-native-tags';
+import { Rating } from 'react-native-ratings';
 
 const styles = StyleSheet.create({
   container: {
@@ -53,6 +54,9 @@ const cardStatus = (status) => {
 const RidesForYou = () => {
   const [rideListForYou, setRideListForYou] = useState([]);
   const [visibleRatingModal, setVisibleRatingModal] = useState(false);
+  const [likedModal, setLikedModal] = useState([]);
+  const [dislikedModal, setDislikedModal] = useState([]);
+  const [ratingModal, setRatingModal] = useState(0);
 
   const getRidesForYou = async () => {
     fetchMyRides()
@@ -93,9 +97,6 @@ const RidesForYou = () => {
     </View>
   );
 
-  const renderModalInput = (props) => {
-    <Input {...props} placeholder='Place your Text' status='success'></Input>;
-  };
   const renderRidesForYouFooter = (footerProps) => (
     <View
       style={{
@@ -120,49 +121,90 @@ const RidesForYou = () => {
         <Modal
           visible={visibleRatingModal}
           backdropStyle={styles.backdrop}
-          onBackdropPress={() => setVisibleRatingModal(false)}
+          onBackdropPress={() => {
+            setVisibleRatingModal(false);
+            setLikedModal([]);
+            setDislikedModal([]);
+            setRatingModal(0);
+          }}
           style={styles.detailsModal}
         >
           <Card style={styles.detailsCard}>
-            <Text category='s1' style={{ margin: 5 }}>
+            <View style={{ justifyContent: 'center' }}>
+              <Text
+                category='h6'
+                style={{ textAlign: 'center', fontWeight: 'bold' }}
+              >
+                New Rating
+              </Text>
+            </View>
+            <Divider style={{ marginTop: '3%', marginBottom: '3%' }} />
+            <Text category='s1' style={{ margin: 5, fontWeight: 'bold' }}>
               Liked:
             </Text>
             <Tags
-              initialTags={[]}
+              initialTags={likedModal}
               deleteTagOnPress={true}
               textInputProps={{
                 placeholder: 'liked tags enter here',
               }}
-              onChangeTags={(tags) => console.log(tags)}
-              onTagPress={(index, tagLabel, event, deleted) =>
-                console.log(
-                  index,
-                  tagLabel,
-                  event,
-                  deleted ? 'deleted' : 'not deleted'
-                )
-              }
+              onChangeTags={(tags) => setLikedModal(tags)}
               containerStyle={{ justifyContent: 'center' }}
               inputStyle={{
                 backgroundColor: 'white',
-                borderColor: '#3366ff',
+                borderColor: 'green',
                 borderRadius: 50,
                 borderWidth: 1,
+                color: 'green',
+                fontWeight: 'bold',
+                fontSize: '16',
               }}
-              renderTag={({
-                tag,
-                index,
-                onPress,
-                deleteTagOnPress,
-                readonly,
-              }) => (
+              renderTag={({ tag, index, onPress }) => (
                 <TouchableOpacity key={`${tag}-${index}`} onPress={onPress}>
-                  <Pill type={'NORMAL'} text={tag} key={index} />
+                  <Pill type={'LIKED'} text={tag} key={index} />
                 </TouchableOpacity>
               )}
             />
+            <Text category='s1' style={{ margin: 5, fontWeight: 'bold' }}>
+              Disliked:
+            </Text>
+            <Tags
+              initialTags={dislikedModal}
+              deleteTagOnPress={true}
+              textInputProps={{
+                placeholder: 'disliked tags enter here',
+              }}
+              onChangeTags={(tags) => setDislikedModal(tags)}
+              containerStyle={{ justifyContent: 'center' }}
+              inputStyle={{
+                backgroundColor: 'white',
+                borderColor: 'red',
+                borderRadius: 50,
+                borderWidth: 1,
+                color: 'red',
+                fontWeight: 'bold',
+                fontSize: '16',
+              }}
+              renderTag={({ tag, index, onPress }) => (
+                <TouchableOpacity key={`${tag}-${index}`} onPress={onPress}>
+                  <Pill type={'DISLIKED'} text={tag} key={index} />
+                </TouchableOpacity>
+              )}
+            />
+            <Text category='s1' style={{ margin: 5, fontWeight: 'bold' }}>
+              Rating:
+            </Text>
+            <View>
+              <Rating
+                showRating
+                ratingCount={5}
+                fractions={1}
+                onFinishRating={(rating) => setRatingModal(rating)}
+                style={{ paddingVertical: 10 }}
+              />
+            </View>
             <Button status='success' style={{ margin: 5 }}>
-              Confirm Requesting Ride
+              Submit
             </Button>
           </Card>
         </Modal>
