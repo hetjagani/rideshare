@@ -175,6 +175,7 @@ public class RideController {
         myRide.setId(r.getId());
         myRide.setPostId(r.getPostId());
         myRide.setUserId(r.getUserId());
+        myRide.setRideTime(r.getRideTime());
         myRide.setPricePerPerson(r.getPricePerPerson());
         myRide.setNoPassengers(r.getNoPassengers());
         myRide.setCapacity(r.getCapacity());
