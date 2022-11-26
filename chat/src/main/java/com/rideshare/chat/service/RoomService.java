@@ -46,4 +46,10 @@ class RoomService implements IRoomService{
         return affectedRows != 0;
     }
 
+    @Override
+    public Room checkRoom(Integer initiatedBy, Integer initiatedFor) throws Exception {
+        String query = "SELECT * FROM chat.room WHERE (room.initiated_by = ? AND room.initiated_for = ?) OR (room.initiated_by = ? AND room.initiated_for = ?)";
+        Room id = jdbcTemplate.queryForObject(query,new RoomMapper(), initiatedBy, initiatedFor, initiatedFor, initiatedBy);
+        return id;
+    }
 }

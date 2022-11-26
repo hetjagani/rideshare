@@ -6,4 +6,5 @@ import lombok.Data;
 public class MyRide extends Ride {
     private Boolean isPassenger = false;
     private Boolean isRatedByUser = false;
+    private Integer ratingsId = -1;
 }

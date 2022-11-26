@@ -7,6 +7,7 @@ import com.rideshare.ride.model.*;
 import com.rideshare.ride.util.Pagination;
 import com.rideshare.ride.webentity.PaginatedEntity;
 import com.rideshare.ride.webentity.Ride;
+import com.rideshare.ride.webentity.RideRating;
 import facade.UserInfoFacade;
 import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
@@ -73,7 +74,7 @@ public class RideService implements IRideService {
 
     private final String getNoOfRidesQuery = "SELECT COUNT(*) FROM ride.ride WHERE user_id = ?";
 
-    private final String fetchRideRatingForUser = "SELECT ride.ride_id FROM ride.ride_user_ratings WHERE user_id = ?";
+    private final String fetchRideRatingForUser = "SELECT ride_user_ratings.ride_id, ride_user_ratings.rating_id FROM ride.ride_user_ratings WHERE user_id = ?";
 
     private final String addRideRatingForUser = "INSERT INTO ride.ride_user_ratings(user_id, ride_id, rating_id) VALUES (?,?,?) RETURNING id";
 
@@ -267,8 +268,8 @@ public class RideService implements IRideService {
     }
 
     @Override
-    public List<Integer> checkRideForUserIfRated(Integer userId) throws Exception {
-        List<Integer> ridesRatedList = jdbcTemplate.query(fetchRideRatingForUser, new RideIdMapper(), userId);
+    public List<RideRating> checkRideForUserIfRated(Integer userId) throws Exception {
+        List<RideRating> ridesRatedList = jdbcTemplate.query(fetchRideRatingForUser, new RideIdMapper(), userId);
         return ridesRatedList;
     }
 

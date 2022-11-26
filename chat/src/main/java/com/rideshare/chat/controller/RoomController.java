@@ -13,6 +13,7 @@ import com.rideshare.chat.webentity.UserInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -62,6 +63,19 @@ public class RoomController {
     @PostMapping
     public ResponseEntity<Room> createRoom(@AuthenticationPrincipal UserPrincipal userDetails, @RequestBody com.rideshare.chat.webentity.Room room) throws Exception {
         try {
+            Integer userId = Integer.parseInt(userDetails.getId());
+
+            Room checkedRoom = roomService.checkRoom(userId, room.getInitiatedFor());
+
+            if(checkedRoom != null){
+                return ResponseEntity.ok(checkedRoom);
+            }
+
+            Room newRoom = new Room(-1, userId, room.getInitiatedFor());
+            Room created = roomService.createRoom(newRoom);
+
+            return ResponseEntity.ok(created);
+        }catch (EmptyResultDataAccessException ee){
             Integer userId = Integer.parseInt(userDetails.getId());
 
             Room newRoom = new Room(-1, userId, room.getInitiatedFor());

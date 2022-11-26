@@ -2,6 +2,7 @@ package com.rideshare.ride.service;
 
 import com.rideshare.ride.model.Ride;
 import com.rideshare.ride.webentity.PaginatedEntity;
+import com.rideshare.ride.webentity.RideRating;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ public interface IRideService {
     com.rideshare.ride.webentity.Ride stopRide(String token, Integer rideId, Integer userId) throws Exception;
     boolean delete(Integer id) throws Exception;
 
-    List<Integer> checkRideForUserIfRated(Integer id) throws Exception;
+    List<RideRating> checkRideForUserIfRated(Integer id) throws Exception;
 
     Integer createRideRatingForUser(Integer rideId, Integer userId, Integer rId) throws Exception;
 

@@ -11,10 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -102,22 +99,27 @@ public class RideController {
            String token = headers.get("Authorization").get(0);
            Integer userId = Integer.parseInt(user.getId());
 
-           List<Integer> userRidesRated = rideService.checkRideForUserIfRated(userId);
-           HashSet<Integer> userRidesRatedSet = new HashSet<>(userRidesRated);
+           List<RideRating> userRidesRated = rideService.checkRideForUserIfRated(userId);
+           HashMap<Integer,Integer> userRidesRatedSet = new HashMap<>();
+
+           for(RideRating rr : userRidesRated){
+                userRidesRatedSet.put(rr.getRideId(),rr.getRatingId());
+           }
 
            // get all rides of user
            List<MyRide> userRides = rideService.getAll(token).stream().filter(r -> Objects.equals(r.getUserId(), userId)).map((Ride r) -> {
-               return toMyRide(r, false, true);
+               return toMyRide(r, false, false,-1);
            }).collect(Collectors.toList());
 
            // get all completed requests of user
            List<MyRide> userRequestedRides = requestService.getAll(token).stream()
                    .filter(r -> Objects.equals(r.getUserId(), userId) && RequestStatus.COMPLETED.equals(r.getStatus()))
-                   .map((Request r) -> toMyRide(r.getRide(), true, true)).collect(Collectors.toList());
+                   .map((Request r) -> toMyRide(r.getRide(), true, false, -1)).collect(Collectors.toList());
 
             for(MyRide r: userRequestedRides) {
                 if (r != null) {
-                    r.setIsRatedByUser(userRidesRatedSet.contains(r.getId()) ? true : false);
+                    r.setIsRatedByUser(userRidesRatedSet.containsKey(r.getId()) ? true : false);
+                    r.setRatingsId(userRidesRatedSet.get(r.getId()));
                     userRides.add(r);
                 }
             }
@@ -168,7 +170,7 @@ public class RideController {
             throw e;
         }
     }
-    private MyRide toMyRide(Ride r, Boolean isPassenger, boolean isRated) {
+    private MyRide toMyRide(Ride r, Boolean isPassenger, boolean isRated, Integer ratingsId) {
         MyRide myRide = new MyRide();
         myRide.setId(r.getId());
         myRide.setPostId(r.getPostId());
@@ -185,6 +187,7 @@ public class RideController {
         myRide.setStartedAt(r.getStartedAt());
         myRide.setEndedAt(r.getEndedAt());
         myRide.setIsRatedByUser(isRated);
+        myRide.setRatingsId(ratingsId);
         return myRide;
     }
 }
