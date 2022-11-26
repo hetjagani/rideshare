@@ -129,6 +129,11 @@ const ProfileNavigator = () => {
         component={MyRatings}
         options={{ headerShown: true, title: 'Your Ratings' }}
       />
+      <Stack.Screen
+        name={MY_RIDES_NAVIGATOR}
+        component={MyRidesNavigator}
+        options={{ headerShown: true, title: 'My Rides' }}
+      />
     </Stack.Navigator>
   );
 };
