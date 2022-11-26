@@ -14,6 +14,8 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
 } from 'react-native';
+import { MESSAGE_SCREEN, ROOM_NAVIGATOR } from '../routes/AppRoutes';
+
 import { Button, Modal, Divider } from '@ui-kitten/components';
 import fetchMyRides from '../services/fetchMyRides';
 import Toast from 'react-native-toast-message';
@@ -23,8 +25,9 @@ import { Rating } from 'react-native-ratings';
 import createRating from '../services/createRating';
 import fetchRatingById from '../services/fetchRatingById';
 import createRatingPost from '../services/createRatingPost';
-import { Keyboard } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import createRoom from '../services/createRoom';
+import { fetchOtherUserDetails } from '../services/fetchOtherUserDetails';
+import getAuthData from '../contexts/getAuthData';
 
 const styles = StyleSheet.create({
   container: {
@@ -61,13 +64,34 @@ const cardStatus = (status) => {
     : 'success';
 };
 
-const RidesForYou = () => {
+const RidesForYou = ({ navigation }) => {
   const [rideListForYou, setRideListForYou] = useState([]);
   const [visibleRatingModal, setVisibleRatingModal] = useState(false);
   const [likedModal, setLikedModal] = useState([]);
   const [dislikedModal, setDislikedModal] = useState([]);
   const [ratingModal, setRatingModal] = useState(0);
   const [description, setDescription] = useState('');
+  const [currentUser, setCurrentUser] = useState();
+
+  const redirectToChatRoom = async (initiatedFor) => {
+    const r = {
+      initiatedFor,
+    };
+
+    const room = await createRoom(r);
+    const usr = await fetchOtherUserDetails(initiatedFor);
+
+    navigation.navigate(ROOM_NAVIGATOR, {
+      screen: MESSAGE_SCREEN,
+      initial: false,
+      params: {
+        userName: `${usr?.firstName} ${usr?.lastName}`,
+        roomId: room?.id,
+        senderId: parseInt(currentUser),
+        receiverId: initiatedFor,
+      },
+    });
+  };
 
   const addRatingPost = async (ratingsId) => {
     const existingRating = await fetchRatingById(ratingsId);
@@ -161,7 +185,13 @@ const RidesForYou = () => {
         justifyContent: 'space-between',
       }}
     >
-      <Button appearance='outline' status='primary'>
+      <Button
+        appearance='outline'
+        status='primary'
+        onPress={() => {
+          redirectToChatRoom(info?.item?.userId);
+        }}
+      >
         CHAT
       </Button>
 
@@ -366,6 +396,15 @@ const RidesForYou = () => {
   );
 
   useEffect(() => {
+    getAuthData((res) => {
+      return res;
+    })
+      .then((user) => {
+        setCurrentUser(user.userId);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
     getRidesForYou();
   }, []);
 
