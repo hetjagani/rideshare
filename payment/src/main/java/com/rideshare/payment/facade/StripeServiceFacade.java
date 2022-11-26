@@ -64,6 +64,7 @@ public class StripeServiceFacade {
         // Get Ephemeral Key for the customer
         EphemeralKeyCreateParams ephemeralKeyParams = EphemeralKeyCreateParams.builder()
                 .setCustomer(customerId)
+                .setStripeVersion("2022-08-01")
                 .build();
 
         RequestOptions ephemeralKeyRequestOptions = new RequestOptions.RequestOptionsBuilder()
