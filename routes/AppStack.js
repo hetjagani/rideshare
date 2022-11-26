@@ -22,6 +22,7 @@ import {
   MY_RATINGS_NAVIGATOR,
   ADD_POST_SCREEN,
   ADD_POST_RIDE_SCREEN,
+  UPDATE_ROLE_SCREEN,
 } from './AppRoutes';
 import Profile from '../screens/Profile';
 import { UserInfo } from '../screens/UserInfo';
@@ -34,6 +35,7 @@ import { RidesByYou, RidesForYou, TopTabBar } from '../screens/MyRides';
 import MyRatings from '../screens/MyRatings';
 import AddPost from '../screens/AddPost';
 import AddPostRide from '../screens/AddPostRide';
+import UpdateRole from '../screens/UpdateRole';
 
 const MyRidesTabs = createMaterialTopTabNavigator();
 
@@ -128,6 +130,11 @@ const ProfileNavigator = () => {
         name={MY_RATINGS_NAVIGATOR}
         component={MyRatings}
         options={{ headerShown: true, title: 'Your Ratings' }}
+      />
+      <Stack.Screen
+        name={UPDATE_ROLE_SCREEN}
+        component={UpdateRole}
+        options={{ headerShown: true, title: 'Update Role' }}
       />
       <Stack.Screen
         name={MY_RIDES_NAVIGATOR}
