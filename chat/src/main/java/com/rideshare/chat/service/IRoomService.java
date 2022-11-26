@@ -15,6 +15,7 @@ public interface IRoomService {
 
     Room createRoom(Room object) throws Exception;
 
+    Room checkRoom(Integer initiatedBy, Integer initiatedFor) throws Exception;
     boolean delete(Integer roomId) throws Exception;
 
 }

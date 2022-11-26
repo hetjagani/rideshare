@@ -11,9 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -25,6 +23,7 @@ public class RideController {
 
     @Autowired
     IRequestService requestService;
+
 
     @GetMapping(path="/noOfRides/{userId}")
     public ResponseEntity<Integer> getNoOfRidesForUser(@PathVariable Integer userId) throws Exception{
@@ -100,18 +99,27 @@ public class RideController {
            String token = headers.get("Authorization").get(0);
            Integer userId = Integer.parseInt(user.getId());
 
+           List<RideRating> userRidesRated = rideService.checkRideForUserIfRated(userId);
+           HashMap<Integer,Integer> userRidesRatedSet = new HashMap<>();
+
+           for(RideRating rr : userRidesRated){
+                userRidesRatedSet.put(rr.getRideId(),rr.getRatingId());
+           }
+
            // get all rides of user
            List<MyRide> userRides = rideService.getAll(token).stream().filter(r -> Objects.equals(r.getUserId(), userId)).map((Ride r) -> {
-               return toMyRide(r, false);
+               return toMyRide(r, false, false,-1);
            }).collect(Collectors.toList());
 
            // get all completed requests of user
            List<MyRide> userRequestedRides = requestService.getAll(token).stream()
                    .filter(r -> Objects.equals(r.getUserId(), userId) && RequestStatus.COMPLETED.equals(r.getStatus()))
-                   .map((Request r) -> toMyRide(r.getRide(), true)).collect(Collectors.toList());
+                   .map((Request r) -> toMyRide(r.getRide(), true, false, -1)).collect(Collectors.toList());
 
             for(MyRide r: userRequestedRides) {
                 if (r != null) {
+                    r.setIsRatedByUser(userRidesRatedSet.containsKey(r.getId()) ? true : false);
+                    r.setRatingsId(userRidesRatedSet.get(r.getId()));
                     userRides.add(r);
                 }
             }
@@ -151,11 +159,23 @@ public class RideController {
         }
     }
 
-    private MyRide toMyRide(Ride r, Boolean isPassenger) {
+    @PostMapping(path="/{id}/ratings/{rId}")
+    public ResponseEntity<Integer> createRideRatingForUser(@PathVariable Integer id, @PathVariable Integer rId, @AuthenticationPrincipal UserPrincipal user, @RequestHeader HttpHeaders headers) throws Exception {
+        try{
+            Integer userId = Integer.parseInt(user.getId());
+            Integer createdId = rideService.createRideRatingForUser(id, userId, rId);
+            return ResponseEntity.ok(createdId);
+        }catch(Exception e){
+            e.printStackTrace();
+            throw e;
+        }
+    }
+    private MyRide toMyRide(Ride r, Boolean isPassenger, boolean isRated, Integer ratingsId) {
         MyRide myRide = new MyRide();
         myRide.setId(r.getId());
         myRide.setPostId(r.getPostId());
         myRide.setUserId(r.getUserId());
+        myRide.setRideTime(r.getRideTime());
         myRide.setPricePerPerson(r.getPricePerPerson());
         myRide.setNoPassengers(r.getNoPassengers());
         myRide.setCapacity(r.getCapacity());
@@ -167,7 +187,8 @@ public class RideController {
         myRide.setIsPassenger(isPassenger);
         myRide.setStartedAt(r.getStartedAt());
         myRide.setEndedAt(r.getEndedAt());
+        myRide.setIsRatedByUser(isRated);
+        myRide.setRatingsId(ratingsId);
         return myRide;
     }
-
 }

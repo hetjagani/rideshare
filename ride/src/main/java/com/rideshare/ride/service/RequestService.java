@@ -31,7 +31,7 @@ public class RequestService implements IRequestService {
 
     private final String userRequestByIdQuery = "SELECT * FROM ride.request WHERE user_id = ? AND id = ?;";
 
-    private final String requestByIdQuery = "SELECT * FROM ride.request WHERE AND id = ?;";
+    private final String requestByIdQuery = "SELECT * FROM ride.request WHERE id = ?;";
 
     private final String allRequestsQuery = "SELECT * FROM ride.request;";
 
