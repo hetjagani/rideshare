@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface ITagsService {
     PaginatedEntity<Tag> searchTags(String query, Integer page, Integer limit) throws Exception;
+    List<Tag> getByName(String query) throws Exception;
     Tag create(Tag tag) throws Exception;
     boolean delete(Integer id) throws Exception;
 }

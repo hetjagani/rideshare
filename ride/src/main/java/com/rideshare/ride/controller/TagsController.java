@@ -5,8 +5,11 @@ import com.rideshare.ride.service.ITagsService;
 import com.rideshare.ride.webentity.DeleteSuccess;
 import com.rideshare.ride.webentity.PaginatedEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/tags")
@@ -28,9 +31,17 @@ public class TagsController {
     @PostMapping
     public ResponseEntity<Tag> createTag(@RequestBody Tag tag) throws Exception {
         try {
+            List<Tag> searchedTag = tagsService.getByName(tag.getName());
+            if(searchedTag.size() > 0) {
+                return ResponseEntity.ok(searchedTag.get(0));
+            }
             Tag createdTag = tagsService.create(tag);
             return ResponseEntity.ok(createdTag);
-        } catch (Exception e) {
+        } catch (EmptyResultDataAccessException e) {
+            Tag createdTag = tagsService.create(tag);
+            return ResponseEntity.ok(createdTag);
+        }
+        catch (Exception e) {
             e.printStackTrace();
             throw e;
         }
