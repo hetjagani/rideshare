@@ -15,6 +15,7 @@ const Profile = ({ navigation }) => {
   const [ratings, setRatings] = useState(0.0);
   const [months, setMonths] = useState(0.0);
   const isFocused = useIsFocused();
+  const [isDriver, setIsDriver] = useState(false);
 
   const getUserDetails = () => {
     fetchUserDetails().then((res) => {
@@ -44,6 +45,14 @@ const Profile = ({ navigation }) => {
       setRatings(res?.data?.rating);
       setRides(res?.data?.rides);
       setMonths(res?.data?.months);
+
+      if (res?.data?.roles?.length > 0) {
+        res?.data?.roles.forEach((role) => {
+          if (role === 'DRIVER') {
+            setIsDriver(true);
+          }
+        });
+      }
     });
   };
 
@@ -131,7 +140,7 @@ const Profile = ({ navigation }) => {
           <Text style={{ fontWeight: 'bold' }}>Account Settings</Text>
         </Layout>
         <Layout>
-          <ProfileMenuItems navigation={navigation} />
+          <ProfileMenuItems navigation={navigation} isDriver={isDriver} />
         </Layout>
       </Layout>
     </View>
