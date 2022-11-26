@@ -6,3 +6,5 @@ export const AWS_SECRET_KEY = '75T/Rd+aGi6EKXA3pidPegH5/8lhSGxUcHmXNN6W';
 export const AWS_REGION = 'us-east-1';
 export const AWS_BUCKET = 'rideshare-sjsu';
 export const MAPS_API_KEY = 'AIzaSyCwW5sS2iPAJt64l1f-sVJEU_yQZrySKYI';
+export const RADAR_API_URL = 'https://api.radar.io/v1/geocode/forward';
+export const RADAR_API_SECRET = 'prj_live_pk_28418693ef82984452e3ca63dbf96c212bf61496';
