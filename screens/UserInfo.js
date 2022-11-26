@@ -8,6 +8,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Button as Save,
+  ScrollView,
 } from 'react-native';
 import { fetchUserDetails } from '../services/fetchUserDetails';
 import updateUserDetails from '../services/updateUserDetails';
@@ -174,7 +175,7 @@ export const UserInfo = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView enabled behavior="position">
+    <KeyboardAvoidingView enabled behavior="padding" style={{ height: '100%' }}>
       <View
         style={{
           height: '100%',

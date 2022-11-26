@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-  ScrollView,
   RefreshControl,
   FlatList,
   ActivityIndicator,
@@ -15,6 +14,7 @@ import {
   TopNavigation,
   TopNavigationAction,
 } from '@ui-kitten/components';
+import { ADD_POST_SCREEN } from '../routes/AppRoutes';
 
 function Home({ navigation }) {
   const [postList, setPostList] = useState([]);
@@ -29,7 +29,12 @@ function Home({ navigation }) {
 
   const AddIcon = (props) => <Icon name="plus-outline" {...props} />;
 
-  const topNavigation = () => <TopNavigationAction icon={AddIcon} />;
+  const topNavigation = () => (
+    <TopNavigationAction
+      icon={AddIcon}
+      onPress={() => navigation.navigate(ADD_POST_SCREEN)}
+    />
+  );
 
   const fetchPostsApi = () => {
     fetchPosts({ page, limit: 2 })

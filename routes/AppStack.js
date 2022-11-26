@@ -20,6 +20,8 @@ import {
   MY_RIDES_BY_YOU_SCREEN,
   MY_RIDES_FOR_YOU_SCREEN,
   MY_RATINGS_NAVIGATOR,
+  ADD_POST_SCREEN,
+  ADD_POST_RIDE_SCREEN,
 } from './AppRoutes';
 import Profile from '../screens/Profile';
 import { UserInfo } from '../screens/UserInfo';
@@ -30,6 +32,8 @@ import MyPosts from '../screens/MyPosts';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { RidesByYou, RidesForYou, TopTabBar } from '../screens/MyRides';
 import MyRatings from '../screens/MyRatings';
+import AddPost from '../screens/AddPost';
+import AddPostRide from '../screens/AddPostRide';
 
 const MyRidesTabs = createMaterialTopTabNavigator();
 
@@ -82,6 +86,21 @@ const HomeNavigator = () => {
         name={RIDE_POST_DETAILS}
         component={RidePostDetails}
         options={{ headerShown: true, title: 'Ride Details' }}
+      />
+      <Stack.Screen
+        name={MY_RIDES_NAVIGATOR}
+        component={MyRidesNavigator}
+        options={{ headerShown: true, title: 'My Rides' }}
+      />
+      <Stack.Screen
+        name={ADD_POST_SCREEN}
+        component={AddPost}
+        options={{ headerShown: true, title: 'Add Post' }}
+      />
+      <Stack.Screen
+        name={ADD_POST_RIDE_SCREEN}
+        component={AddPostRide}
+        options={{ headerShown: true, title: 'Add Ride' }}
       />
     </Stack.Navigator>
   );
