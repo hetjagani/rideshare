@@ -28,6 +28,8 @@ import createRatingPost from '../services/createRatingPost';
 import createRoom from '../services/createRoom';
 import { fetchOtherUserDetails } from '../services/fetchOtherUserDetails';
 import getAuthData from '../contexts/getAuthData';
+import startRide from '../services/startRide';
+import endRide from '../services/endRide';
 
 const styles = StyleSheet.create({
   container: {
@@ -350,9 +352,7 @@ const RidesForYou = ({ navigation }) => {
       <View style={{ marginTop: -9, marginLeft: -15 }}>
         <Text category='s3'>
           <Text category='s1'>Expected Start Time:</Text>{' '}
-          {info?.item?.rideTime
-            ? new Date(info?.item?.rideTime).toLocaleString
-            : 'N/A'}
+          {info?.item?.rideTime ? info?.item?.rideTime : 'N/A'}
         </Text>
         <Text category='s3'>
           <Text category='s1'>Ride started on:</Text>{' '}
@@ -419,152 +419,180 @@ const RidesForYou = ({ navigation }) => {
 };
 
 const RidesByYou = () => {
-  const [rideList, setRideList] = useState([]);
-  const [displayRide, setDisplayRide] = useState({});
-  const [visible, setVisible] = useState(false);
+  const [rideListByYou, setRideListByYou] = useState([]);
 
-  const getMyRides = () => {
+  const doStartRide = async (rideId) => {
+    startRide(rideId)
+      .then((res) => {
+        console.log('start', res);
+        Toast.show({
+          type: 'success',
+          text1: 'Ride Started',
+        });
+        getRidesByYou();
+      })
+      .catch((err) =>
+        Toast.show({ type: 'error', text1: 'Cannot Start Ride' })
+      );
+  };
+
+  const doEndRide = async (rideId) => {
+    endRide(rideId)
+      .then((res) => {
+        Toast.show({
+          type: 'success',
+          text1: 'Ride Ended',
+        });
+        getRidesByYou();
+      })
+      .catch((err) => Toast.show({ type: 'error', text1: 'Cannot End Ride' }));
+  };
+
+  const getRidesByYou = async () => {
     fetchMyRides()
       .then((res) => {
-        const responseList = res?.nodes;
-        var listRides = [];
-        for (const item of responseList) {
-          if (item.isPassenger === false) {
-            listRides.push(item);
-          }
-        }
-        setRideList(listRides);
+        setRideListByYou(
+          res?.nodes?.filter((item) => {
+            return item?.isPassenger == false;
+          })
+        );
       })
-      .catch((err) => {
+      .catch((err) =>
         Toast.show({
           type: 'error',
-          text1: 'Enable to fetch rides.',
+          text1: 'Enable to fetch rides by you.',
           text2: err,
-        });
-      });
+        })
+      );
   };
 
   useEffect(() => {
-    getMyRides(false);
+    getRidesByYou();
   }, []);
 
-  const openDetailsModal = ({ ride }) => {
-    setDisplayRide(ride);
-    setVisible(true);
-  };
-
-  const renderListItem = ({ item, index }) => {
-    const styles = StyleSheet.create({
-      container: {
-        display: 'flex',
-        borderRadius: 5,
-        borderColor: '#444',
-        backgroundColor: '#ddd',
-        padding: 10,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        margin: 5,
-      },
-      tags: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        marginVertical: 5,
-      },
-    });
-
-    const date = new Date(item?.createdAt);
-
-    return (
-      <View style={styles.container}>
-        <View>
-          <Text category='s1'>{`Ride to ${item?.endAddress?.street}`}</Text>
-          <Text category='s2'>
-            {date.toDateString()} - ${item.pricePerPerson}
-          </Text>
-          <View style={styles.tags}>
-            {item?.tags?.map((tag) => (
-              <Pill text={tag?.name} key={tag?.id} />
-            ))}
-          </View>
-        </View>
-        <View>
-          <Button onPress={() => openDetailsModal({ ride: item })}>
-            Details
-          </Button>
-        </View>
-      </View>
-    );
-  };
-
-  const DetailRow = ({ title, value }) => {
-    const styles = StyleSheet.create({
-      container: {
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-      },
-    });
-    return (
-      <View style={styles.container}>
-        <Text category='s1'>{title}</Text>
-        <Text
-          category='p1'
-          style={{ display: 'flex', flexWrap: 'wrap', overflow: 'scroll' }}
-        >
-          {value}
+  const renderRidesByYouHeader = (headerProps, info) => (
+    <View
+      {...headerProps}
+      style={{ marginTop: 8, marginLeft: 8, marginBottom: 8 }}
+    >
+      <View>
+        <Text category='h6' style={{ fontWeight: 'bold' }}>
+          Ride: #{info?.item?.id}
+        </Text>
+        <Text category='s1'>
+          <Text style={{ fontWeight: 'bold' }}>To:</Text>{' '}
+          {info?.item?.endAddress?.street}, {info?.item?.endAddress?.city}
+        </Text>
+        <Text category='s1'>
+          <Text style={{ fontWeight: 'bold' }}>From:</Text>{' '}
+          {info?.item?.startAddress?.street}, {info?.item?.startAddress?.city}
         </Text>
       </View>
-    );
-  };
+    </View>
+  );
+
+  const renderRidesByYouFooter = (footerProps, info) => (
+    <View
+      {...footerProps}
+      style={{
+        padding: '2%',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-around',
+      }}
+    >
+      {Date.now() + 3600000 >= info?.item?.rideTime &&
+        info?.item?.startedAt == null && (
+          <Button
+            appearance='outline'
+            status='primary'
+            onPress={() => doStartRide(info?.item?.id)}
+          >
+            START RIDE
+          </Button>
+        )}
+
+      {info?.item?.status == 'ACTIVE' && (
+        <Button
+          appearance='outline'
+          status='danger'
+          onPress={() => doEndRide(info?.item?.id)}
+        >
+          END RIDE
+        </Button>
+      )}
+
+      {info?.item?.status == 'COMPLETED' && (
+        <View style={{ margin: '2%' }}>
+          <Text style={{ fontWeight: 'bold' }}>Ride Completed</Text>
+        </View>
+      )}
+    </View>
+  );
+
+  const renderItemBy = (info) => (
+    <Card
+      style={styles.item}
+      status={cardStatus(info?.item?.status)}
+      header={(headerProps) => renderRidesByYouHeader(headerProps, info)}
+      footer={(footerProps) => renderRidesByYouFooter(footerProps, info)}
+    >
+      <View style={{ marginTop: -9, marginLeft: -15 }}>
+        <Text category='s3'>
+          <Text category='s1'>Expected Start Time:</Text>{' '}
+          {info?.item?.rideTime
+            ? new Date(info?.item?.rideTime).toLocaleString('PST')
+            : 'N/A'}
+          {console.log(info?.item?.rideTime)}
+        </Text>
+        <Text category='s3'>
+          <Text category='s1'>Ride started on:</Text>{' '}
+          {info?.item?.startedAt
+            ? new Date(info?.item?.startedAt).toLocaleString()
+            : 'N/A'}
+        </Text>
+        <Text category='s3'>
+          <Text category='s1'>Ride ended on:</Text>{' '}
+          {info?.item?.endedAt
+            ? new Date(info?.item?.endedAt).toLocaleString()
+            : 'N/A'}
+        </Text>
+        <Text category='s3'>
+          <Text category='s1'>Status:</Text>{' '}
+          <Text style={{ color: '#3366ff', fontWeight: 'bold' }}>
+            {info?.item?.status ? info?.item?.status : 'N/A'}
+          </Text>
+        </Text>
+        <Text category='s3'>
+          <Text category='s1'>Price:</Text>{' '}
+          <Text style={{ fontWeight: 'bold' }}>
+            ${info?.item?.pricePerPerson}
+          </Text>
+        </Text>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            marginVertical: 5,
+            marginBottom: -5,
+          }}
+        >
+          {info?.item?.tags?.map((tag) => (
+            <Pill type={'NORMAL'} text={tag?.name} key={tag?.id} />
+          ))}
+        </View>
+      </View>
+    </Card>
+  );
 
   return (
-    <View style={styles.container}>
-      <List data={rideList} renderItem={renderListItem} />
-
-      <Modal
-        visible={visible}
-        backdropStyle={styles.backdrop}
-        onBackdropPress={() => setVisible(false)}
-        style={styles.detailsModal}
-      >
-        <Card style={styles.detailsCard}>
-          <DetailRow title={'Status:'} value={displayRide?.status} />
-          <DetailRow
-            title={'Price:'}
-            value={`$${displayRide?.pricePerPerson}`}
-          />
-          <DetailRow
-            title={'Capacity:'}
-            value={`${displayRide?.noPassengers - displayRide?.capacity}/${
-              displayRide?.noPassengers
-            }`}
-          />
-          <DetailRow
-            title={'Created At:'}
-            value={new Date(displayRide?.createdAt).toDateString()}
-          />
-          <Divider />
-          <DetailRow
-            title={'Start Address:'}
-            value={`${displayRide?.startAddress?.street}, ${displayRide?.startAddress?.line}, ${displayRide?.startAddress?.city} ${displayRide?.startAddress?.state}`}
-          />
-          <DetailRow
-            title={'End Address:'}
-            value={`${displayRide?.endAddress?.street}, ${displayRide?.endAddress?.line}, ${displayRide?.endAddress?.city} ${displayRide?.endAddress?.state}`}
-          />
-          <Divider />
-          <View style={styles.tags}>
-            {displayRide?.tags?.map((tag) => (
-              <Pill text={tag?.name} key={tag?.id} />
-            ))}
-          </View>
-        </Card>
-      </Modal>
-    </View>
+    <List
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      data={rideListByYou}
+      renderItem={renderItemBy}
+    />
   );
 };
 
