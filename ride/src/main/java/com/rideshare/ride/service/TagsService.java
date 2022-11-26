@@ -19,6 +19,7 @@ public class TagsService implements ITagsService {
 
     private final String getByIdQuery = "SELECT * FROM \"ride\".\"tags\" WHERE id = ?";
     private final String searchQuery = "SELECT * FROM \"ride\".\"tags\" WHERE name LIKE ? LIMIT ? OFFSET ?;";
+    private final String searchOneQuery = "SELECT * FROM \"ride\".\"tags\" WHERE name = ?;";
     private final String insertQuery = "INSERT INTO \"ride\".\"tags\"(name) VALUES (?) RETURNING id;";
     private final String deleteQuery = "DELETE FROM ride.tags WHERE id = ?";
 
@@ -34,6 +35,11 @@ public class TagsService implements ITagsService {
         List<Tag> tagList = jdbcTemplate.query(searchQuery, new TagsMapper(), query, limit, offset);
 
         return new PaginatedEntity<>(tagList, page, limit);
+    }
+
+    @Override
+    public List<Tag> getByName(String query) throws Exception {
+        return jdbcTemplate.query(searchOneQuery, new TagsMapper(), query);
     }
 
     @Override

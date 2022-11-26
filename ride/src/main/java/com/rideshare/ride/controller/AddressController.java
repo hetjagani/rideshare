@@ -5,6 +5,7 @@ import com.rideshare.ride.service.IAddressService;
 import com.rideshare.ride.webentity.DeleteSuccess;
 import com.rideshare.ride.webentity.PaginatedEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,9 +40,18 @@ public class AddressController {
     @PostMapping
     public ResponseEntity<Address> addAddress(@RequestBody Address address) throws Exception {
         try {
+            Address searchedAdd = addressService.searchOneAddress(address.getLatitude(), address.getLongitude());
+            if(searchedAdd != null){
+                return ResponseEntity.ok(searchedAdd);
+            }
+
             Address createdAddress = addressService.create(address);
             return ResponseEntity.ok(createdAddress);
-        } catch (Exception e) {
+        } catch (EmptyResultDataAccessException e) {
+            Address createdAddress = addressService.create(address);
+            return ResponseEntity.ok(createdAddress);
+        }
+        catch (Exception e) {
             e.printStackTrace();
             throw e;
         }

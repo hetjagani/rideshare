@@ -21,6 +21,8 @@ public class AddressService implements IAddressService {
             "FROM ride.address \n" +
             "WHERE street LIKE ? OR line LIKE ? OR city LIKE ? OR state LIKE ? OR country LIKE ? OR zipcode LIKE ?\n" +
             "LIMIT ? OFFSET ?";
+
+    private final String searchOneQuery = "SELECT * FROM ride.address WHERE lat = ? AND long = ? LIMIT 1";
     private final String insertQuery = "INSERT INTO ride.address(street, line, city, state, country, zipcode, lat, long)\n" +
             "VALUES(?, ?, ?, ?, ?, ?, ?, ?) RETURNING id;";
 
@@ -53,6 +55,11 @@ public class AddressService implements IAddressService {
         query = "%" + query + "%";
         List<Address> searchedAddresses = jdbcTemplate.query(searchQuery, new AddressMapper(), query, query, query, query, query, query, limit, offset);
         return new PaginatedEntity<>(searchedAddresses, page, limit);
+    }
+
+    @Override
+    public Address searchOneAddress(Float lat, Float lon) throws Exception {
+        return jdbcTemplate.queryForObject(searchOneQuery, new AddressMapper(), lat, lon);
     }
 
     @Override
