@@ -136,6 +136,11 @@ const ProfileNavigator = () => {
         component={UpdateRole}
         options={{ headerShown: true, title: 'Update Role' }}
       />
+      <Stack.Screen
+        name={MY_RIDES_NAVIGATOR}
+        component={MyRidesNavigator}
+        options={{ headerShown: true, title: 'My Rides' }}
+      />
     </Stack.Navigator>
   );
 };
