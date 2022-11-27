@@ -38,7 +38,6 @@ const AuthProvider = ({ children }) => {
   const signIn = async (authData) => {
     try {
       const _authData = await login(authData);
-      console.log(_authData)
 
       if (_authData?.response?.status == 401) {
         Toast.show({

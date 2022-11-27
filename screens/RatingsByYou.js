@@ -56,7 +56,7 @@ const RatingsByYou = (props) => {
 
   const renderHeaderBy = (headerProps, info) => (
     <View {...headerProps}>
-      <Text category="h6">
+      <Text category='h6'>
         {info?.item?.user?.firstName + ' ' + info?.item?.user?.lastName}
       </Text>
     </View>

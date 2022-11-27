@@ -9,9 +9,9 @@ import { useNavigation } from '@react-navigation/native';
 import { RIDE_POST_DETAILS } from '../routes/AppRoutes';
 import { Rating } from 'react-native-ratings';
 
-const StarIcon = (props) => <Icon {...props} name='star' />;
-const StarOutlineIcon = (props) => <Icon {...props} name='star-outline' />;
-const InfoIcon = (props) => <Icon {...props} name='info-outline' />;
+const StarIcon = (props) => <Icon {...props} name="star" />;
+const StarOutlineIcon = (props) => <Icon {...props} name="star-outline" />;
+const InfoIcon = (props) => <Icon {...props} name="info-outline" />;
 
 const CardHeader = ({ text, postType }) => {
   const headerStyles = StyleSheet.create({
@@ -28,7 +28,7 @@ const CardHeader = ({ text, postType }) => {
   });
   return (
     <View style={headerStyles.layout}>
-      <Text style={headerStyles.title} category='s1'>
+      <Text style={headerStyles.title} category="s1">
         {postType == 'RIDE' ? '🚗' : postType == 'RATING' ? '⭐' : '📜'} {text}
       </Text>
     </View>
@@ -216,7 +216,7 @@ const PostCard = ({ post, updateLike, navigation }) => {
             }}
           >
             <Carousel
-              layout='default'
+              layout="default"
               ref={isCarousel}
               data={post.imageList}
               renderItem={renderImageItem}
@@ -245,33 +245,36 @@ const PostCard = ({ post, updateLike, navigation }) => {
               inactiveDotOpacity={0.4}
               inactiveDotScale={0.6}
             />
+          </View>
+        )}
+        {post?.description && (
+          <View style={cardStyle.description}>
+            <Divider />
+            <Text category="s1" style={{ marginBottom: 10, marginTop: 10 }}>
+              {post.description}
+            </Text>
             <Divider />
           </View>
         )}
         {/* Description */}
-        <View style={cardStyle.description}>
-          <Text category='s1'>{post.description}</Text>
-        </View>
 
         {post.type == 'RIDE' && (
           // Ride Info
           <View>
-            <Divider />
-
             <View style={cardStyle.ride}>
               {/* <Text category="s1">Ride:</Text> */}
               <Text>
-                <Text category='s1'>From:</Text>{' '}
+                <Text category="s1">From:</Text>{' '}
                 {post.ride?.startAddress?.street}
               </Text>
               <Text>
-                <Text category='s1'>To:</Text> {post.ride?.endAddress?.street}
+                <Text category="s1">To:</Text> {post.ride?.endAddress?.street}
               </Text>
               <Text>
-                <Text category='s1'>Price:</Text> ${post.ride?.pricePerPerson}
+                <Text category="s1">Price:</Text> ${post.ride?.pricePerPerson}
               </Text>
               <Text>
-                <Text category='s1'>Capacity:</Text>{' '}
+                <Text category="s1">Capacity:</Text>{' '}
                 {post.ride?.noPassengers - post.ride?.capacity}/
                 {post.ride?.noPassengers}
               </Text>
@@ -286,7 +289,6 @@ const PostCard = ({ post, updateLike, navigation }) => {
 
         {post.type == 'RATING' && (
           <View>
-            <Divider />
             <View
               style={{
                 ...cardStyle.rideTags,
@@ -295,12 +297,12 @@ const PostCard = ({ post, updateLike, navigation }) => {
               }}
             >
               {post?.rating?.liked?.map((l, index) => (
-                <Pill type='LIKED' text={l} key={index} />
+                <Pill type="LIKED" text={l} key={index} />
               ))}
             </View>
             <View style={{ ...cardStyle.rideTags, justifyContent: 'center' }}>
               {post?.rating?.disliked?.map((l, index) => (
-                <Pill type='DISLIKED' text={l} key={index} />
+                <Pill type="DISLIKED" text={l} key={index} />
               ))}
             </View>
             {/* <Divider /> */}
@@ -308,7 +310,7 @@ const PostCard = ({ post, updateLike, navigation }) => {
               <Rating
                 readonly
                 showReadOnlyText={false}
-                type='custom'
+                type="custom"
                 showRating
                 ratingTextColor={'#000000'}
                 fractions={1}

@@ -13,6 +13,7 @@ import {
   View,
   TouchableOpacity,
   KeyboardAvoidingView,
+  Image,
 } from 'react-native';
 import { MESSAGE_SCREEN, ROOM_NAVIGATOR } from '../routes/AppRoutes';
 
@@ -162,14 +163,14 @@ const RidesForYou = ({ navigation }) => {
       style={{ marginTop: 8, marginLeft: 8, marginBottom: 8 }}
     >
       <View>
-        <Text category='h6' style={{ fontWeight: 'bold' }}>
+        <Text category="h6" style={{ fontWeight: 'bold' }}>
           Ride: #{info?.item?.id}
         </Text>
-        <Text category='s1'>
+        <Text category="s1">
           <Text style={{ fontWeight: 'bold' }}>To:</Text>{' '}
           {info?.item?.endAddress?.street}, {info?.item?.endAddress?.city}
         </Text>
-        <Text category='s1'>
+        <Text category="s1">
           <Text style={{ fontWeight: 'bold' }}>From:</Text>{' '}
           {info?.item?.startAddress?.street}, {info?.item?.startAddress?.city}
         </Text>
@@ -188,8 +189,8 @@ const RidesForYou = ({ navigation }) => {
       }}
     >
       <Button
-        appearance='outline'
-        status='primary'
+        appearance="outline"
+        status="primary"
         onPress={() => {
           redirectToChatRoom(info?.item?.userId);
         }}
@@ -200,8 +201,8 @@ const RidesForYou = ({ navigation }) => {
       <Layout>
         {info?.item?.status == 'COMPLETED' && (
           <Button
-            appearance='outline'
-            status='primary'
+            appearance="outline"
+            status="primary"
             onPress={() => setVisibleRatingModal(true)}
             disabled={info?.item?.isRatedByUser == true}
           >
@@ -223,14 +224,14 @@ const RidesForYou = ({ navigation }) => {
           <Card style={{ ...styles.detailsCard }}>
             <View style={{ justifyContent: 'center' }}>
               <Text
-                category='h6'
+                category="h6"
                 style={{ textAlign: 'center', fontWeight: 'bold' }}
               >
                 New Rating
               </Text>
             </View>
             <Divider style={{ marginTop: '3%', marginBottom: '3%' }} />
-            <Text category='s1' style={{ margin: 5, fontWeight: 'bold' }}>
+            <Text category="s1" style={{ margin: 5, fontWeight: 'bold' }}>
               Liked:
             </Text>
             <Tags
@@ -256,7 +257,7 @@ const RidesForYou = ({ navigation }) => {
                 </TouchableOpacity>
               )}
             />
-            <Text category='s1' style={{ margin: 5, fontWeight: 'bold' }}>
+            <Text category="s1" style={{ margin: 5, fontWeight: 'bold' }}>
               Disliked:
             </Text>
             <Tags
@@ -282,7 +283,7 @@ const RidesForYou = ({ navigation }) => {
                 </TouchableOpacity>
               )}
             />
-            <Text category='s1' style={{ margin: 5, fontWeight: 'bold' }}>
+            <Text category="s1" style={{ margin: 5, fontWeight: 'bold' }}>
               Rating:
             </Text>
             <View style={{ alignItems: 'center' }}>
@@ -298,17 +299,17 @@ const RidesForYou = ({ navigation }) => {
                 style={{}}
               />
             </View>
-            <Text category='s1' style={{ margin: 5, fontWeight: 'bold' }}>
+            <Text category="s1" style={{ margin: 5, fontWeight: 'bold' }}>
               Description:
             </Text>
             <Input
               multiline={true}
               textStyle={{ maxHeight: 64 }}
               onChangeText={(input) => setDescription(input)}
-              placeholder='Enter your description here'
+              placeholder="Enter your description here"
             ></Input>
             <Button
-              status='success'
+              status="success"
               style={{ margin: 5, marginTop: '5%' }}
               onPress={() => {
                 addRating(info?.item?.userId, info?.item?.id)
@@ -330,8 +331,8 @@ const RidesForYou = ({ navigation }) => {
 
       {info?.item?.isRatedByUser == true && (
         <Button
-          appearance='outline'
-          status='primary'
+          appearance="outline"
+          status="primary"
           onPress={() => {
             addRatingPost(info?.item?.ratingsId);
           }}
@@ -350,30 +351,30 @@ const RidesForYou = ({ navigation }) => {
       footer={(footerProps) => renderRidesForYouFooter(footerProps, info)}
     >
       <View style={{ marginTop: -9, marginLeft: -15 }}>
-        <Text category='s3'>
-          <Text category='s1'>Expected Start Time:</Text>{' '}
+        <Text>
+          <Text category="s1">Expected Start Time:</Text>{' '}
           {info?.item?.rideTime ? info?.item?.rideTime : 'N/A'}
         </Text>
-        <Text category='s3'>
-          <Text category='s1'>Ride started on:</Text>{' '}
+        <Text>
+          <Text category="s1">Ride started on:</Text>{' '}
           {info?.item?.startedAt
             ? new Date(info?.item?.startedAt).toLocaleString()
             : 'N/A'}
         </Text>
-        <Text category='s3'>
-          <Text category='s1'>Ride ended on:</Text>{' '}
+        <Text>
+          <Text category="s1">Ride ended on:</Text>{' '}
           {info?.item?.endedAt
             ? new Date(info?.item?.endedAt).toLocaleString()
             : 'N/A'}
         </Text>
-        <Text category='s3'>
-          <Text category='s1'>Status:</Text>{' '}
+        <Text>
+          <Text category="s1">Status:</Text>{' '}
           <Text style={{ color: '#3366ff', fontWeight: 'bold' }}>
             {info?.item?.status ? info?.item?.status : 'N/A'}
           </Text>
         </Text>
-        <Text category='s3'>
-          <Text category='s1'>Price:</Text>{' '}
+        <Text>
+          <Text category="s1">Price:</Text>{' '}
           <Text style={{ fontWeight: 'bold' }}>
             ${info?.item?.pricePerPerson}
           </Text>
@@ -476,14 +477,14 @@ const RidesByYou = () => {
       style={{ marginTop: 8, marginLeft: 8, marginBottom: 8 }}
     >
       <View>
-        <Text category='h6' style={{ fontWeight: 'bold' }}>
+        <Text category="h6" style={{ fontWeight: 'bold' }}>
           Ride: #{info?.item?.id}
         </Text>
-        <Text category='s1'>
+        <Text category="s1">
           <Text style={{ fontWeight: 'bold' }}>To:</Text>{' '}
           {info?.item?.endAddress?.street}, {info?.item?.endAddress?.city}
         </Text>
-        <Text category='s1'>
+        <Text category="s1">
           <Text style={{ fontWeight: 'bold' }}>From:</Text>{' '}
           {info?.item?.startAddress?.street}, {info?.item?.startAddress?.city}
         </Text>
@@ -496,37 +497,77 @@ const RidesByYou = () => {
       {...footerProps}
       style={{
         padding: '2%',
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'space-around',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
       }}
     >
-      {Date.now() + 3600000 >= info?.item?.rideTime &&
-        info?.item?.startedAt == null && (
+      {info?.item?.requests && info?.item?.requests.length > 0 && (
+        <View
+          style={{
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginBottom: 15,
+            width: '100%',
+          }}
+        >
+          <Text category="s1">Ride Requested By: </Text>
+          <View style={{ display: 'flex', flexDirection: 'row' }}>
+            {info?.item?.requests.map((req) => (
+              <View style={{ display: 'flex', alignItems: 'center', margin: 2, padding: 2 }}>
+                <Image
+                  style={{ height: 30, width: 30, borderRadius: 30 }}
+                  source={
+                    req?.user?.profileImage
+                      ? { uri: req?.user?.profileImage }
+                      : require('../assets/img_avatar.png')
+                  }
+                />
+                <Text>
+                  {req?.user?.firstName}
+                </Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      )}
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: '100%',
+        }}
+      >
+        {Date.now() + 3600000 >= info?.item?.rideTime &&
+          info?.item?.startedAt == null && (
+            <Button
+              appearance="outline"
+              status="primary"
+              onPress={() => doStartRide(info?.item?.id)}
+            >
+              START RIDE
+            </Button>
+          )}
+
+        {info?.item?.status == 'ACTIVE' && (
           <Button
-            appearance='outline'
-            status='primary'
-            onPress={() => doStartRide(info?.item?.id)}
+            appearance="outline"
+            status="danger"
+            onPress={() => doEndRide(info?.item?.id)}
           >
-            START RIDE
+            END RIDE
           </Button>
         )}
 
-      {info?.item?.status == 'ACTIVE' && (
-        <Button
-          appearance='outline'
-          status='danger'
-          onPress={() => doEndRide(info?.item?.id)}
-        >
-          END RIDE
-        </Button>
-      )}
-
-      {info?.item?.status == 'COMPLETED' && (
-        <View style={{ margin: '2%' }}>
-          <Text style={{ fontWeight: 'bold' }}>Ride Completed</Text>
-        </View>
-      )}
+        {info?.item?.status == 'COMPLETED' && (
+          <View style={{ margin: '2%' }}>
+            <Text style={{ fontWeight: 'bold' }}>Ride Completed</Text>
+          </View>
+        )}
+      </View>
     </View>
   );
 
@@ -538,33 +579,33 @@ const RidesByYou = () => {
       footer={(footerProps) => renderRidesByYouFooter(footerProps, info)}
     >
       <View style={{ marginTop: -9, marginLeft: -15 }}>
-        <Text category='s3'>
-          <Text category='s1'>Expected Start Time:</Text>{' '}
+        <Text>
+          <Text category="s1">Expected Start Time:</Text>{' '}
           {info?.item?.rideTime
             ? new Date(info?.item?.rideTime).toLocaleString('PST')
             : 'N/A'}
           {console.log(info?.item?.rideTime)}
         </Text>
-        <Text category='s3'>
-          <Text category='s1'>Ride started on:</Text>{' '}
+        <Text>
+          <Text category="s1">Ride started on:</Text>{' '}
           {info?.item?.startedAt
             ? new Date(info?.item?.startedAt).toLocaleString()
             : 'N/A'}
         </Text>
-        <Text category='s3'>
-          <Text category='s1'>Ride ended on:</Text>{' '}
+        <Text>
+          <Text category="s1">Ride ended on:</Text>{' '}
           {info?.item?.endedAt
             ? new Date(info?.item?.endedAt).toLocaleString()
             : 'N/A'}
         </Text>
-        <Text category='s3'>
-          <Text category='s1'>Status:</Text>{' '}
+        <Text>
+          <Text category="s1">Status:</Text>{' '}
           <Text style={{ color: '#3366ff', fontWeight: 'bold' }}>
             {info?.item?.status ? info?.item?.status : 'N/A'}
           </Text>
         </Text>
-        <Text category='s3'>
-          <Text category='s1'>Price:</Text>{' '}
+        <Text>
+          <Text category="s1">Price:</Text>{' '}
           <Text style={{ fontWeight: 'bold' }}>
             ${info?.item?.pricePerPerson}
           </Text>
@@ -602,8 +643,8 @@ const TopTabBar = ({ navigation, state }) => (
     onSelect={(index) => navigation.navigate(state.routeNames[index])}
     style={{ height: 50 }}
   >
-    <Tab title='Ride By You' />
-    <Tab title='Ride For You' />
+    <Tab title="Ride By You" />
+    <Tab title="Ride For You" />
   </TabBar>
 );
 

@@ -6,7 +6,6 @@ const fetchPaymentSheetParams = async (requestId) => {
     data: { requestId },
   })
     .then((response) => {
-      console.log("Checkout Response: ", response.data);
       return response.data;
     })
     .catch((err) => {

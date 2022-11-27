@@ -22,7 +22,6 @@ const Room = ({ navigation }) => {
 
   const getRooms = async () => {
     const res = await userRoomsInfo();
-    console.log(res.data);
     if (res?.response?.status == 401) {
       Toast.show({
         type: 'error',
@@ -75,7 +74,7 @@ const Room = ({ navigation }) => {
                 <View style={ChatStyles.userimgwrapper}>
                   <Image
                     style={ChatStyles.userimg}
-                    source={{ uri: item.profileImage }}
+                    source={item.profileImage != "" ? { uri: item.profileImage } : require('../assets/img_avatar.png')}
                   />
                 </View>
                 <View style={ChatStyles.textsection}>

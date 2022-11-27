@@ -124,7 +124,6 @@ const AddPostRide = ({ navigation }) => {
 
   const createStartAddressBE = () => {
     addAddress(startAddressBE).then((res) => {
-      console.log(res?.data)
       setStartAddressBE(res?.data);
     });
   };

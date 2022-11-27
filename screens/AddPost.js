@@ -1,5 +1,6 @@
 import {
   Button,
+  Card,
   Divider,
   Input,
   Layout,
@@ -28,6 +29,7 @@ import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { ADD_POST_RIDE_SCREEN, HOME_SCREEN } from '../routes/AppRoutes';
 import { addPost } from '../services/addPost';
 import { useIsFocused } from '@react-navigation/native';
+import Pill from '../components/Pill';
 
 const LoadingIndicator = (props) => (
   <View style={[props.style]}>
@@ -53,6 +55,9 @@ const AddPost = ({ navigation, route }) => {
     },
     saveButton: {
       width: '80%',
+    },
+    item: {
+      marginVertical: 4,
     },
   });
 
@@ -173,10 +178,8 @@ const AddPost = ({ navigation, route }) => {
       type: postType,
       refId: route?.params?.refId,
     };
-    console.log('Adding Post:', data);
     addPost(data).then((res) => {
       if (res?.response && res?.response.status != 200) {
-        console.log(res?.response);
         Toast.show({
           type: 'error',
           text1: 'Error Adding Post',
@@ -189,6 +192,13 @@ const AddPost = ({ navigation, route }) => {
     });
   };
 
+  const cardStatus = (status) => {
+    return status === 'CREATED'
+      ? 'primary'
+      : status === 'ACTIVE'
+      ? 'warning'
+      : 'success';
+  };
   return (
     <KeyboardAvoidingView behavior="position">
       <Layout style={styles.container}>
@@ -287,8 +297,65 @@ const AddPost = ({ navigation, route }) => {
           </Button>
         </View>
 
+        {route?.params?.refId && (
+          <Card
+            style={styles.item}
+            status={cardStatus(ride?.status)}
+            // header={(headerProps) => renderRidesByYouHeader(headerProps, info)}
+            // footer={(footerProps) => renderRidesByYouFooter(footerProps, info)}
+          >
+            <View style={{ marginTop: -9, marginLeft: -15 }}>
+              <Text>
+                <Text category="s1">Expected Start Time:</Text>{' '}
+                {ride?.rideTime
+                  ? new Date(ride?.rideTime).toLocaleString('PST')
+                  : 'N/A'}
+              </Text>
+              <Text>
+                <Text category="s1">Ride started on:</Text>{' '}
+                {ride?.startedAt
+                  ? new Date(ride?.startedAt).toLocaleString()
+                  : 'N/A'}
+              </Text>
+              <Text>
+                <Text category="s1">Ride ended on:</Text>{' '}
+                {ride?.endedAt
+                  ? new Date(ride?.endedAt).toLocaleString()
+                  : 'N/A'}
+              </Text>
+              <Text>
+                <Text category="s1">Status:</Text>{' '}
+                <Text style={{ color: '#3366ff', fontWeight: 'bold' }}>
+                  {ride?.status ? ride?.status : 'N/A'}
+                </Text>
+              </Text>
+              <Text>
+                <Text category="s1">Price:</Text>{' '}
+                <Text style={{ fontWeight: 'bold' }}>
+                  ${ride?.pricePerPerson}
+                </Text>
+              </Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  marginVertical: 5,
+                  marginBottom: -5,
+                }}
+              >
+                {ride?.tags?.map((tag) => (
+                  <Pill type={'NORMAL'} text={tag?.name} key={tag?.id} />
+                ))}
+              </View>
+            </View>
+          </Card>
+        )}
+
         <View style={styles.saveButton}>
-          <Button onPress={() => savePost()}>Save Post</Button>
+          <Button onPress={() => savePost()} status="success">
+            Save Post
+          </Button>
         </View>
       </Layout>
     </KeyboardAvoidingView>
