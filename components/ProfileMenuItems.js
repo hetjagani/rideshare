@@ -1,5 +1,5 @@
 import { Layout, Menu, MenuItem, Icon } from '@ui-kitten/components';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import {
@@ -7,14 +7,20 @@ import {
   MY_RIDES_NAVIGATOR,
   USER_INFO_SCREEN,
   MY_RATINGS_NAVIGATOR,
+  UPDATE_ROLE_SCREEN,
 } from '../routes/AppRoutes';
+import getAuthData from '../contexts/getAuthData';
+import { useIsFocused } from '@react-navigation/native';
 
-export const ProfileMenuItems = ({ navigation, props }) => {
+export const ProfileMenuItems = ({ navigation, isDriver }) => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
+
   const auth = useAuth();
   const signOut = () => {
     auth.signOut();
   };
+
+  const isFocused = useIsFocused();
 
   const styles = StyleSheet.create({
     container: {
@@ -27,36 +33,42 @@ export const ProfileMenuItems = ({ navigation, props }) => {
     },
   });
 
-  const ForwardIcon = (props) => <Icon {...props} name='arrow-ios-forward' />;
+  const ForwardIcon = (props) => <Icon {...props} name="arrow-ios-forward" />;
   return (
-    <Layout style={styles.container} level='1'>
+    <Layout style={styles.container} level="1">
       <Menu
         style={styles.menu}
         selectedIndex={selectedIndex}
         onSelect={(index) => setSelectedIndex(index)}
       >
         <MenuItem
-          title='Account Info'
+          title="Account Info"
           accessoryRight={ForwardIcon}
           onPress={() => navigation.navigate(USER_INFO_SCREEN)}
         />
-        <MenuItem title='Update Role' accessoryRight={ForwardIcon} />
+        {isDriver === false ? (
+          <MenuItem
+            title="Become Driver"
+            accessoryRight={ForwardIcon}
+            onPress={() => navigation.navigate(UPDATE_ROLE_SCREEN)}
+          />
+        ) : null}
         <MenuItem
-          title='My Posts'
+          title="My Posts"
           accessoryRight={ForwardIcon}
           onPress={() => navigation.navigate(MY_POSTS_SCREEN)}
         />
         <MenuItem
-          title='My Rides'
+          title="My Rides"
           accessoryRight={ForwardIcon}
           onPress={() => navigation.navigate(MY_RIDES_NAVIGATOR)}
         />
         <MenuItem
-          title='My Ratings'
+          title="My Ratings"
           accessoryRight={ForwardIcon}
           onPress={() => navigation.navigate(MY_RATINGS_NAVIGATOR)}
         />
-        <MenuItem title='Sign Out' onPress={signOut} />
+        <MenuItem title="Sign Out" onPress={signOut} />
       </Menu>
     </Layout>
   );
