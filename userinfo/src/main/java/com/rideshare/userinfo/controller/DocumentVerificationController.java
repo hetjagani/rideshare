@@ -14,6 +14,7 @@ import com.rideshare.userinfo.webentity.DeleteSuccess;
 import com.rideshare.userinfo.webentity.DocumentVerificationRequest;
 import com.rideshare.userinfo.webentity.IdAnalyzerRequest;
 import com.rideshare.userinfo.webentity.IdAnalyzerResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequestMapping(path = "/documents")
 public class DocumentVerificationController {
@@ -92,6 +94,7 @@ public class DocumentVerificationController {
             }
 
             if(!idAnalyzerResponse.getVerification().getPassed()) {
+                log.info(idAnalyzerResponse.toString());
                 throw new BadRequestException("License verification failed");
             }
 

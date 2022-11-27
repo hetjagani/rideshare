@@ -52,6 +52,7 @@ public class WebhookController {
             switch (event.getType()) {
                 case PAYMENT_SUCCEEDED:
                     PaymentIntent paymentIntent = (PaymentIntent) stripeObject;
+                    log.info(paymentIntent.toString());
 
                     // set payment status to complete
                     Payment payment = paymentService.getByStripePaymentId(paymentIntent.getId());
@@ -60,7 +61,6 @@ public class WebhookController {
                     // set request status to complete in Ride Service
                     Integer requestId = payment.getRequestId();
                     CompleteRequest completeRequest = new CompleteRequest();
-                    completeRequest.setReceiptUrl(paymentIntent.getLatestChargeObject().getReceiptUrl());
                     completeRequest.setStripePaymentId(paymentIntent.getId());
 
                     rideService.completeRequest(requestId, completeRequest);
