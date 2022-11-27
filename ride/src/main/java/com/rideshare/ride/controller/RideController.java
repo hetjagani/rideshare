@@ -5,6 +5,7 @@ import com.rideshare.ride.security.UserPrincipal;
 import com.rideshare.ride.service.IRequestService;
 import com.rideshare.ride.service.IRideService;
 import com.rideshare.ride.webentity.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequestMapping(path = "/rides")
 public class RideController {
@@ -106,15 +108,18 @@ public class RideController {
                 userRidesRatedSet.put(rr.getRideId(),rr.getRatingId());
            }
 
+           Map<Integer, List<Request>> requestMap = requestService.getCompletedRequests(token);
+           log.info(requestMap.toString());
+
            // get all rides of user
            List<MyRide> userRides = rideService.getAll(token).stream().filter(r -> Objects.equals(r.getUserId(), userId)).map((Ride r) -> {
-               return toMyRide(r, false, false,-1);
+               return toMyRide(r, false, false,-1, requestMap.get(r.getId()));
            }).collect(Collectors.toList());
 
            // get all completed requests of user
            List<MyRide> userRequestedRides = requestService.getAll(token).stream()
                    .filter(r -> Objects.equals(r.getUserId(), userId) && RequestStatus.COMPLETED.equals(r.getStatus()))
-                   .map((Request r) -> toMyRide(r.getRide(), true, false, -1)).collect(Collectors.toList());
+                   .map((Request r) -> toMyRide(r.getRide(), true, false, -1, requestMap.get(r.getRideId()))).collect(Collectors.toList());
 
             for(MyRide r: userRequestedRides) {
                 if (r != null) {
@@ -170,7 +175,7 @@ public class RideController {
             throw e;
         }
     }
-    private MyRide toMyRide(Ride r, Boolean isPassenger, boolean isRated, Integer ratingsId) {
+    private MyRide toMyRide(Ride r, Boolean isPassenger, boolean isRated, Integer ratingsId, List<Request> requests) {
         MyRide myRide = new MyRide();
         myRide.setId(r.getId());
         myRide.setPostId(r.getPostId());
@@ -189,6 +194,7 @@ public class RideController {
         myRide.setEndedAt(r.getEndedAt());
         myRide.setIsRatedByUser(isRated);
         myRide.setRatingsId(ratingsId);
+        myRide.setRequests(requests);
         return myRide;
     }
 }

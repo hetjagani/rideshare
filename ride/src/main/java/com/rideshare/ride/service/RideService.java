@@ -178,7 +178,6 @@ public class RideService implements IRideService {
 
     @Override
     public Ride getById(String token, Integer id) throws Exception {
-        // TODO: get information of user who has created this ride
         Ride rideWithAddress = jdbcTemplate.queryForObject(getByIdQuery, new RideWithAddressMapper(), id);
 
         List<RideTag> rideTags = jdbcTemplate.query(rideTagsWithId, new RideTagMapper(), id);
@@ -188,6 +187,21 @@ public class RideService implements IRideService {
         List<Tag> tagList = rideTags.stream().map((RideTag rt) -> rt.getTag()).collect(Collectors.toList());
         rideWithAddress.setTags(tagList);
         rideWithAddress.setUser(userInfoMap.get(rideWithAddress.getUserId()));
+        if(rideWithAddress.getEndedAt() != null && rideWithAddress.getStartedAt() != null)
+            rideWithAddress.setDuration(Duration.between(rideWithAddress.getStartedAt().toInstant(), rideWithAddress.getEndedAt().toInstant()));
+
+        return rideWithAddress;
+    }
+
+    @Override
+    public Ride getById(Integer id) throws Exception {
+        // TODO: get information of user who has created this ride
+        Ride rideWithAddress = jdbcTemplate.queryForObject(getByIdQuery, new RideWithAddressMapper(), id);
+
+        List<RideTag> rideTags = jdbcTemplate.query(rideTagsWithId, new RideTagMapper(), id);
+
+        List<Tag> tagList = rideTags.stream().map((RideTag rt) -> rt.getTag()).collect(Collectors.toList());
+        rideWithAddress.setTags(tagList);
         if(rideWithAddress.getEndedAt() != null && rideWithAddress.getStartedAt() != null)
             rideWithAddress.setDuration(Duration.between(rideWithAddress.getStartedAt().toInstant(), rideWithAddress.getEndedAt().toInstant()));
 
@@ -208,9 +222,9 @@ public class RideService implements IRideService {
     }
 
     @Override
-    public Ride updateCapacity(String token, Integer rideId, Integer capacity) throws Exception {
+    public Ride updateCapacity(Integer rideId, Integer capacity) throws Exception {
         jdbcTemplate.update(updateCapacityQuery, capacity, rideId);
-        Ride updatedRide = getById(token, rideId);
+        Ride updatedRide = getById(rideId);
         return updatedRide;
     }
 

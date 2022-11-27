@@ -2,10 +2,12 @@ package com.rideshare.ride.service;
 
 import com.rideshare.ride.mapper.RequestMapper;
 import com.rideshare.ride.model.RequestStatus;
+import com.rideshare.ride.model.UserInfo;
 import com.rideshare.ride.util.Pagination;
 import com.rideshare.ride.webentity.PaginatedEntity;
 import com.rideshare.ride.webentity.Request;
 import com.rideshare.ride.webentity.Ride;
+import facade.UserInfoFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -13,9 +15,7 @@ import org.springframework.util.StringUtils;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +26,9 @@ public class RequestService implements IRequestService {
 
     @Autowired
     private IRideService rideService;
+
+    @Autowired
+    private UserInfoFacade userInfoFacade;
 
     private final String userRequestsQuery = "SELECT * FROM ride.request WHERE user_id = ? LIMIT ? OFFSET ?;";
 
@@ -45,6 +48,11 @@ public class RequestService implements IRequestService {
 
     private final String searchQueryT = "SELECT * FROM ride.request WHERE ";
 
+    private final String getCompletedRequestsForRideQuery = "SELECT request.* FROM ride.ride, ride.request\n" +
+            "WHERE ride.id = request.ride_id AND request.status = 'COMPLETED' AND ride_id = ?;";
+
+    private final String getCompletedRequestsQuery = "SELECT request.* FROM ride.ride, ride.request\n" +
+            "WHERE ride.id = request.ride_id AND request.status = 'COMPLETED';";
 
     private Map<Integer, Ride> getRideIdMap(String token) throws Exception {
         List<Ride> allRides = rideService.getAll(token);
@@ -172,5 +180,37 @@ public class RequestService implements IRequestService {
     public boolean delete(Integer requestId, Integer userId) throws Exception {
         Integer affectedRows = jdbcTemplate.update(deleteQuery, requestId, userId);
         return affectedRows != 0;
+    }
+
+    @Override
+    public List<Request> getCompletedRequestsForRide(Integer rideId) throws Exception {
+        return jdbcTemplate.query(getCompletedRequestsForRideQuery, new RequestMapper(), rideId);
+    }
+
+    @Override
+    public Map<Integer, List<Request>> getCompletedRequests(String token) throws Exception {
+        Map<Integer, UserInfo> userMap = userInfoFacade.getAllUsers(token);
+
+        List<Request> allCompletedRequest = jdbcTemplate.query(getCompletedRequestsQuery, new RequestMapper());
+
+        for(Request r: allCompletedRequest) {
+            r.setUser(userMap.get(r.getUserId()));
+        }
+
+        Map<Integer, List<Request>> requestMap = new HashMap<>();
+
+        for(Request r: allCompletedRequest) {
+            if(!requestMap.containsKey(r.getRideId())) {
+                List<Request> list = new ArrayList<>();
+                list.add(r);
+                requestMap.put(r.getRideId(), list);
+            } else {
+                List<Request> rl = requestMap.get(r.getRideId());
+                rl.add(r);
+                requestMap.put(r.getRideId(), rl);
+            }
+        }
+
+        return requestMap;
     }
 }

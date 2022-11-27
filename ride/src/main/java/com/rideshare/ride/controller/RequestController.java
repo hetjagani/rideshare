@@ -99,9 +99,11 @@ public class RequestController {
             request.setStripePaymentId(requestData.getStripePaymentId());
             request.setReceiptUrl(requestData.getReceiptUrl());
 
-            // TODO: update ride capacity
+            Ride requestedRide = rideService.getById(request.getRideId());
+            Ride updatedRide = rideService.updateCapacity(request.getRideId(), requestedRide.getCapacity() - 1);
 
             Request updatedRequest = requestService.update(request);
+            updatedRequest.setRide(updatedRide);
 
             return ResponseEntity.ok(updatedRequest);
         } catch (Exception e) {

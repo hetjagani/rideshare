@@ -1,5 +1,6 @@
 package com.rideshare.ride.webentity;
 
+import com.rideshare.ride.model.UserInfo;
 import lombok.Data;
 
 import java.sql.Timestamp;
@@ -16,4 +17,5 @@ public class Request {
     private String notes;
     private String status;
     private Timestamp createdAt;
+    private UserInfo user;
 }

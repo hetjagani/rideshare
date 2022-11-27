@@ -4,6 +4,7 @@ import com.rideshare.ride.webentity.PaginatedEntity;
 import com.rideshare.ride.webentity.Request;
 
 import java.util.List;
+import java.util.Map;
 
 public interface IRequestService {
     PaginatedEntity<Request> getPaginated(String token, Integer userId, Integer page, Integer limit) throws Exception;
@@ -14,4 +15,8 @@ public interface IRequestService {
     Request create(String token, com.rideshare.ride.model.Request request) throws Exception;
     Request update(Request request) throws Exception;
     boolean delete(Integer requestId, Integer userId) throws Exception;
+
+    List<Request> getCompletedRequestsForRide(Integer rideId) throws Exception;
+
+    Map<Integer, List<Request>> getCompletedRequests(String token) throws Exception;
 }

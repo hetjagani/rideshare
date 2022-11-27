@@ -11,8 +11,9 @@ public interface IRideService {
     PaginatedEntity<com.rideshare.ride.webentity.Ride> searchRides(String token, Integer userId, Integer page, Integer limit) throws Exception;
     List<com.rideshare.ride.webentity.Ride> getAll(String token) throws Exception;
     com.rideshare.ride.webentity.Ride getById(String token, Integer id) throws Exception;
+    com.rideshare.ride.webentity.Ride getById(Integer id) throws Exception;
     com.rideshare.ride.webentity.Ride create(String token, Ride ride) throws Exception;
-    com.rideshare.ride.webentity.Ride updateCapacity(String token, Integer rideId, Integer capacity) throws Exception;
+    com.rideshare.ride.webentity.Ride updateCapacity(Integer rideId, Integer capacity) throws Exception;
     com.rideshare.ride.webentity.Ride startRide(String token, Integer rideId, Integer userId) throws Exception;
     com.rideshare.ride.webentity.Ride stopRide(String token, Integer rideId, Integer userId) throws Exception;
     boolean delete(Integer id) throws Exception;
