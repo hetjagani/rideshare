@@ -134,7 +134,7 @@ const ProfileNavigator = () => {
       <Stack.Screen
         name={UPDATE_ROLE_SCREEN}
         component={UpdateRole}
-        options={{ headerShown: true, title: 'Update Role' }}
+        options={{ headerShown: true, title: 'Upload License' }}
       />
       <Stack.Screen
         name={MY_RIDES_NAVIGATOR}

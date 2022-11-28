@@ -49,6 +49,7 @@ axiosInstance.interceptors.response.use(
     }
     if (err && err.response && err.response.data && err.response.data.message) {
       if (typeof err.response.data.message === 'string') {
+        console.log(err.response.data)
         Toast.show({
           type: 'error',
           text1: 'Oops!',

@@ -5,6 +5,9 @@ import { StripeProvider } from "@stripe/stripe-react-native";
 import { STRIPE_PUBLISHABLE_KEY } from "./Config";
 import { EvaIconsPack } from "@ui-kitten/eva-icons";
 import Toast from "react-native-toast-message";
+import { LogBox } from "react-native";
+
+LogBox.ignoreAllLogs();
 
 export default function App() {
   return (
