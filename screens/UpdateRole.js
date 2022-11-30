@@ -47,7 +47,7 @@ export default function UpdateRole({ navigation }) {
       <Spinner size="small" />
     </View>
   );
-  const updateRoleToDriver = () => {
+  const updateRoleToDriver = (imageBase64) => {
     setIsVerifying(true);
     const dataObj = {
       address,
@@ -55,7 +55,7 @@ export default function UpdateRole({ navigation }) {
       name,
       postcode,
       dob: dob.toString().substring(0, 10),
-      fileBase64: image,
+      fileBase64: imageBase64,
     };
 
     verifyDocument(dataObj).then((res) => {
@@ -88,7 +88,7 @@ export default function UpdateRole({ navigation }) {
 
     if (!result.cancelled) {
       setImage(result.base64);
-      updateRoleToDriver();
+      updateRoleToDriver(result.base64);
     }
   };
 
