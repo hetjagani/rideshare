@@ -70,6 +70,7 @@ public class DocumentVerificationController {
                                                    @AuthenticationPrincipal UserPrincipal userDetails,
                                                    @RequestHeader HttpHeaders headers) throws Exception {
         try {
+            log.info(request.toString());
             Integer userId = Integer.parseInt(userDetails.getId());
             String token = headers.get("Authorization").get(0);
             // post license data to ID Analyzer service
@@ -84,14 +85,14 @@ public class DocumentVerificationController {
             IdAnalyzerResponse idAnalyzerResponse = idAnalyzerService.verifyLicense(idAnalyzerRequest);
 
             // check response against the user data
-            UserInfo loggedInUser = userInfoService.getById(token, userId);
-            String loggedInUserName = loggedInUser.getFirstName().replaceAll("\\s", "").toLowerCase();
-            String verificationFirstName = idAnalyzerResponse.getResult().getFirstName().replaceAll("\\s", "").toLowerCase();
-            String verificationUserName = idAnalyzerResponse.getResult().getFullName().replaceAll("\\s", "").toLowerCase();
+            // UserInfo loggedInUser = userInfoService.getById(token, userId);
+            // String loggedInUserName = loggedInUser.getFirstName().replaceAll("\\s", "").toLowerCase();
+            // String verificationFirstName = idAnalyzerResponse.getResult().getFirstName().replaceAll("\\s", "").toLowerCase();
+            // String verificationUserName = idAnalyzerResponse.getResult().getFullName().replaceAll("\\s", "").toLowerCase();
 
-            if(!(loggedInUserName.contains(verificationFirstName) || verificationUserName.contains(loggedInUserName))) {
-                throw new ForbiddenException("Please upload your own license");
-            }
+            // if(!(loggedInUserName.contains(verificationFirstName) || verificationUserName.contains(loggedInUserName))) {
+            //     throw new ForbiddenException("Please upload your own license");
+            // }
 
             if(!idAnalyzerResponse.getVerification().getPassed()) {
                 log.info(idAnalyzerResponse.toString());
